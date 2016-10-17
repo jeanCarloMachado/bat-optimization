@@ -3,6 +3,7 @@
 #define MAX_ITERATIONS 100
 #define BATS 40
 
+//pulse rate and frequency are correlated
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 100
 
@@ -45,9 +46,8 @@ float current_position()
 void initialize_bats()
 {
     for (int i = 0; i < BATS; i ++ ) {
-    //set random loudness and pulse emission
-    //loudness tipically 1-2
-    //emission rate around 0
+        bat[i].pulse_rate = 0;
+        bat[i].loudness = 1;
     }
 }
 
@@ -55,7 +55,6 @@ int main() {
 
 
     initialize_bats();
-    //  give a random frequency for each
     for (int i = 0; i < MAX_ITERATIONS ; i ++) {
         //generate new solution by adjusting frequency and updating velocities 
 
