@@ -19,6 +19,7 @@
 #define GAMMA = 0.9
 
 int average_loudness = 0;
+bat** solutions;
 
 struct bat {
    float pulse_rate;
@@ -29,7 +30,7 @@ struct bat {
 float current_frequency()
 {
     float beta = random_vector; //0-1
-    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * BETA
+    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta
 }
 
 float current_velocity()
@@ -64,7 +65,7 @@ int main() {
         }
 
         //generate a new solution by flying randomly
-        if (rand < Ai && solution > bestSolution) {
+        if (rand < average_loudness && solution > bestSolution) {
             //accept new solutions 
             //increase ri and reduce Ai
         }
