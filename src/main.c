@@ -26,19 +26,13 @@
 struct bat {
 	int pulse_rate; //or frequency
 	int loudness;
-	int frequency;
+	double frequency;
 	int position[DIMENSIONS];
 	int velocity[DIMENSIONS];
 };
 
 /* int average_loudness = 0; */
 /* bat** solutions; */
-
-/* int current_frequency() */
-/* { */
-/*     int beta = random_vector; //0-1 */
-/*     return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta */
-/* } */
 
 /* int current_velocity() */
 /* { */
@@ -52,28 +46,36 @@ struct bat {
 /* } */
 
 void initialize_bats(struct bat bats[]);
-int my_random(int, int);
-int my_seed(void);
+double my_random(int, int);
+void my_seed(void);
 void print_bat(struct bat bat);
 struct bat get_best(struct bat bats[]);
 int sphere(int x[], int d);
 void print_bat_collection(struct bat bats[]);
 double objective_function (struct bat bat);
+double generate_frequency();
 
 int main() {
 
 	struct bat bats[BATS];
+	struct bat best;
 
 	my_seed();
 
 	initialize_bats(bats);
 
-	struct bat current_best = get_best(bats);	
-	print_bat_collection(bats);
-	printf("BEST BAT\n");
-	print_bat(current_best);
+	best = get_best(bats);	
+	/* print_bat_collection(bats); */
+	/* printf("BEST BAT\n"); */
+	/* print_bat(best); */
 
-	/* for (int i = 0; i < MAX_ITERATIONS ; i ++) { */
+	for (int i = 0; i < MAX_ITERATIONS ; i ++) {
+		for (int j = 0; i < BATS; j++) {
+			bats[j].frequency = generate_frequency(bats[j]);
+			
+			print_bat(bats[i]);
+			exit (0);
+
 	/*     //generate new solution by adjusting frequency and updating velocities */ 
 
 	/*     if (rand > ri) { */
@@ -88,10 +90,19 @@ int main() {
 	/*     } */
 
 	/*     //rank the bats and find the current best */
-	/* } */
+		}
+	}
 	/* //results and vizualization */
 	return 0;
 }
+
+double generate_frequency()
+{
+	double beta = my_random(0,1);
+	printf("%f", beta);
+	return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
+}
+
 
 
 void print_bat_collection(struct bat bats[])
@@ -108,6 +119,9 @@ void print_bat(struct bat bat)
 	printf("Bat Position\n");
 	printf("[0]: %i \n", bat.position[0]);
 	printf("[1]: %i \n", bat.position[1]);
+
+	printf("Bat Frequency: %f\n", bat.frequency);
+
 }
 
 struct bat get_best(struct bat bats[])
@@ -128,13 +142,17 @@ struct bat get_best(struct bat bats[])
 	return current_best_bat;
 }
 
-int my_seed(void)
+void my_seed(void)
 {
 	srand(time(NULL));
 }
 
-int my_random(int inferior, int superior)
+double my_random(int inferior, int superior)
 {
+	if (inferior == 0 && superior == 1) {
+		return (double)rand() / (double)RAND_MAX ;
+	}
+
 	return rand () % superior;
 }
 
