@@ -24,35 +24,31 @@
 #define SEARCH_BOUNDRY 100
 
 struct bat {
-	int pulse_rate; //or frequency
-	int loudness;
+	double pulse_rate; //or frequency
+	double loudness;
 	double frequency;
-	int position[DIMENSIONS];
-	int velocity[DIMENSIONS];
+	double position[DIMENSIONS];
+	double velocity[DIMENSIONS];
 };
 
-/* int average_loudness = 0; */
+/* double average_loudness = 0; */
 /* bat** solutions; */
 
-/* int current_velocity() */
-/* { */
-/*     return  previous_velocity + (previous_position - best_position) * current_frequency() */
-/* } */
 
-
-/* int current_position() */
+/* double current_position() */
 /* { */
 /*     return previous_position + current_velocity(); */
 /* } */
 
 void initialize_bats(struct bat bats[]);
-double my_random(int, int);
+double my_random(double, double);
 void my_seed(void);
 void print_bat(struct bat bat);
 struct bat get_best(struct bat bats[]);
-int sphere(int x[], int d);
+double sphere(double x[], double d);
 void print_bat_collection(struct bat bats[]);
 double objective_function (struct bat bat);
+void update_velocity(struct bat *bat, struct bat best);
 double generate_frequency();
 
 int main() {
@@ -72,9 +68,9 @@ int main() {
 	for (int i = 0; i < MAX_ITERATIONS ; i ++) {
 		for (int j = 0; i < BATS; j++) {
 			bats[j].frequency = generate_frequency(bats[j]);
-			
-			print_bat(bats[i]);
-			exit (0);
+			update_velocity(&bats[j], best);
+			print_bat(bats[j]);
+			exit(0);
 
 	/*     //generate new solution by adjusting frequency and updating velocities */ 
 
@@ -96,10 +92,19 @@ int main() {
 	return 0;
 }
 
+
+void update_velocity(struct bat *bat, struct bat best)
+{
+	for (int i = 0; i < DIMENSIONS; i++ ) {
+		bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best.position[i]) * bat->frequency;
+	}
+}
+
+
 double generate_frequency()
 {
 	double beta = my_random(0,1);
-	printf("%f", beta);
+	/* printf("%f", beta); */
 	return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 }
 
@@ -116,18 +121,22 @@ void print_bat_collection(struct bat bats[])
 
 void print_bat(struct bat bat)
 {
-	printf("Bat Position\n");
-	printf("[0]: %i \n", bat.position[0]);
-	printf("[1]: %i \n", bat.position[1]);
+	printf("=== BAT === \n");
+	printf("Frequency: %f\n", bat.frequency);
 
-	printf("Bat Frequency: %f\n", bat.frequency);
+	printf("Velocity:\n");
+	printf("[0] %f \n", bat.velocity[0]);
+	printf("[1] %f \n", bat.velocity[1]);
 
+	printf("Position:\n");
+	printf("[0] %f \n", bat.position[0]);
+	printf("[1] %f \n", bat.position[1]);
 }
 
 struct bat get_best(struct bat bats[])
 {
-	int current_best_val; 
-	int current_val;
+	double current_best_val; 
+	double current_val;
 
  	current_val = current_best_val = objective_function(bats[0]);
 	struct bat current_best_bat = bats[0];
@@ -147,13 +156,13 @@ void my_seed(void)
 	srand(time(NULL));
 }
 
-double my_random(int inferior, int superior)
+double my_random(double inferior, double superior)
 {
 	if (inferior == 0 && superior == 1) {
 		return (double)rand() / (double)RAND_MAX ;
 	}
 
-	return rand () % superior;
+	return rand () % (int) superior;
 }
 
 void initialize_bats(struct bat bats[])
@@ -171,13 +180,13 @@ void initialize_bats(struct bat bats[])
 
 double objective_function (struct bat bat)
 {
-	int result = sphere(bat.position, DIMENSIONS);
+	double result = sphere(bat.position, DIMENSIONS);
 	return result;
 }
 
-int sphere(int x[], int d)
+double sphere(double x[], double d)
 {
-	int total = 0;
+	double total = 0;
 
 	for (int i = 0; i < DIMENSIONS; i++) {
 		total+= x[i] * x[i];
