@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #define DIMENSIONS 2
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 100000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 100
@@ -16,11 +16,12 @@
 #define LAMBDA 0.1
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
 
-#define DEBUG 1
+#define DEBUG_LEVEL 1
 #define DEBUG_RANDOM 0
 
 #define LOG_FILE_MAIN 1
 #define LOG_FILE_RANDOM 2
+#define LOG_STDOUT 3
 
 int RUN_TIME;
 FILE *LOG;
@@ -35,20 +36,19 @@ struct bat {
 };
 
 
+struct bat get_worst(struct bat bats[]);
 void initialize_bats(struct bat bats[]);
 double my_rand(int, int);
 void my_seed(void);
-void print_bat(struct bat bat);
+void log_bat(int destination, struct bat bat);
 struct bat get_best(struct bat bats[]);
 double sphere(double x[], double d);
-void print_bat_collection(struct bat bats[]);
 double objective_function (struct bat bat);
 void update_velocity(struct bat *bat, struct bat best);
 double generate_frequency();
 void update_position(struct bat *bat);
 void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
-struct bat get_worst(struct bat bats[]);
 struct bat get_average(struct bat bats[]);
 void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
@@ -81,33 +81,37 @@ int main()
 
             if (my_rand(0,1) < candidate.pulse_rate) {
                 local_search(&candidate, best, calc_loudness_average(bats));
+                if (DEBUG_LEVEL >= 2) {
+                    logger(LOG_FILE_MAIN, "Doing Local Search\n");
+                }
             }
 
             if (my_rand(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
                 memcpy(current->position, candidate.position, sizeof candidate.position);
                 current->pulse_rate = 1 - exp(-LAMBDA*iteration);
                 current->loudness =  ALFA*current->loudness;
+                if (DEBUG_LEVEL >= 2) {
+                    logger(LOG_FILE_MAIN, "Updating with local search\n");
+                }
             }
             best = get_best(bats);
+            worst = get_worst(bats);
         }
 
         logger(LOG_FILE_MAIN, "Iteration Best\n");
-        print_bat(best);
+        log_bat(LOG_FILE_MAIN, best);
         logger(LOG_FILE_MAIN, "Iteration Average\n");
         average = get_average(bats);
-        print_bat(average);
+        log_bat(LOG_FILE_MAIN, average);
     }
 
-    logger(LOG_FILE_MAIN, "BEST");
-    best = get_best(bats);
-    print_bat(best);
-    logger(LOG_FILE_MAIN, "AVERAGE");
+    logger(LOG_STDOUT, "BEST");
+    log_bat(LOG_STDOUT, best);
+    logger(LOG_STDOUT, "AVERAGE");
     average = get_average(bats);
-    print_bat(average);
-    /* logger(LOG_FILE_MAIN, "WORST"); */
-    /* worst = get_worst(bats); */
-    /* print_bat(worst); */
-
+    log_bat(LOG_STDOUT, average);
+    logger(LOG_STDOUT, "WORST");
+    log_bat(LOG_STDOUT, worst);
 
     deallocate_resources();
     return 0;
@@ -162,6 +166,8 @@ void logger(int destination, char *fmt, ...)
         fprintf(LOG,"%s",formatted_string);
     else if (destination == LOG_FILE_RANDOM)
         fprintf(LOG_RANDOM,"%s",formatted_string);
+    else if (destination == LOG_STDOUT) 
+        printf("%s",formatted_string);
 }
 
 
@@ -205,47 +211,22 @@ double generate_frequency()
     return (FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN)) * beta;
 }
 
-void print_bat_collection(struct bat bats[])
+void log_bat(int destination, struct bat bat)
 {
-    for(int i=0;i<BATS_COUNT;i++) {
-        print_bat(bats[i]);
-    }
+    logger(destination, " = BAT = \n");
+    logger(destination, "\tFrequency: %f\n", bat.frequency);
+    logger(destination, "\tLoudness: %f\n", bat.loudness);
+    logger(destination, "\tPulse-rate: %f\n", bat.pulse_rate);
 
-}
-
-void print_bat(struct bat bat)
-{
-    logger(LOG_FILE_MAIN, " = BAT = \n");
-    logger(LOG_FILE_MAIN, "\tFrequency: %f\n", bat.frequency);
-    logger(LOG_FILE_MAIN, "\tLoudness: %f\n", bat.loudness);
-    logger(LOG_FILE_MAIN, "\tPulse-rate: %f\n", bat.pulse_rate);
-
-    logger(LOG_FILE_MAIN, "\tVelocity:\n");
+    logger(destination, "\tVelocity:\n");
     for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.velocity[i]);
+        logger(destination, "\t[%d] %f \n", i, bat.velocity[i]);
     }
 
-    logger(LOG_FILE_MAIN, "\tPosition:\n");
+    logger(destination, "\tPosition:\n");
     for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.position[i]);
+        logger(destination, "\t[%d] %f \n", i, bat.position[i]);
     }
-}
-struct bat get_worst(struct bat bats[])
-{
-    double current_worst_val; 
-    double current_val;
-
-    current_val = current_worst_val = objective_function(bats[0]);
-    struct bat current_worst_bat = bats[0];
-    for (int i = 0; i < BATS_COUNT; i++) {
-        current_val = objective_function(bats[i]);
-        if (current_val > current_worst_val) {
-            current_worst_bat = bats[i];
-            current_worst_val = current_val;
-        }
-    }
-
-    return current_worst_bat;
 }
 
 
@@ -274,6 +255,26 @@ struct bat get_average(struct bat bats[])
 
     return average;
 }
+
+struct bat get_worst(struct bat bats[])
+{
+    double current_worst_val; 
+    double current_val;
+
+    current_val = current_worst_val = objective_function(bats[0]);
+    struct bat current_worst_bat = bats[0];
+    for (int i = 0; i < BATS_COUNT; i++) {
+        current_val = objective_function(bats[i]);
+        if (current_val > current_worst_val) {
+            current_worst_bat = bats[i];
+            current_worst_val = current_val;
+        }
+    }
+
+    return current_worst_bat;
+}
+
+
 
 struct bat get_best(struct bat bats[])
 {
@@ -306,7 +307,7 @@ double my_rand(int min, int max)
         result = (double)rand() / (double)RAND_MAX ;
 
         if (DEBUG_RANDOM) {
-            logger(LOG_FILE_RANDOM, "0-1: %f\n", result, "debug");
+            logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
         }
         return result;
     }
@@ -331,7 +332,6 @@ void initialize_bats(struct bat bats[])
         }
     }
 }
-
 
 double objective_function (struct bat bat)
 {
