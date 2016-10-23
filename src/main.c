@@ -301,10 +301,10 @@ double my_random(double inferior, double superior)
         return result;
     }
 
+    result = rand () % (int) superior;
     if (DEBUG_RANDOM) {
-        result = rand () % (int) superior;
+        my_print(LOG_FILE_RANDOM, "0-100: %f\n", result, "debug");
     }
-    my_print(LOG_FILE_RANDOM, "0-100: %f\n", result, "debug");
     return result;
 }
 
