@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #define DIMENSIONS 2
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 700000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 100
