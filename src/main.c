@@ -14,11 +14,17 @@
 #define LOUDNESS_MAX 100
 #define ALFA 0.5
 #define LAMBDA 0.1
-#define DEBUG 1
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
+
+#define DEBUG 1
+#define DEBUG_RANDOM 1
+
+#define LOG_FILE_MAIN 1
+#define LOG_FILE_RANDOM 2
 
 int RUN_TIME;
 FILE *LOG;
+FILE *LOG_RANDOM;
 
 struct bat {
 	double pulse_rate; //or frequency
@@ -44,18 +50,12 @@ void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
 struct bat get_worst(struct bat bats[]);
 struct bat get_average(struct bat bats[]);
-void my_print(char *fmt, ...);
+void my_print(int destination, char *fmt, ...);
+void allocate_resources(void);
+void deallocate_resources();
 
 int main() {
- 	RUN_TIME = time(NULL);
-	char fileName[100];
-	sprintf(fileName, "%s/%i-main", DUMP_DIR, RUN_TIME);
-	LOG = fopen(fileName,"w");
-	if (LOG == NULL)
-	{
-		printf("Error opening file %s !\n", fileName);
-		exit(1);
-	}
+	allocate_resources();
 	struct bat bats[BATS_COUNT];
 	struct bat best;
 	struct bat worst;
@@ -92,32 +92,67 @@ int main() {
 		}
 	}
 
-	my_print("BEST");
+	my_print(LOG_FILE_MAIN, "BEST");
 	best = get_best(bats);
 	print_bat(best);
-	my_print("AVERAGE");
+	my_print(LOG_FILE_MAIN, "AVERAGE");
 	average = get_average(bats);
 	print_bat(average);
-	my_print("WORST");
+	my_print(LOG_FILE_MAIN, "WORST");
 	worst = get_worst(bats);
 	print_bat(worst);
 
 
-	fclose(LOG);
-
+	deallocate_resources();
 	return 0;
 }
 
-
-void my_print(char *fmt, ...)
+void allocate_resources()
 {
- char formatted_string[666];
+	RUN_TIME = time(NULL);
 
- va_list argptr;
- va_start(argptr,fmt);
- sprintf(formatted_string, fmt, argptr);
- va_end(argptr);
- fprintf(LOG,"%s",formatted_string);
+	char fileName[100];
+	sprintf(fileName, "%s/%i-main", DUMP_DIR, RUN_TIME);
+	LOG = fopen(fileName,"w");
+	if (LOG == NULL)
+	{
+		printf("Error opening file %s !\n", fileName);
+		exit(1);
+	}
+
+	sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
+	LOG_RANDOM = fopen(fileName,"w");
+	if (LOG_RANDOM == NULL)
+	{
+		printf("Error opening file %s !\n", fileName);
+		exit(1);
+	}
+
+
+
+}
+
+void deallocate_resources()
+{
+	fclose(LOG);
+	fclose(LOG_RANDOM);
+}
+
+void my_print(int destination, char *fmt, ...)
+{
+	char formatted_string[6666];
+
+	va_list argptr;
+	va_start(argptr,fmt);
+	vsprintf(formatted_string, fmt, argptr);
+	va_end(argptr);
+
+	/* printf("%s",formatted_string); */
+
+	if (destination == LOG_FILE_MAIN) 
+		fprintf(LOG,"%s",formatted_string);
+	else if (destination == LOG_FILE_RANDOM)
+		fprintf(LOG_RANDOM,"%s",formatted_string);
 }
 
 
@@ -171,19 +206,19 @@ void print_bat_collection(struct bat bats[])
 
 void print_bat(struct bat bat)
 {
-	my_print("=== BAT === \n");
-	my_print("\tFrequency: %f\n", bat.frequency);
-	my_print("\tLoudness: %f\n", bat.loudness);
-	my_print("\tPulse-rate: %f\n", bat.pulse_rate);
+	my_print(LOG_FILE_MAIN, " = BAT = \n");
+	my_print(LOG_FILE_MAIN, "\tFrequency: %f\n", bat.frequency);
+	my_print(LOG_FILE_MAIN, "\tLoudness: %f\n", bat.loudness);
+	my_print(LOG_FILE_MAIN, "\tPulse-rate: %f\n", bat.pulse_rate);
 
-	my_print("\tVelocity:\n");
+	my_print(LOG_FILE_MAIN, "\tVelocity:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		my_print("\t[%d] %f \n", i, bat.velocity[i]);
+		my_print(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.velocity[i]);
 	}
 
-	my_print("\tPosition:\n");
+	my_print(LOG_FILE_MAIN, "\tPosition:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		my_print("\t[%d] %f \n", i, bat.position[i]);
+		my_print(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.position[i]);
 	}
 }
 struct bat get_worst(struct bat bats[])
@@ -251,7 +286,7 @@ struct bat get_best(struct bat bats[])
 
 void my_seed(void)
 {
-	srand(RUN_TIME);
+	srand(time(NULL));
 }
 
 double my_random(double inferior, double superior)
@@ -259,10 +294,13 @@ double my_random(double inferior, double superior)
 	double result;
 	if (inferior == 0 && superior == 1) {
 		result = (double)rand() / (double)RAND_MAX ;
+
+		my_print(LOG_FILE_RANDOM, "0-1: %f\n", result, "debug");
 		return result;
 	}
 
 	result = rand () % (int) superior;
+	my_print(LOG_FILE_RANDOM, "0-100: %f\n", result, "debug");
 	return result;
 }
 
