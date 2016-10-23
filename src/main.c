@@ -3,20 +3,22 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-
-#define MAX_ITERATIONS 100
-#define BATS_COUNT 40
-
-#define FREQUENCY_MIN 0
-#define FREQUENCY_MAX 100
-
-#define LOUDNESS_MIN 1
-#define LOUDNESS_MAX 100
-
-#define ALFA 0.9
-#define LAMBDA 0.9
+#include <stdarg.h>
 
 #define DIMENSIONS 2
+#define MAX_ITERATIONS 100
+#define BATS_COUNT 40
+#define FREQUENCY_MIN 0
+#define FREQUENCY_MAX 100
+#define LOUDNESS_MIN 1
+#define LOUDNESS_MAX 100
+#define ALFA 0.5
+#define LAMBDA 0.1
+#define DEBUG 1
+#define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
+
+int RUN_TIME;
+FILE *LOG;
 
 struct bat {
 	double pulse_rate; //or frequency
@@ -42,9 +44,18 @@ void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
 struct bat get_worst(struct bat bats[]);
 struct bat get_average(struct bat bats[]);
+void my_print(char *fmt, ...);
 
 int main() {
-
+ 	RUN_TIME = time(NULL);
+	char fileName[100];
+	sprintf(fileName, "%s/%i-main", DUMP_DIR, RUN_TIME);
+	LOG = fopen(fileName,"w");
+	if (LOG == NULL)
+	{
+		printf("Error opening file %s !\n", fileName);
+		exit(1);
+	}
 	struct bat bats[BATS_COUNT];
 	struct bat best;
 	struct bat worst;
@@ -70,9 +81,7 @@ int main() {
 				local_search(&candidate, best, calc_loudness_average(bats));
 			}
 
-			//generate a new solution by flying randomly
 			if (my_random(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
-
 				memcpy(current->position, candidate.position, sizeof candidate.position);
 				current->pulse_rate = 1 - exp(-LAMBDA*iteration);
 				current->loudness =  ALFA*current->loudness;
@@ -83,17 +92,34 @@ int main() {
 		}
 	}
 
-	printf("BEST");
+	my_print("BEST");
 	best = get_best(bats);
 	print_bat(best);
-	printf("AVERAGE");
+	my_print("AVERAGE");
 	average = get_average(bats);
 	print_bat(average);
-	printf("WORST");
+	my_print("WORST");
 	worst = get_worst(bats);
 	print_bat(worst);
+
+
+	fclose(LOG);
+
 	return 0;
 }
+
+
+void my_print(char *fmt, ...)
+{
+ char formatted_string[666];
+
+ va_list argptr;
+ va_start(argptr,fmt);
+ sprintf(formatted_string, fmt, argptr);
+ va_end(argptr);
+ fprintf(LOG,"%s",formatted_string);
+}
+
 
 void local_search(struct bat *bat, struct bat best, double loudness_average)
 {
@@ -145,19 +171,19 @@ void print_bat_collection(struct bat bats[])
 
 void print_bat(struct bat bat)
 {
-	printf("=== BAT === \n");
-	printf("\tFrequency: %f\n", bat.frequency);
-	printf("\tLoudness: %f\n", bat.loudness);
-	printf("\tPulse-rate: %f\n", bat.pulse_rate);
+	my_print("=== BAT === \n");
+	my_print("\tFrequency: %f\n", bat.frequency);
+	my_print("\tLoudness: %f\n", bat.loudness);
+	my_print("\tPulse-rate: %f\n", bat.pulse_rate);
 
-	printf("\tVelocity:\n");
+	my_print("\tVelocity:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		printf("\t[%d] %f \n", i, bat.velocity[i]);
+		my_print("\t[%d] %f \n", i, bat.velocity[i]);
 	}
 
-	printf("\tPosition:\n");
+	my_print("\tPosition:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		printf("\t[%d] %f \n", i, bat.position[i]);
+		my_print("\t[%d] %f \n", i, bat.position[i]);
 	}
 }
 struct bat get_worst(struct bat bats[])
@@ -225,16 +251,19 @@ struct bat get_best(struct bat bats[])
 
 void my_seed(void)
 {
-	srand(time(NULL));
+	srand(RUN_TIME);
 }
 
 double my_random(double inferior, double superior)
 {
+	double result;
 	if (inferior == 0 && superior == 1) {
-		return (double)rand() / (double)RAND_MAX ;
+		result = (double)rand() / (double)RAND_MAX ;
+		return result;
 	}
 
-	return rand () % (int) superior;
+	result = rand () % (int) superior;
+	return result;
 }
 
 void initialize_bats(struct bat bats[])
