@@ -127,9 +127,6 @@ void allocate_resources()
         printf("Error opening file %s !\n", fileName);
         exit(1);
     }
-
-
-
 }
 
 void deallocate_resources()
