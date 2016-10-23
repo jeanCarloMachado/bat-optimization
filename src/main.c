@@ -131,7 +131,6 @@ double generate_frequency()
 void print_bat_collection(struct bat bats[])
 {
 	for(int i=0;i<BATS_COUNT;i++) {
-
 		print_bat(bats[i]);
 	}
 
@@ -145,12 +144,14 @@ void print_bat(struct bat bat)
 	printf("Pulse-rate: %f\n", bat.pulse_rate);
 
 	printf("Velocity:\n");
-	printf("[0] %f \n", bat.velocity[0]);
-	printf("[1] %f \n", bat.velocity[1]);
+	for (int i = 0; i < DIMENSIONS; i++) {
+		printf("[%d] %f \n", i, bat.velocity[i]);
+	}
 
 	printf("Position:\n");
-	printf("[0] %f \n", bat.position[0]);
-	printf("[1] %f \n", bat.position[1]);
+	for (int i = 0; i < DIMENSIONS; i++) {
+		printf("[%d] %f \n", i, bat.position[i]);
+	}
 }
 
 struct bat get_best(struct bat bats[])
@@ -191,10 +192,11 @@ void initialize_bats(struct bat bats[])
 		bats[i].pulse_rate = 0;
 		bats[i].frequency = 0;
 		bats[i].loudness = 1;
-		bats[i].velocity[0] = 0;
-		bats[i].velocity[1] = 0;
-		bats[i].position[0] = my_random(0, RAND_MAX);
-		bats[i].position[1] = my_random(0, RAND_MAX);
+
+		for (int j = 0; j < DIMENSIONS; j++) {
+			bats[i].velocity[j] = 0;
+			bats[i].position[j] = my_random(0, RAND_MAX);
+		}
 	}
 }
 
