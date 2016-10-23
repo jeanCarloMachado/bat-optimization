@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #define DIMENSIONS 2
-#define MAX_ITERATIONS 700000
+#define MAX_ITERATIONS 100
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 100
@@ -27,7 +27,7 @@ FILE *LOG;
 FILE *LOG_RANDOM;
 
 struct bat {
-    double pulse_rate; //or frequency
+    double pulse_rate;
     double loudness;
     double frequency;
     double position[DIMENSIONS];
@@ -36,7 +36,7 @@ struct bat {
 
 
 void initialize_bats(struct bat bats[]);
-double my_random(double, double);
+double my_rand(int, int);
 void my_seed(void);
 void print_bat(struct bat bat);
 struct bat get_best(struct bat bats[]);
@@ -50,11 +50,12 @@ void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
 struct bat get_worst(struct bat bats[]);
 struct bat get_average(struct bat bats[]);
-void my_print(int destination, char *fmt, ...);
+void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
 
-int main() {
+int main()
+{
     allocate_resources();
     struct bat bats[BATS_COUNT];
     struct bat best;
@@ -66,9 +67,10 @@ int main() {
     my_seed();
 
     initialize_bats(bats);
-    best = get_best(bats);	
+    best = get_best(bats);
 
     for (int iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
+        logger(LOG_FILE_MAIN, "Iteration %i\n", iteration);
         for (int j = 0; j < BATS_COUNT; j++) {
             current = &bats[j];
             current->frequency = generate_frequency(current);
@@ -77,30 +79,34 @@ int main() {
 
             update_position(&candidate);
 
-            if (my_random(0,1) < candidate.pulse_rate) {
+            if (my_rand(0,1) < candidate.pulse_rate) {
                 local_search(&candidate, best, calc_loudness_average(bats));
             }
 
-            if (my_random(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
+            if (my_rand(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
                 memcpy(current->position, candidate.position, sizeof candidate.position);
                 current->pulse_rate = 1 - exp(-LAMBDA*iteration);
                 current->loudness =  ALFA*current->loudness;
             }
-
-            best = get_best(bats);	
-
+            best = get_best(bats);
         }
+
+        logger(LOG_FILE_MAIN, "Iteration Best\n");
+        print_bat(best);
+        logger(LOG_FILE_MAIN, "Iteration Average\n");
+        average = get_average(bats);
+        print_bat(average);
     }
 
-    my_print(LOG_FILE_MAIN, "BEST");
+    logger(LOG_FILE_MAIN, "BEST");
     best = get_best(bats);
     print_bat(best);
-    my_print(LOG_FILE_MAIN, "AVERAGE");
+    logger(LOG_FILE_MAIN, "AVERAGE");
     average = get_average(bats);
     print_bat(average);
-    my_print(LOG_FILE_MAIN, "WORST");
-    worst = get_worst(bats);
-    print_bat(worst);
+    /* logger(LOG_FILE_MAIN, "WORST"); */
+    /* worst = get_worst(bats); */
+    /* print_bat(worst); */
 
 
     deallocate_resources();
@@ -119,23 +125,29 @@ void allocate_resources()
         printf("Error opening file %s !\n", fileName);
         exit(1);
     }
+    printf ("Main log: %s\n", fileName);
 
-    sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
-    LOG_RANDOM = fopen(fileName,"w");
-    if (LOG_RANDOM == NULL)
-    {
-        printf("Error opening file %s !\n", fileName);
-        exit(1);
+    if (DEBUG_RANDOM) {
+        sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
+        LOG_RANDOM = fopen(fileName,"w");
+        if (LOG_RANDOM == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Random log: %s\n", fileName);
     }
 }
 
 void deallocate_resources()
 {
     fclose(LOG);
-    fclose(LOG_RANDOM);
+    if (DEBUG_RANDOM) {
+        fclose(LOG_RANDOM);
+    }
 }
 
-void my_print(int destination, char *fmt, ...)
+void logger(int destination, char *fmt, ...)
 {
     char formatted_string[6666];
 
@@ -156,7 +168,7 @@ void my_print(int destination, char *fmt, ...)
 void local_search(struct bat *bat, struct bat best, double loudness_average)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->position[i] = best.position[i] + loudness_average * my_random(0,1);
+        bat->position[i] = best.position[i] + loudness_average * my_rand(0,1);
     }
 }
 
@@ -189,7 +201,7 @@ void update_position(struct bat *bat)
 
 double generate_frequency()
 {
-    double beta = my_random(0,1);
+    double beta = my_rand(0,1);
     return (FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN)) * beta;
 }
 
@@ -203,19 +215,19 @@ void print_bat_collection(struct bat bats[])
 
 void print_bat(struct bat bat)
 {
-    my_print(LOG_FILE_MAIN, " = BAT = \n");
-    my_print(LOG_FILE_MAIN, "\tFrequency: %f\n", bat.frequency);
-    my_print(LOG_FILE_MAIN, "\tLoudness: %f\n", bat.loudness);
-    my_print(LOG_FILE_MAIN, "\tPulse-rate: %f\n", bat.pulse_rate);
+    logger(LOG_FILE_MAIN, " = BAT = \n");
+    logger(LOG_FILE_MAIN, "\tFrequency: %f\n", bat.frequency);
+    logger(LOG_FILE_MAIN, "\tLoudness: %f\n", bat.loudness);
+    logger(LOG_FILE_MAIN, "\tPulse-rate: %f\n", bat.pulse_rate);
 
-    my_print(LOG_FILE_MAIN, "\tVelocity:\n");
+    logger(LOG_FILE_MAIN, "\tVelocity:\n");
     for (int i = 0; i < DIMENSIONS; i++) {
-        my_print(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.velocity[i]);
+        logger(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.velocity[i]);
     }
 
-    my_print(LOG_FILE_MAIN, "\tPosition:\n");
+    logger(LOG_FILE_MAIN, "\tPosition:\n");
     for (int i = 0; i < DIMENSIONS; i++) {
-        my_print(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.position[i]);
+        logger(LOG_FILE_MAIN, "\t[%d] %f \n", i, bat.position[i]);
     }
 }
 struct bat get_worst(struct bat bats[])
@@ -286,21 +298,22 @@ void my_seed(void)
     srand(time(NULL));
 }
 
-double my_random(double inferior, double superior)
+double my_rand(int min, int max)
 {
     double result;
-    if (inferior == 0 && superior == 1) {
+
+    if (min == 0 && max == 1) {
         result = (double)rand() / (double)RAND_MAX ;
 
         if (DEBUG_RANDOM) {
-            my_print(LOG_FILE_RANDOM, "0-1: %f\n", result, "debug");
+            logger(LOG_FILE_RANDOM, "0-1: %f\n", result, "debug");
         }
         return result;
     }
 
-    result = rand () % (int) superior;
+    result =  (rand() % (max + 1 - min)) + min;
     if (DEBUG_RANDOM) {
-        my_print(LOG_FILE_RANDOM, "0-100: %f\n", result, "debug");
+        logger(LOG_FILE_RANDOM, "0-100: %i\n", result);
     }
     return result;
 }
@@ -314,7 +327,7 @@ void initialize_bats(struct bat bats[])
 
         for (int j = 0; j < DIMENSIONS; j++) {
             bats[i].velocity[j] = 0;
-            bats[i].position[j] = my_random(0, RAND_MAX);
+            bats[i].position[j] = my_rand(0, 100);
         }
     }
 }
