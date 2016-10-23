@@ -40,18 +40,21 @@ double generate_frequency();
 void update_position(struct bat *bat);
 void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
+struct bat get_worst(struct bat bats[]);
+struct bat get_average(struct bat bats[]);
 
 int main() {
 
 	struct bat bats[BATS_COUNT];
 	struct bat best;
+	struct bat worst;
+	struct bat average;
 	struct bat candidate;
 	struct bat *current;
 
 	my_seed();
 
 	initialize_bats(bats);
-
 	best = get_best(bats);	
 
 	for (int iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
@@ -80,10 +83,15 @@ int main() {
 		}
 	}
 
-
-
+	printf("BEST");
 	best = get_best(bats);
 	print_bat(best);
+	printf("AVERAGE");
+	average = get_average(bats);
+	print_bat(average);
+	printf("WORST");
+	worst = get_worst(bats);
+	print_bat(worst);
 	return 0;
 }
 
@@ -127,7 +135,6 @@ double generate_frequency()
 	return (FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN)) * beta;
 }
 
-
 void print_bat_collection(struct bat bats[])
 {
 	for(int i=0;i<BATS_COUNT;i++) {
@@ -139,19 +146,63 @@ void print_bat_collection(struct bat bats[])
 void print_bat(struct bat bat)
 {
 	printf("=== BAT === \n");
-	printf("Frequency: %f\n", bat.frequency);
-	printf("Loudness: %f\n", bat.loudness);
-	printf("Pulse-rate: %f\n", bat.pulse_rate);
+	printf("\tFrequency: %f\n", bat.frequency);
+	printf("\tLoudness: %f\n", bat.loudness);
+	printf("\tPulse-rate: %f\n", bat.pulse_rate);
 
-	printf("Velocity:\n");
+	printf("\tVelocity:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		printf("[%d] %f \n", i, bat.velocity[i]);
+		printf("\t[%d] %f \n", i, bat.velocity[i]);
 	}
 
-	printf("Position:\n");
+	printf("\tPosition:\n");
 	for (int i = 0; i < DIMENSIONS; i++) {
-		printf("[%d] %f \n", i, bat.position[i]);
+		printf("\t[%d] %f \n", i, bat.position[i]);
 	}
+}
+struct bat get_worst(struct bat bats[])
+{
+	double current_worst_val; 
+	double current_val;
+
+	current_val = current_worst_val = objective_function(bats[0]);
+	struct bat current_worst_bat = bats[0];
+	for (int i = 0; i < BATS_COUNT; i++) {
+		current_val = objective_function(bats[i]);
+		if (current_val > current_worst_val) {
+			current_worst_bat = bats[i];
+			current_worst_val = current_val;
+		}
+	}
+
+	return current_worst_bat;
+}
+
+
+struct bat get_average(struct bat bats[])
+{
+	struct bat average;
+
+	for (int i = 0; i < BATS_COUNT; i++) {
+		average.frequency =  bats[i].frequency;
+		average.loudness =  bats[i].loudness;
+		average.pulse_rate =  bats[i].pulse_rate;
+		for (int j = 0; j < DIMENSIONS; j++) {
+			average.position[j]+= bats[i].position[j];
+			average.velocity[j]+= bats[i].velocity[j];
+		}
+	}
+
+
+	average.frequency =  average.frequency / BATS_COUNT;
+	average.loudness =  average.loudness / BATS_COUNT;
+	average.pulse_rate =  average.pulse_rate / BATS_COUNT;
+	for (int j = 0; j < DIMENSIONS; j++) {
+		average.position[j] = average.position[j] / BATS_COUNT;
+		average.velocity[j] = average.velocity[j] / BATS_COUNT;
+	}
+
+	return average;
 }
 
 struct bat get_best(struct bat bats[])
