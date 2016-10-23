@@ -5,20 +5,14 @@
 #include <math.h>
 
 #define MAX_ITERATIONS 100
-/* #define BATS 40 */
 #define BATS_COUNT 40
 
-//pulse rate and frequency are correlated
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 100
 
-//loudness decrease over time (A)
 #define LOUDNESS_MIN 1
 #define LOUDNESS_MAX 100
 
-
-//BAT PARAMETERS
-//simillar to the cooling schedule in simulated annealing
 #define ALFA 0.9
 #define LAMBDA 0.9
 
@@ -32,14 +26,6 @@ struct bat {
 	double velocity[DIMENSIONS];
 };
 
-/* double average_loudness = 0; */
-/* bat** solutions; */
-
-
-/* double current_position() */
-/* { */
-/*     return previous_position + current_velocity(); */
-/* } */
 
 void initialize_bats(struct bat bats[]);
 double my_random(double, double);
@@ -83,7 +69,7 @@ int main() {
 
 			//generate a new solution by flying randomly
 			if (my_random(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
-				
+
 				memcpy(current->position, candidate.position, sizeof candidate.position);
 				current->pulse_rate = 1 - exp(-LAMBDA*iteration);
 				current->loudness =  ALFA*current->loudness;
@@ -98,7 +84,6 @@ int main() {
 
 	best = get_best(bats);
 	print_bat(best);
-	/* //results and vizualization */
 	return 0;
 }
 
@@ -173,7 +158,7 @@ struct bat get_best(struct bat bats[])
 	double current_best_val; 
 	double current_val;
 
- 	current_val = current_best_val = objective_function(bats[0]);
+	current_val = current_best_val = objective_function(bats[0]);
 	struct bat current_best_bat = bats[0];
 	for (int i = 0; i < BATS_COUNT; i++) {
 		current_val = objective_function(bats[i]);
