@@ -5,16 +5,20 @@
 #include <math.h>
 #include <stdarg.h>
 
-#define DIMENSIONS 2
-#define MAX_ITERATIONS 100000
+#define DIMENSIONS 512
+#define MAX_ITERATIONS 2500
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
-#define FREQUENCY_MAX 100
-#define LOUDNESS_MIN 1
-#define LOUDNESS_MAX 100
-#define ALFA 0.5
-#define LAMBDA 0.1
+#define FREQUENCY_MAX 1
+#define LOUDNESS_MIN 0
+#define LOUDNESS_MAX 1
+#define INITIAL_LOUDNESS 1
+
+#define ALFA 0.9
+#define LAMBDA 0.5
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
+#define BETA_MIN -1
+#define BETA_MAX 1
 
 #define DEBUG_LEVEL 1
 #define DEBUG_RANDOM 0
@@ -28,7 +32,9 @@ FILE *LOG;
 FILE *LOG_RANDOM;
 
 struct bat {
+    //tends towards 1
     double pulse_rate;
+    //tends towards 0
     double loudness;
     double frequency;
     double position[DIMENSIONS];
@@ -53,6 +59,7 @@ struct bat get_average(struct bat bats[]);
 void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
+void decrease_loudness(struct bat*, int);
 
 int main()
 {
@@ -89,7 +96,7 @@ int main()
             if (my_rand(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
                 memcpy(current->position, candidate.position, sizeof candidate.position);
                 current->pulse_rate = 1 - exp(-LAMBDA*iteration);
-                current->loudness =  ALFA*current->loudness;
+                decrease_loudness(current, iteration);
                 if (DEBUG_LEVEL >= 2) {
                     logger(LOG_FILE_MAIN, "Updating with local search\n");
                 }
@@ -106,12 +113,7 @@ int main()
     }
 
     logger(LOG_STDOUT, "BEST");
-    log_bat(LOG_STDOUT, best);
-    logger(LOG_STDOUT, "AVERAGE");
-    average = get_average(bats);
-    log_bat(LOG_STDOUT, average);
-    logger(LOG_STDOUT, "WORST");
-    log_bat(LOG_STDOUT, worst);
+    printf("Objective %f", objective_function(best));
 
     deallocate_resources();
     return 0;
@@ -143,6 +145,21 @@ void allocate_resources()
     }
 }
 
+void initialize_bats(struct bat bats[])
+{
+    for (int i = 0; i < BATS_COUNT; i ++ ) {
+        bats[i].pulse_rate = 0;
+        bats[i].frequency = 0;
+        bats[i].loudness = INITIAL_LOUDNESS;
+
+        for (int j = 0; j < DIMENSIONS; j++) {
+            bats[i].velocity[j] = 0;
+            bats[i].position[j] = my_rand(0, 100);
+        }
+    }
+}
+
+
 void deallocate_resources()
 {
     fclose(LOG);
@@ -159,8 +176,6 @@ void logger(int destination, char *fmt, ...)
     va_start(argptr,fmt);
     vsprintf(formatted_string, fmt, argptr);
     va_end(argptr);
-
-    /* printf("%s",formatted_string); */
 
     if (destination == LOG_FILE_MAIN) 
         fprintf(LOG,"%s",formatted_string);
@@ -198,6 +213,11 @@ void update_velocity(struct bat *bat, struct bat best)
     }
 }
 
+void decrease_loudness(struct bat *bat, int iteration)
+{
+    bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
+}
+
 void update_position(struct bat *bat)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
@@ -207,8 +227,8 @@ void update_position(struct bat *bat)
 
 double generate_frequency()
 {
-    double beta = my_rand(0,1);
-    return (FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN)) * beta;
+    double beta = my_rand(BETA_MIN, BETA_MAX);
+    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 }
 
 void log_bat(int destination, struct bat bat)
@@ -312,25 +332,29 @@ double my_rand(int min, int max)
         return result;
     }
 
+
+    if (min == -1 && max == 1) {
+        double signal;
+        result = (double)rand() / (double)RAND_MAX ;
+
+        if (DEBUG_RANDOM) {
+            logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
+        }
+
+       signal = (double)rand() / (double)RAND_MAX ;
+       if (signal < 0.5)  {
+            result = -result;
+       }
+
+        return result;
+    }
+
+
     result =  (rand() % (max + 1 - min)) + min;
     if (DEBUG_RANDOM) {
         logger(LOG_FILE_RANDOM, "0-100: %i\n", result);
     }
     return result;
-}
-
-void initialize_bats(struct bat bats[])
-{
-    for (int i = 0; i < BATS_COUNT; i ++ ) {
-        bats[i].pulse_rate = 0;
-        bats[i].frequency = 0;
-        bats[i].loudness = 1;
-
-        for (int j = 0; j < DIMENSIONS; j++) {
-            bats[i].velocity[j] = 0;
-            bats[i].position[j] = my_rand(0, 100);
-        }
-    }
 }
 
 double objective_function (struct bat bat)
