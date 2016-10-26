@@ -5,23 +5,24 @@
 #include <math.h>
 #include <stdarg.h>
 
-#define DIMENSIONS 512
-#define MAX_ITERATIONS 2500
+#define DIMENSIONS 200
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
-#define FREQUENCY_MAX 1
+#define FREQUENCY_MAX 100
 #define LOUDNESS_MIN 0
 #define LOUDNESS_MAX 1
 #define INITIAL_LOUDNESS 1
 
-#define ALFA 0.9
-#define LAMBDA 0.5
+//probability of accepting bad results
+#define ALFA 0.5
+//affects local search
+#define LAMBDA 0.1
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
-#define BETA_MIN -1
+#define BETA_MIN 0
 #define BETA_MAX 1
 
 #define DEBUG_LEVEL 1
-#define DEBUG_RANDOM 0
 
 #define LOG_FILE_MAIN 1
 #define LOG_FILE_RANDOM 2
@@ -41,7 +42,6 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-
 struct bat get_worst(struct bat bats[]);
 void initialize_bats(struct bat bats[]);
 double my_rand(int, int);
@@ -60,6 +60,7 @@ void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
 void decrease_loudness(struct bat*, int);
+void position_perturbation(struct bat *bat);
 
 int main()
 {
@@ -77,7 +78,6 @@ int main()
     best = get_best(bats);
 
     for (int iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
-        logger(LOG_FILE_MAIN, "Iteration %i\n", iteration);
         for (int j = 0; j < BATS_COUNT; j++) {
             current = &bats[j];
             current->frequency = generate_frequency(current);
@@ -88,10 +88,9 @@ int main()
 
             if (my_rand(0,1) < candidate.pulse_rate) {
                 local_search(&candidate, best, calc_loudness_average(bats));
-                if (DEBUG_LEVEL >= 2) {
-                    logger(LOG_FILE_MAIN, "Doing Local Search\n");
-                }
             }
+
+            position_perturbation(&candidate);
 
             if (my_rand(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
                 memcpy(current->position, candidate.position, sizeof candidate.position);
@@ -101,19 +100,18 @@ int main()
                     logger(LOG_FILE_MAIN, "Updating with local search\n");
                 }
             }
+            log_bat(LOG_FILE_MAIN, best);
             best = get_best(bats);
             worst = get_worst(bats);
         }
 
-        logger(LOG_FILE_MAIN, "Iteration Best\n");
-        log_bat(LOG_FILE_MAIN, best);
-        logger(LOG_FILE_MAIN, "Iteration Average\n");
-        average = get_average(bats);
-        log_bat(LOG_FILE_MAIN, average);
+        if (DEBUG_LEVEL >= 1) {
+            logger(LOG_FILE_MAIN, "Iteration %i best: %f\n", iteration, objective_function(best));
+            logger(LOG_FILE_MAIN, "Iteration %i average: %f\n", iteration, objective_function(get_average(bats)));
+        }
     }
 
-    logger(LOG_STDOUT, "BEST");
-    printf("Objective %f", objective_function(best));
+    printf("Best of All: %f", objective_function(best));
 
     deallocate_resources();
     return 0;
@@ -133,7 +131,7 @@ void allocate_resources()
     }
     printf ("Main log: %s\n", fileName);
 
-    if (DEBUG_RANDOM) {
+    if (DEBUG_LEVEL > 9) {
         sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
         LOG_RANDOM = fopen(fileName,"w");
         if (LOG_RANDOM == NULL)
@@ -163,7 +161,7 @@ void initialize_bats(struct bat bats[])
 void deallocate_resources()
 {
     fclose(LOG);
-    if (DEBUG_RANDOM) {
+    if (DEBUG_LEVEL > 9) {
         fclose(LOG_RANDOM);
     }
 }
@@ -183,6 +181,12 @@ void logger(int destination, char *fmt, ...)
         fprintf(LOG_RANDOM,"%s",formatted_string);
     else if (destination == LOG_STDOUT) 
         printf("%s",formatted_string);
+}
+
+void position_perturbation(struct bat *bat)
+{
+    int dimension = my_rand(0, DIMENSIONS);
+    bat->position[dimension] = bat->position[dimension] * my_rand(0,1);
 }
 
 
@@ -326,7 +330,7 @@ double my_rand(int min, int max)
     if (min == 0 && max == 1) {
         result = (double)rand() / (double)RAND_MAX ;
 
-        if (DEBUG_RANDOM) {
+        if (DEBUG_LEVEL > 9) {
             logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
         }
         return result;
@@ -337,7 +341,7 @@ double my_rand(int min, int max)
         double signal;
         result = (double)rand() / (double)RAND_MAX ;
 
-        if (DEBUG_RANDOM) {
+        if (DEBUG_LEVEL > 9) {
             logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
         }
 
@@ -351,7 +355,7 @@ double my_rand(int min, int max)
 
 
     result =  (rand() % (max + 1 - min)) + min;
-    if (DEBUG_RANDOM) {
+    if (DEBUG_LEVEL > 9) {
         logger(LOG_FILE_RANDOM, "0-100: %i\n", result);
     }
     return result;
@@ -363,7 +367,8 @@ double objective_function (struct bat bat)
     return result;
 }
 
-double sphere(double x[], double d)
+//best: 0.632
+double sphere (double x[], double d)
 {
     double total = 0;
 
