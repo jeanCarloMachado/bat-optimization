@@ -1,0 +1,6 @@
+#!/bin/bash
+rm -rf dump/latest
+cp -rf dump/`ls -lah dump/ | tail -n1 | rev | cut -d' ' -f1 | rev ` latest
+gnuplot plot
+notify-send "Execution finished"
+feh graphic.png

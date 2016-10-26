@@ -5,11 +5,11 @@
 #include <math.h>
 #include <stdarg.h>
 
-#define DIMENSIONS 200
-#define MAX_ITERATIONS 1000
+#define DIMENSIONS 100
+#define MAX_ITERATIONS 100
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
-#define FREQUENCY_MAX 100
+#define FREQUENCY_MAX 1
 #define LOUDNESS_MIN 0
 #define LOUDNESS_MAX 1
 #define INITIAL_LOUDNESS 1
@@ -17,12 +17,12 @@
 //probability of accepting bad results
 #define ALFA 0.5
 //affects local search
-#define LAMBDA 0.1
+#define LAMBDA 0.9
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
 #define BETA_MIN 0
 #define BETA_MAX 1
 
-#define DEBUG_LEVEL 1
+#define LOG_LEVEL 1
 
 #define LOG_FILE_MAIN 1
 #define LOG_FILE_RANDOM 2
@@ -96,18 +96,21 @@ int main()
                 memcpy(current->position, candidate.position, sizeof candidate.position);
                 current->pulse_rate = 1 - exp(-LAMBDA*iteration);
                 decrease_loudness(current, iteration);
-                if (DEBUG_LEVEL >= 2) {
-                    logger(LOG_FILE_MAIN, "Updating with local search\n");
-                }
             }
-            log_bat(LOG_FILE_MAIN, best);
             best = get_best(bats);
-            worst = get_worst(bats);
         }
 
-        if (DEBUG_LEVEL >= 1) {
-            logger(LOG_FILE_MAIN, "Iteration %i best: %f\n", iteration, objective_function(best));
-            logger(LOG_FILE_MAIN, "Iteration %i average: %f\n", iteration, objective_function(get_average(bats)));
+        if (LOG_LEVEL >= 1) {
+            int best_result = abs(objective_function(best));
+            int average_result = abs(objective_function(get_average(bats)));
+            logger(
+                LOG_FILE_MAIN,
+                "%u\t%d\t%u\n",
+                iteration,
+                best_result,
+                average_result
+            );
+
         }
     }
 
@@ -131,7 +134,7 @@ void allocate_resources()
     }
     printf ("Main log: %s\n", fileName);
 
-    if (DEBUG_LEVEL > 9) {
+    if (LOG_LEVEL > 9) {
         sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
         LOG_RANDOM = fopen(fileName,"w");
         if (LOG_RANDOM == NULL)
@@ -161,7 +164,7 @@ void initialize_bats(struct bat bats[])
 void deallocate_resources()
 {
     fclose(LOG);
-    if (DEBUG_LEVEL > 9) {
+    if (LOG_LEVEL > 9) {
         fclose(LOG_RANDOM);
     }
 }
@@ -330,7 +333,7 @@ double my_rand(int min, int max)
     if (min == 0 && max == 1) {
         result = (double)rand() / (double)RAND_MAX ;
 
-        if (DEBUG_LEVEL > 9) {
+        if (LOG_LEVEL > 9) {
             logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
         }
         return result;
@@ -341,7 +344,7 @@ double my_rand(int min, int max)
         double signal;
         result = (double)rand() / (double)RAND_MAX ;
 
-        if (DEBUG_LEVEL > 9) {
+        if (LOG_LEVEL > 9) {
             logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
         }
 
@@ -355,7 +358,7 @@ double my_rand(int min, int max)
 
 
     result =  (rand() % (max + 1 - min)) + min;
-    if (DEBUG_LEVEL > 9) {
+    if (LOG_LEVEL > 9) {
         logger(LOG_FILE_RANDOM, "0-100: %i\n", result);
     }
     return result;
