@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
+#define BOUNDRY_MIN 0
+#define BOUNDRY_MAX 100
 
 #define DIMENSIONS 100
 #define MAX_ITERATIONS 1000
@@ -19,9 +21,6 @@
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
 #define BETA_MIN 0
 #define BETA_MAX 1
-
-#define BOUNDRY_MIN 0
-#define BOUNDRY_MAX 100
 
 //probability of accepting bad results
 #define ALFA 0.1
