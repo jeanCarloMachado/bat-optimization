@@ -65,6 +65,7 @@ void position_perturbation(struct bat *bat);
 double objective_function (struct bat bat);
 double sphere(double x[]);
 double rastringin (double solution[]);
+double griewank (double solution[]);
 
 
 int main()
@@ -371,7 +372,7 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = rastringin(bat.position);
+    double result = griewank(bat.position);
     return result;
 }
 
@@ -395,6 +396,23 @@ double rastringin (double solution[])
     {
         total=total+(pow(solution[i],(double)2)-10*cos(2*M_PI*solution[i])+10);
     }
+
+   return total;
+}
+
+double griewank (double solution[])
+{
+    double total = 0;
+
+    double top1=0;
+    double top2=1;
+
+    for(int i=0;i<DIMENSIONS;i++)
+    {
+        top1=top1+pow((solution[i]),(double)2);
+        top2=top2*cos((((solution[i])/sqrt((double)(i+1)))*M_PI)/180);
+    }
+    total=(1/(double)4000)*top1-top2+1;
 
    return total;
 }
