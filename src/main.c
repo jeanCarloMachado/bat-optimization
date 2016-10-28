@@ -10,7 +10,7 @@
 #define BOUNDRY_MAX 100
 
 #define DIMENSIONS 100
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 100
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 1
@@ -25,17 +25,20 @@
 //probability of accepting bad results
 #define ALFA 0.1
 //affects local search
-#define LAMBDA 0.9
+#define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
+#define LOG_GENERAL_ENABLED 1
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE_FUNCTION 1
 #define LOG_FILE_RANDOM 2
 #define LOG_STDOUT 3
+#define LOG_FILE_GENERAL 4
 
 int RUN_TIME;
 FILE *LOG_OBJECTIVE;
+FILE *LOG_GENERAL;
 FILE *LOG_RANDOM;
 
 struct bat {
@@ -110,6 +113,10 @@ int main()
             best = get_best(bats);
         }
 
+        if (LOG_GENERAL_ENABLED) {
+            log_bat(LOG_FILE_GENERAL, get_average(bats));
+        }
+
         if (LOG_OBJECTIVE_ENABLED) {
             int best_result = abs(objective_function(best));
             int average_result = abs(objective_function(get_average(bats)));
@@ -124,7 +131,7 @@ int main()
         }
     }
 
-    printf("Best of All: %f", objective_function(best));
+    logger(LOG_STDOUT, "Best of All: %f", objective_function(best));
 
     deallocate_resources();
     return 0;
@@ -144,6 +151,17 @@ void allocate_resources()
             exit(1);
         }
         printf ("Objective log: %s\n", fileName);
+    }
+
+    if (LOG_GENERAL_ENABLED) {
+        sprintf(fileName, "%s/%i-general", DUMP_DIR, RUN_TIME);
+        LOG_GENERAL = fopen(fileName,"w");
+        if (LOG_GENERAL == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("General log: %s\n", fileName);
     }
 
     if (LOG_RANDOM_ENABLED) {
@@ -178,6 +196,9 @@ void deallocate_resources()
     if (LOG_OBJECTIVE_ENABLED) {
         fclose(LOG_OBJECTIVE);
     }
+    if (LOG_GENERAL_ENABLED) {
+        fclose(LOG_GENERAL);
+    }
     if (LOG_RANDOM_ENABLED) {
         fclose(LOG_RANDOM);
     }
@@ -194,6 +215,8 @@ void logger(int destination, char *fmt, ...)
 
     if (destination == LOG_OBJECTIVE_FUNCTION) 
         fprintf(LOG_OBJECTIVE,"%s",formatted_string);
+    else if (destination == LOG_FILE_GENERAL)
+        fprintf(LOG_GENERAL,"%s",formatted_string);
     else if (destination == LOG_FILE_RANDOM)
         fprintf(LOG_RANDOM,"%s",formatted_string);
     else if (destination == LOG_STDOUT) 
@@ -254,20 +277,16 @@ double generate_frequency()
 
 void log_bat(int destination, struct bat bat)
 {
-    logger(destination, " = BAT = \n");
-    logger(destination, "\tFrequency: %f\n", bat.frequency);
-    logger(destination, "\tLoudness: %f\n", bat.loudness);
-    logger(destination, "\tPulse-rate: %f\n", bat.pulse_rate);
+    logger(destination, "\tF,PR,L: %f %f %f\n", bat.frequency, bat.pulse_rate, bat.loudness);
+    /* logger(destination, "\tVelocity:\n"); */
+    /* for (int i = 0; i < DIMENSIONS; i++) { */
+    /*     logger(destination, "\t[%d] %f \n", i, bat.velocity[i]); */
+    /* } */
 
-    logger(destination, "\tVelocity:\n");
-    for (int i = 0; i < DIMENSIONS; i++) {
-        logger(destination, "\t[%d] %f \n", i, bat.velocity[i]);
-    }
-
-    logger(destination, "\tPosition:\n");
-    for (int i = 0; i < DIMENSIONS; i++) {
-        logger(destination, "\t[%d] %f \n", i, bat.position[i]);
-    }
+    /* logger(destination, "\tPosition:\n"); */
+    /* for (int i = 0; i < DIMENSIONS; i++) { */
+    /*     logger(destination, "\t[%d] %f \n", i, bat.position[i]); */
+    /* } */
 }
 
 
@@ -276,9 +295,9 @@ struct bat get_average(struct bat bats[])
     struct bat average;
 
     for (int i = 0; i < BATS_COUNT; i++) {
-        average.frequency =  bats[i].frequency;
-        average.loudness =  bats[i].loudness;
-        average.pulse_rate =  bats[i].pulse_rate;
+        average.frequency+=  bats[i].frequency;
+        average.loudness+=  bats[i].loudness;
+        average.pulse_rate+=  bats[i].pulse_rate;
         for (int j = 0; j < DIMENSIONS; j++) {
             average.position[j]+= bats[i].position[j];
             average.velocity[j]+= bats[i].velocity[j];
@@ -354,7 +373,7 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = sphere(bat.position);
+    double result = ackley(bat.position);
     return result;
 }
 
