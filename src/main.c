@@ -277,7 +277,7 @@ double generate_frequency()
 
 void log_bat(int destination, struct bat bat)
 {
-    logger(destination, "\tF,PR,L: %f %f %f\n", bat.frequency, bat.pulse_rate, bat.loudness);
+    logger(destination, "F,PR,L: %f %f %f\n", bat.frequency, bat.pulse_rate, bat.loudness);
     /* logger(destination, "\tVelocity:\n"); */
     /* for (int i = 0; i < DIMENSIONS; i++) { */
     /*     logger(destination, "\t[%d] %f \n", i, bat.velocity[i]); */
