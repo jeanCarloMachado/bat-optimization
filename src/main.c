@@ -9,8 +9,8 @@
 #define BOUNDRY_MIN -10
 #define BOUNDRY_MAX 10
 
-#define DIMENSIONS 100
-#define MAX_ITERATIONS 100
+#define DIMENSIONS 256
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 1
@@ -28,7 +28,7 @@
 #define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
-#define LOG_GENERAL_ENABLED 1
+#define LOG_GENERAL_ENABLED 0
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE_FUNCTION 1
@@ -84,13 +84,15 @@ int main()
     struct bat average;
     struct bat candidate;
     struct bat *current;
+    int iteration;
+    double best_result,average_result,worst_result;
 
     my_seed();
 
     initialize_bats(bats);
     best = get_best(bats);
 
-    for (int iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
+    for (iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
         for (int j = 0; j < BATS_COUNT; j++) {
             current = &bats[j];
             current->frequency = generate_frequency(current);
@@ -116,11 +118,11 @@ int main()
             }
         }
 
+        best_result = objective_function(best);
 
         if (LOG_OBJECTIVE_ENABLED) {
-            float best_result = objective_function(best);
-            float average_result = objective_function(get_average(bats));
-            float worst_result = objective_function(get_worst(bats));
+            average_result = objective_function(get_average(bats));
+            worst_result = objective_function(get_worst(bats));
             logger(
                 LOG_OBJECTIVE_FUNCTION,
                 "%f\t%f\t%f\n",
@@ -131,9 +133,19 @@ int main()
             );
 
         }
+
+        if (fabs(best_result - 0) < 0.0009) {
+            break;
+        }
+
     }
 
-    logger(LOG_STDOUT, "Best of All: %f", objective_function(best));
+    logger(
+        LOG_STDOUT,
+        "Best of All: %f iterations (%d)",
+        objective_function(best),
+        iteration
+    );
 
     deallocate_resources();
     return 0;
@@ -434,5 +446,5 @@ double ackley (double solution[])
         aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    return (-20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1));
+    return (-20.0*(exp(-0.2*sqrt(1.0/(double)DIMENSIONS*aux)))-exp(1.0/(double)DIMENSIONS*aux1)+20.0+exp(1));
 }
