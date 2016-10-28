@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
+
 #define DIMENSIONS 100
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
@@ -19,8 +20,11 @@
 #define BETA_MIN 0
 #define BETA_MAX 1
 
+#define BOUNDRY_MIN 0
+#define BOUNDRY_MAX 100
+
 //probability of accepting bad results
-#define ALFA 0.9
+#define ALFA 0.1
 //affects local search
 #define LAMBDA 0.9
 
@@ -164,7 +168,7 @@ void initialize_bats(struct bat bats[])
 
         for (int j = 0; j < DIMENSIONS; j++) {
             bats[i].velocity[j] = 0;
-            bats[i].position[j] = my_rand(0, 100);
+            bats[i].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
     }
 }
@@ -351,7 +355,7 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = rastringin(bat.position);
+    double result = sphere(bat.position);
     return result;
 }
 
