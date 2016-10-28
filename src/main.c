@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #define DIMENSIONS 200
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 5000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 1
@@ -25,7 +25,6 @@
 
 
 #define LOG_LEVEL 1
-
 #define LOG_FILE_MAIN 1
 #define LOG_FILE_RANDOM 2
 #define LOG_STDOUT 3
@@ -66,7 +65,7 @@ double objective_function (struct bat bat);
 double sphere(double x[]);
 double rastringin (double solution[]);
 double griewank (double solution[]);
-
+double ackley (double solution[]);
 
 int main()
 {
@@ -372,7 +371,7 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = griewank(bat.position);
+    double result = ackley(bat.position);
     return result;
 }
 
@@ -415,4 +414,21 @@ double griewank (double solution[])
     total=(1/(double)4000)*top1-top2+1;
 
    return total;
+}
+
+double ackley (double solution[])
+{
+    int i;
+    double aux1, aux;
+
+    for (i = 0; i < DIMENSIONS; i++)
+    {
+        aux += solution[i]*solution[i];
+    }
+    for (i = 0; i < DIMENSIONS; i++)
+    {
+        aux1 += cos(2.0*M_PI*solution[i]);
+    }
+
+    return (-20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1));
 }
