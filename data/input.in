@@ -1,0 +1,21 @@
+/*Input file*/
+RUN = 2
+MAX_ITER = 10
+POP_SIZE = 10
+DIM = 5
+FUNCTION = 1
+
+/* RUN is the number of times the ECO alg will run.*/
+/* POP_SIZE is the number of candidate solutions that compounds each population. */
+/* DIM is the number of problem variables. */
+/* FUNCTION represents the problem to be solved. The current options are:*/
+		    /* .0: Rastrigin  [  -5.12,   5.12]*/
+	  	    /*. 1: Schaffer   [-100.00, 100.00]*/
+		    /*. 2: Griewank   [-600.00, 600.00]*/
+		    /*. 3: Ackley     [ -32.00,  32.00]*/
+	 	    /*. 4: Rosenbrock [ -30.00,  30.00]*/
+	 	    /*. 5: Sphere     [-100.00, 100.00]*/
+//To compile (Linux):
+//gcc -c mersenne.c -lm
+//gcc mersenne.o -o alg algorithm.c -lm
+

@@ -60,7 +60,7 @@ unsigned long twist(unsigned long m, unsigned long s0, unsigned long s1 )
 
 void MT_seed()
 {
-	/* FILE* urandom = fopen( "/dev/urandom", "rb" ); */
+	FILE* urandom = fopen( "/dev/urandom", "rb" );
 	/*if( urandom )
 	{
 		unsigned long bigSeed[N];

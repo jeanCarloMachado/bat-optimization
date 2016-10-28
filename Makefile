@@ -1,7 +1,7 @@
 all: source
 
 source:
-	gcc src/main.c -lm -o bat
+	gcc mersenne.o src/main.c -lm -o bat
 run: source
 	./bat
 	./post-run

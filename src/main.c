@@ -4,9 +4,10 @@
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
+#include "mersenne.h"
 
-#define DIMENSIONS 200
-#define MAX_ITERATIONS 5000
+#define DIMENSIONS 100
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 1
@@ -23,14 +24,15 @@
 //affects local search
 #define LAMBDA 0.9
 
+#define LOG_OBJECTIVE_ENABLED 1
+#define LOG_RANDOM_ENABLED 0
 
-#define LOG_LEVEL 1
-#define LOG_FILE_MAIN 1
+#define LOG_OBJECTIVE_FUNCTION 1
 #define LOG_FILE_RANDOM 2
 #define LOG_STDOUT 3
 
 int RUN_TIME;
-FILE *LOG;
+FILE *LOG_OBJECTIVE;
 FILE *LOG_RANDOM;
 
 struct bat {
@@ -105,11 +107,11 @@ int main()
             best = get_best(bats);
         }
 
-        if (LOG_LEVEL >= 1) {
+        if (LOG_OBJECTIVE_ENABLED) {
             int best_result = abs(objective_function(best));
             int average_result = abs(objective_function(get_average(bats)));
             logger(
-                LOG_FILE_MAIN,
+                LOG_OBJECTIVE_FUNCTION,
                 "%u\t%d\t%u\n",
                 iteration,
                 best_result,
@@ -128,18 +130,20 @@ int main()
 void allocate_resources()
 {
     RUN_TIME = time(NULL);
-
     char fileName[100];
-    sprintf(fileName, "%s/%i-main", DUMP_DIR, RUN_TIME);
-    LOG = fopen(fileName,"w");
-    if (LOG == NULL)
-    {
-        printf("Error opening file %s !\n", fileName);
-        exit(1);
-    }
-    printf ("Main log: %s\n", fileName);
 
-    if (LOG_LEVEL > 9) {
+    if (LOG_OBJECTIVE_ENABLED) {
+        sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
+        LOG_OBJECTIVE = fopen(fileName,"w");
+        if (LOG_OBJECTIVE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Objective log: %s\n", fileName);
+    }
+
+    if (LOG_RANDOM_ENABLED) {
         sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
         LOG_RANDOM = fopen(fileName,"w");
         if (LOG_RANDOM == NULL)
@@ -168,8 +172,10 @@ void initialize_bats(struct bat bats[])
 
 void deallocate_resources()
 {
-    fclose(LOG);
-    if (LOG_LEVEL > 9) {
+    if (LOG_OBJECTIVE_ENABLED) {
+        fclose(LOG_OBJECTIVE);
+    }
+    if (LOG_RANDOM_ENABLED) {
         fclose(LOG_RANDOM);
     }
 }
@@ -183,8 +189,8 @@ void logger(int destination, char *fmt, ...)
     vsprintf(formatted_string, fmt, argptr);
     va_end(argptr);
 
-    if (destination == LOG_FILE_MAIN) 
-        fprintf(LOG,"%s",formatted_string);
+    if (destination == LOG_OBJECTIVE_FUNCTION) 
+        fprintf(LOG_OBJECTIVE,"%s",formatted_string);
     else if (destination == LOG_FILE_RANDOM)
         fprintf(LOG_RANDOM,"%s",formatted_string);
     else if (destination == LOG_STDOUT) 
@@ -328,50 +334,24 @@ struct bat get_best(struct bat bats[])
 
 void my_seed(void)
 {
-    srand(time(NULL));
+    MT_seed();
 }
 
 double my_rand(int min, int max)
 {
-    double result;
 
-    if (min == 0 && max == 1) {
-        result = (double)rand() / (double)RAND_MAX ;
+  double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
 
-        if (LOG_LEVEL > 9) {
-            logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
-        }
-        return result;
-    }
+  if (LOG_RANDOM_ENABLED) {
+      logger(LOG_FILE_RANDOM, "%i-%i: %f\n", min, max, result); 
+  }
 
-
-    if (min == -1 && max == 1) {
-        double signal;
-        result = (double)rand() / (double)RAND_MAX ;
-
-        if (LOG_LEVEL > 9) {
-            logger(LOG_FILE_RANDOM, "0-1: %f\n", result);
-        }
-
-       signal = (double)rand() / (double)RAND_MAX ;
-       if (signal < 0.5)  {
-            result = -result;
-       }
-
-        return result;
-    }
-
-
-    result =  (rand() % (max + 1 - min)) + min;
-    if (LOG_LEVEL > 9) {
-        logger(LOG_FILE_RANDOM, "0-100: %i\n", result);
-    }
-    return result;
+   return result;
 }
 
 double objective_function (struct bat bat)
 {
-    double result = ackley(bat.position);
+    double result = rastringin(bat.position);
     return result;
 }
 
