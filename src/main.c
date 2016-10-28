@@ -5,8 +5,8 @@
 #include <math.h>
 #include <stdarg.h>
 
-#define DIMENSIONS 100
-#define MAX_ITERATIONS 100
+#define DIMENSIONS 200
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
 #define FREQUENCY_MAX 1
@@ -14,13 +14,15 @@
 #define LOUDNESS_MAX 1
 #define INITIAL_LOUDNESS 1
 
-//probability of accepting bad results
-#define ALFA 0.5
-//affects local search
-#define LAMBDA 0.9
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
 #define BETA_MIN 0
 #define BETA_MAX 1
+
+//probability of accepting bad results
+#define ALFA 0.9
+//affects local search
+#define LAMBDA 0.9
+
 
 #define LOG_LEVEL 1
 
@@ -48,8 +50,6 @@ double my_rand(int, int);
 void my_seed(void);
 void log_bat(int destination, struct bat bat);
 struct bat get_best(struct bat bats[]);
-double sphere(double x[], double d);
-double objective_function (struct bat bat);
 void update_velocity(struct bat *bat, struct bat best);
 double generate_frequency();
 void update_position(struct bat *bat);
@@ -61,6 +61,11 @@ void allocate_resources(void);
 void deallocate_resources();
 void decrease_loudness(struct bat*, int);
 void position_perturbation(struct bat *bat);
+
+double objective_function (struct bat bat);
+double sphere(double x[]);
+double rastringin (double solution[]);
+
 
 int main()
 {
@@ -366,19 +371,30 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = sphere(bat.position, DIMENSIONS);
+    double result = rastringin(bat.position);
     return result;
 }
 
 //best: 0.632
-double sphere (double x[], double d)
+double sphere (double solution[])
 {
     double total = 0;
 
     for (int i = 0; i < DIMENSIONS; i++) {
-        total+= x[i] * x[i];
+        total+= solution[i] * solution[i];
     }
 
     return total;
 }
 
+double rastringin (double solution[])
+{
+    double total = 0;
+
+    for(int i=0;i<DIMENSIONS;i++)
+    {
+        total=total+(pow(solution[i],(double)2)-10*cos(2*M_PI*solution[i])+10);
+    }
+
+   return total;
+}
