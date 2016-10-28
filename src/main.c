@@ -6,8 +6,8 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
-#define BOUNDRY_MIN 0
-#define BOUNDRY_MAX 100
+#define BOUNDRY_MIN -10
+#define BOUNDRY_MAX 10
 
 #define DIMENSIONS 100
 #define MAX_ITERATIONS 100
@@ -111,21 +111,23 @@ int main()
                 decrease_loudness(current, iteration);
             }
             best = get_best(bats);
+            if (LOG_GENERAL_ENABLED) {
+                log_bat(LOG_FILE_GENERAL, bats[j]);
+            }
         }
 
-        if (LOG_GENERAL_ENABLED) {
-            log_bat(LOG_FILE_GENERAL, get_average(bats));
-        }
 
         if (LOG_OBJECTIVE_ENABLED) {
-            int best_result = abs(objective_function(best));
-            int average_result = abs(objective_function(get_average(bats)));
+            float best_result = objective_function(best);
+            float average_result = objective_function(get_average(bats));
+            float worst_result = objective_function(get_worst(bats));
             logger(
                 LOG_OBJECTIVE_FUNCTION,
-                "%u\t%d\t%u\n",
+                "%f\t%f\t%f\n",
                 iteration,
                 best_result,
-                average_result
+                average_result,
+                worst_result
             );
 
         }
@@ -318,7 +320,7 @@ struct bat get_average(struct bat bats[])
 
 struct bat get_worst(struct bat bats[])
 {
-    double current_worst_val; 
+    double current_worst_val;
     double current_val;
 
     current_val = current_worst_val = objective_function(bats[0]);
@@ -373,7 +375,7 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = ackley(bat.position);
+    double result = sphere(bat.position);
     return result;
 }
 

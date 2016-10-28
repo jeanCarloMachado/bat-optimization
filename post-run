@@ -22,8 +22,9 @@ rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
     echo '
     set term png 
     set output "latest-objective.png" 
-    plot "latest-objective" using 2  title "Best" with lines, \
-    "" using 3 title "Average" with lines 
+    plot "latest-objective" using 1  title "Best" with lines, \
+    "" using 2 title "Average" with lines, \
+    "" using 3 title "Worst" with lines
     ' | gnuplot
     xdg-open latest-objective.png &
 }
