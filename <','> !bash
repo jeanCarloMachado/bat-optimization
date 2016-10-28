@@ -9,7 +9,7 @@
 #define BOUNDRY_MIN -10
 #define BOUNDRY_MAX 10
 
-#define DIMENSIONS 100
+#define DIMENSIONS 256
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0
