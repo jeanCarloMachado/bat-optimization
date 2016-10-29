@@ -7,15 +7,14 @@ cp -rf dump/$lastDumpTimestamp* .
 
 rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
 
-[ -f latest-general ] && {
+[ -f latest-scalar_attr ] && {
     echo '
     set term png
-    set output "latest-general.png"
-    plot "latest-general" using 2  title "Frequency" with lines,  \
-       "" using 3 title "Pulse Rate" with lines,  \
+    set output "latest-scalar_attr.png"
+    plot "latest-scalar_attr" using 3  title "Pulse Rate" with lines,  \
          "" using 4 title "Loudness" with lines
     ' | gnuplot
-    xdg-open latest-general.png
+    xdg-open latest-scalar_attr.png
 }
 
 [ -f latest-objective ] && {
@@ -24,6 +23,7 @@ rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
     set output "latest-objective.png"
     plot "latest-objective" using 1  title "Best" with lines, \
     "" using 2 title "Average" with lines, \
+    "" using 3 title "Worst" with lines
     ' | gnuplot
     xdg-open latest-objective.png
 }
