@@ -6,26 +6,26 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
-#define BOUNDRY_MIN -10
-#define BOUNDRY_MAX 10
+#define BOUNDRY_MIN 0
+#define BOUNDRY_MAX 100
 
 #define DIMENSIONS 100
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
-#define FREQUENCY_MIN 0
-#define FREQUENCY_MAX 1
-#define LOUDNESS_MIN 0
-#define LOUDNESS_MAX 1
-#define INITIAL_LOUDNESS 1
+#define FREQUENCY_MIN 0.0
+#define FREQUENCY_MAX 1.0
+#define LOUDNESS_MIN 0.0
+#define LOUDNESS_MAX 1.0
+#define INITIAL_LOUDNESS 1.0
 
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
 #define BETA_MIN 0
 #define BETA_MAX 1
 
 //probability of accepting bad results
-#define ALFA 0.9
+#define ALFA 0.5
 //affects local search
-#define LAMBDA 0.9
+#define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
 #define LOG_ATRIBUTES_ENABLED 1
@@ -65,13 +65,13 @@ void update_position(struct bat *bat);
 void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
 struct bat get_average(struct bat bats[]);
+double objective_function_average(struct bat bats[]);
 void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
 void decrease_loudness(struct bat*, int);
 void position_perturbation(struct bat *bat);
 void force_boundry_over_position(struct bat *bat);
-
 
 double objective_function (struct bat bat);
 double sphere(double x[]);
@@ -96,7 +96,7 @@ int main()
     initialize_bats(bats);
     best = get_best(bats);
 
-    for (iteration = 0; iteration < MAX_ITERATIONS ; iteration ++) {
+    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; j++) {
             current = &bats[j];
             current->frequency = generate_frequency(current);
@@ -123,10 +123,16 @@ int main()
             }
         }
 
-        best_result = objective_function(best);
+        best_result = objective_function(get_best(bats));
 
         if (LOG_OBJECTIVE_ENABLED) {
-            average_result = objective_function(get_average(bats));
+            /* logger(LOG_OBJECTIVE, "# iteration %i\n", iteration); */
+            /* logger(LOG_OBJECTIVE, "# best %f\n", objective_function(best)); */
+            /* logger(LOG_OBJECTIVE, "# aver %f\n", objective_function(get_average(bats))); */
+            /* for (int j = 0; j < BATS_COUNT; j++) { */
+            /*     logger(LOG_OBJECTIVE, "%f\n", objective_function(bats[j])); */
+            /* } */
+            average_result = objective_function_average(bats);
             worst_result = objective_function(get_worst(bats));
             logger(
                 LOG_OBJECTIVE,
@@ -214,7 +220,7 @@ void initialize_bats(struct bat bats[])
         bats[i].loudness = INITIAL_LOUDNESS;
 
         for (int j = 0; j < DIMENSIONS; j++) {
-            bats[i].velocity[j] = 0;
+            bats[i].velocity[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
             bats[i].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
     }
@@ -295,6 +301,10 @@ void update_velocity(struct bat *bat, struct bat best)
 
 void decrease_loudness(struct bat *bat, int iteration)
 {
+    //linear method
+    //bat->loudness = INITIAL_LOUDNESS - ((INITIAL_LOUDNESS/100)*iteration);
+
+    //geometric method
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
 }
 
@@ -341,6 +351,14 @@ struct bat get_average(struct bat bats[])
 {
     struct bat average;
 
+    average.frequency = 0.0;
+    average.loudness = 0.0;
+    average.pulse_rate = 0.0;
+    for (int j = 0; j < DIMENSIONS; j++) {
+        average.position[j] = 0.0;
+        average.velocity[j] = 0.0;
+    }
+
     for (int i = 0; i < BATS_COUNT; i++) {
         average.frequency+=  bats[i].frequency;
         average.loudness+=  bats[i].loudness;
@@ -350,7 +368,6 @@ struct bat get_average(struct bat bats[])
             average.velocity[j]+= bats[i].velocity[j];
         }
     }
-
 
     average.frequency =  average.frequency / BATS_COUNT;
     average.loudness =  average.loudness / BATS_COUNT;
@@ -362,6 +379,19 @@ struct bat get_average(struct bat bats[])
 
     return average;
 }
+
+
+double objective_function_average(struct bat bats[])
+{
+    double result = 0;
+
+    for (int i = 0; i < BATS_COUNT; i++) {
+        result+= objective_function(bats[i]);
+    }
+
+    return result / BATS_COUNT;
+}
+
 
 struct bat get_worst(struct bat bats[])
 {
