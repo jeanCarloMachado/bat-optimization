@@ -6,21 +6,19 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
-#define BOUNDRY_MIN 0
-#define BOUNDRY_MAX 100
+#define BOUNDRY_MIN -32
+#define BOUNDRY_MAX 32
 
 #define DIMENSIONS 100
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
-#define LOUDNESS_MIN 0.0
-#define LOUDNESS_MAX 1.0
 #define INITIAL_LOUDNESS 1.0
 
 #define DUMP_DIR "/home/jean/projects/bat-optimization/dump"
-#define BETA_MIN 0
-#define BETA_MAX 1
+#define BETA_MIN 0.0
+#define BETA_MAX 1.0
 
 //probability of accepting bad results
 #define ALFA 0.5
@@ -78,6 +76,7 @@ double sphere(double x[]);
 double rastringin (double solution[]);
 double griewank (double solution[]);
 double ackley (double solution[]);
+double rosenbrock(double solution[]);
 
 int main()
 {
@@ -129,6 +128,7 @@ int main()
             /* logger(LOG_OBJECTIVE, "# iteration %i\n", iteration); */
             /* logger(LOG_OBJECTIVE, "# best %f\n", objective_function(best)); */
             /* logger(LOG_OBJECTIVE, "# aver %f\n", objective_function(get_average(bats))); */
+            /* logger(LOG_OBJECTIVE, "# worst %f\n", objective_function(get_worst(bats))); */
             /* for (int j = 0; j < BATS_COUNT; j++) { */
             /*     logger(LOG_OBJECTIVE, "%f\n", objective_function(bats[j])); */
             /* } */
@@ -450,8 +450,12 @@ double my_rand(int min, int max)
 
 double objective_function (struct bat bat)
 {
-    double result = sphere(bat.position);
-    return result;
+    /* double result = rastringin(bat.position); */
+    double result = griewank(bat.position);
+    /* double result = sphere(bat.position); */
+    /* double result = ackley(bat.position); */
+    /* double result = rosenbrock(bat.position); */
+    return fabs(result);
 }
 
 //best: 0.632
@@ -498,7 +502,8 @@ double griewank (double solution[])
 double ackley (double solution[])
 {
     int i;
-    double aux1, aux;
+    double aux, aux1;
+    double result;
 
     for (i = 0; i < DIMENSIONS; i++)
     {
@@ -506,8 +511,26 @@ double ackley (double solution[])
     }
     for (i = 0; i < DIMENSIONS; i++)
     {
-        aux1 += cos(2.0*M_PI*solution[i]);
+    aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    return (-20.0*(exp(-0.2*sqrt(1.0/(double)DIMENSIONS*aux)))-exp(1.0/(double)DIMENSIONS*aux1)+20.0+exp(1));
+
+    result = (-20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1));
+
+    /* if (isnan(result)) { */
+    /*     result = INT_MAX; */ 
+    /* } */
+
+    return result;
+}
+
+double rosenbrock(double solution[])
+{
+    double top;
+    for (int i = 0; i < DIMENSIONS-1; i++)
+    {
+        top=top+100.*pow((solution[i+1] - pow(solution[i],2.)),2) + pow((1. - solution[i]),2);
+    }
+
+    return top;
 }
