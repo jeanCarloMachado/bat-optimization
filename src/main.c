@@ -6,10 +6,23 @@
 #include <stdarg.h>
 #include "mersenne.h"
 
+//rastringin
+/* #define BOUNDRY_MIN -5.12 */
+/* #define BOUNDRY_MAX 5.12 */
+
+//griewank
+/* #define BOUNDRY_MIN -600 */
+/* #define BOUNDRY_MAX 600 */
+
+//sphere
+/* #define BOUNDRY_MIN -100 */
+/* #define BOUNDRY_MAX 100 */
+
+//ackley
 #define BOUNDRY_MIN -32
 #define BOUNDRY_MAX 32
 
-#define DIMENSIONS 100
+#define DIMENSIONS 200
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
@@ -25,8 +38,8 @@
 //affects local search
 #define LAMBDA 0.1
 
-#define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 1
+#define LOG_OBJECTIVE_ENABLED 0
+#define LOG_ATRIBUTES_ENABLED 0
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -413,8 +426,8 @@ void objective_function (struct bat *bat)
     /* bat->fitness = griewank(bat->position); */
     /* bat->fitness = sphere(bat->position); */
 
-    /* bat->fitness = ackley(bat->position); */
-    /* usleep(0); */
+    bat->fitness = ackley(bat->position);
+    usleep(0);
 }
 
 //best: 0.632
