@@ -9,8 +9,8 @@
 #define BOUNDRY_MIN -32
 #define BOUNDRY_MAX 32
 
-#define DIMENSIONS 100
-#define MAX_ITERATIONS 1000
+#define DIMENSIONS 1
+#define MAX_ITERATIONS 100
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
@@ -70,6 +70,8 @@ void deallocate_resources();
 void decrease_loudness(struct bat*, int);
 void position_perturbation(struct bat *bat);
 void force_boundry_over_position(struct bat *bat);
+_Bool first_is_better_than_second(double first, double second);
+
 
 double objective_function (struct bat bat);
 double sphere(double x[]);
@@ -135,13 +137,12 @@ int main()
             average_result = objective_function_average(bats);
             worst_result = objective_function(get_worst(bats));
             logger(
-                LOG_OBJECTIVE,
-                "%f\t%f\t%f\n",
-                iteration,
-                best_result,
-                average_result,
-                worst_result
-            );
+                    LOG_OBJECTIVE,
+                    "%f\t%f\t%f\n",
+                    best_result,
+                    average_result,
+                    worst_result
+                  );
 
         }
 
@@ -152,11 +153,11 @@ int main()
     }
 
     logger(
-        LOG_STDOUT,
-        "Best of All: %f iterations (%d)",
-        objective_function(best),
-        iteration
-    );
+            LOG_STDOUT,
+            "Best of All: %f iterations (%d)",
+            objective_function(best),
+            iteration
+          );
 
     deallocate_resources();
     return 0;
@@ -294,7 +295,7 @@ void update_velocity(struct bat *bat, struct bat best)
     for (int i = 0; i < DIMENSIONS; i++ ) {
         bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best.position[i]) * bat->frequency;
         if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
-             bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
     }
 }
@@ -314,7 +315,7 @@ void update_position(struct bat *bat)
         bat->position[i] = bat->position[i] + bat->velocity[i];
 
         if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-             bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
     }
 }
@@ -324,7 +325,7 @@ void force_boundry_over_position(struct bat *bat)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
         if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-             bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
     }
 }
@@ -402,16 +403,19 @@ struct bat get_worst(struct bat bats[])
     struct bat current_worst_bat = bats[0];
     for (int i = 0; i < BATS_COUNT; i++) {
         current_val = objective_function(bats[i]);
-        if (current_val > current_worst_val) {
-            current_worst_bat = bats[i];
+        if (first_is_better_than_second(current_worst_val, current_val)) {
             current_worst_val = current_val;
+            current_worst_bat = bats[i];
         }
     }
 
     return current_worst_bat;
 }
 
-
+_Bool first_is_better_than_second(double first, double second)
+{
+    return (first < second && !isnan(first));
+}
 
 struct bat get_best(struct bat bats[])
 {
@@ -422,9 +426,9 @@ struct bat get_best(struct bat bats[])
     struct bat current_best_bat = bats[0];
     for (int i = 0; i < BATS_COUNT; i++) {
         current_val = objective_function(bats[i]);
-        if (current_val < current_best_val) {
-            current_best_bat = bats[i];
+        if (first_is_better_than_second(current_val, current_best_val)) {
             current_best_val = current_val;
+            current_best_bat = bats[i];
         }
     }
 
@@ -439,21 +443,22 @@ void my_seed(void)
 double my_rand(int min, int max)
 {
 
-  double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
+    double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
 
-  if (LOG_RANDOM_ENABLED) {
-      logger(LOG_RANDOM, "%i-%i: %f\n", min, max, result); 
-  }
+    if (LOG_RANDOM_ENABLED) {
+        logger(LOG_RANDOM, "%i-%i: %f\n", min, max, result); 
+    }
 
-   return result;
+    return result;
 }
 
 double objective_function (struct bat bat)
 {
     /* double result = rastringin(bat.position); */
-    double result = griewank(bat.position);
+    /* double result = griewank(bat.position); */
     /* double result = sphere(bat.position); */
-    /* double result = ackley(bat.position); */
+    double result = ackley(bat.position);
+    /* printf("Position: %f, Result: %f\n", bat.position[0], result); */
     /* double result = rosenbrock(bat.position); */
     return fabs(result);
 }
@@ -479,10 +484,10 @@ double rastringin (double solution[])
         total=total+(pow(solution[i],(double)2)-10*cos(2*M_PI*solution[i])+10);
     }
 
-   return total;
+    return total;
 }
 
-double griewank (double solution[])
+double griewank(double solution[])
 {
     double total = 0;
 
@@ -496,14 +501,13 @@ double griewank (double solution[])
     }
     total=(1/(double)4000)*top1-top2+1;
 
-   return total;
+    return total;
 }
 
-double ackley (double solution[])
+double ackley(double solution[])
 {
     int i;
-    double aux, aux1;
-    double result;
+    double aux, aux1, result;
 
     for (i = 0; i < DIMENSIONS; i++)
     {
@@ -511,15 +515,10 @@ double ackley (double solution[])
     }
     for (i = 0; i < DIMENSIONS; i++)
     {
-    aux1 += cos(2.0*M_PI*solution[i]);
+        aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-
     result = (-20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1));
-
-    /* if (isnan(result)) { */
-    /*     result = INT_MAX; */ 
-    /* } */
 
     return result;
 }
