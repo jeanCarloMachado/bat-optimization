@@ -10,7 +10,7 @@
 #define BOUNDRY_MAX 32
 
 #define DIMENSIONS 100
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 100
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
@@ -21,12 +21,12 @@
 #define BETA_MAX 1.0
 
 //probability of accepting bad results
-#define ALFA 0.9
+#define ALFA 0.5
 //affects local search
-#define LAMBDA 0.9
+#define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 0
+#define LOG_ATRIBUTES_ENABLED 1
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -56,7 +56,7 @@ struct bat get_worst(struct bat bats[]);
 void initialize_bats(struct bat bats[]);
 double my_rand(int, int);
 void my_seed(void);
-void log_bat(struct bat bat);
+void log_bat(struct bat *bat);
 struct bat get_best(struct bat bats[]);
 void update_velocity(struct bat *bat, struct bat best);
 double generate_frequency();
@@ -88,7 +88,6 @@ int main()
     struct bat worst;
     struct bat average;
     struct bat candidate;
-    struct bat *current;
     int iteration;
     double best_result,average_result,worst_result;
 
@@ -99,10 +98,9 @@ int main()
 
     for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; j++) {
-            current = &bats[j];
-            current->frequency = generate_frequency(current);
-            update_velocity(current, best);
-            candidate = *current;
+            bats[j].frequency = generate_frequency(bats[j]);
+            update_velocity(&bats[j], best);
+            candidate = bats[j];
 
             update_position(&candidate);
 
@@ -114,17 +112,19 @@ int main()
             force_boundry_over_position(&candidate);
 
 
-            current->fitness = objective_function(*current);
+            bats[j].fitness = objective_function(bats[j]);
+            printf("%f\n", bats[j].fitness);
             candidate.fitness = objective_function(candidate);
 
-            if (my_rand(0,1) < bats[j].loudness || candidate.fitness < current->fitness) {
-                memcpy(current->position, candidate.position, sizeof candidate.position);
-                current->pulse_rate = 1 - exp(-LAMBDA*iteration);
-                decrease_loudness(current, iteration);
+            if (my_rand(0,1) < bats[j].loudness || candidate.fitness < bats[j].fitness) {
+                memcpy(bats[j].position, candidate.position, sizeof candidate.position);
+                bats[j].fitness = candidate.fitness;
+                bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
+                decrease_loudness(&bats[j], iteration);
             }
             best = get_best(bats);
             if (LOG_ATRIBUTES_ENABLED) {
-                log_bat(bats[j]);
+                log_bat(&bats[j]);
             }
         }
 
@@ -335,12 +335,12 @@ double generate_frequency()
     return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 }
 
-void log_bat(struct bat bat)
+void log_bat(struct bat *bat)
 {
-    logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %f %f %f\n", bat.frequency, bat.pulse_rate, bat.loudness);
+    logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %f %f %f\n", bat->frequency, bat->pulse_rate, bat->loudness);
 
     for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_VECTOR_ATRIBUTES, "%f\t%f\n", bat.velocity[i], bat.position[i]);
+        logger(LOG_VECTOR_ATRIBUTES, "%f\t%f\t%f\n", bat->velocity[i], bat->position[i], bat->fitness);
     }
 }
 
@@ -415,8 +415,8 @@ double objective_function (struct bat bat)
     /* double result = rastringin(bat.position); */
     /* double result = griewank(bat.position); */
     /* double result = sphere(bat.position); */
-    double result = ackley(bat.position);
-    /* double result = rosenbrock(bat.position); */
+    /* double result = ackley(bat.position); */
+    double result = rosenbrock(bat.position);
     return fabs(result);
 }
 
