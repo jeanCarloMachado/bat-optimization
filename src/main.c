@@ -9,8 +9,8 @@
 #define BOUNDRY_MIN -32
 #define BOUNDRY_MAX 32
 
-#define DIMENSIONS 1
-#define MAX_ITERATIONS 100
+#define DIMENSIONS 100
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
@@ -21,12 +21,12 @@
 #define BETA_MAX 1.0
 
 //probability of accepting bad results
-#define ALFA 0.5
+#define ALFA 0.9
 //affects local search
-#define LAMBDA 0.1
+#define LAMBDA 0.9
 
 #define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 1
+#define LOG_ATRIBUTES_ENABLED 0
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -46,6 +46,7 @@ struct bat {
     double pulse_rate;
     //tends towards 0
     double loudness;
+    double fitness;
     double frequency;
     double position[DIMENSIONS];
     double velocity[DIMENSIONS];
@@ -62,8 +63,7 @@ double generate_frequency();
 void update_position(struct bat *bat);
 void local_search(struct bat *bat, struct bat best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
-struct bat get_average(struct bat bats[]);
-double objective_function_average(struct bat bats[]);
+double fitness_average(struct bat bats[]);
 void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
@@ -113,7 +113,11 @@ int main()
             position_perturbation(&candidate);
             force_boundry_over_position(&candidate);
 
-            if (my_rand(0,1) < bats[j].loudness || objective_function(candidate) < objective_function(*current)) {
+
+            current->fitness = objective_function(*current);
+            candidate.fitness = objective_function(candidate);
+
+            if (my_rand(0,1) < bats[j].loudness || candidate.fitness < current->fitness) {
                 memcpy(current->position, candidate.position, sizeof candidate.position);
                 current->pulse_rate = 1 - exp(-LAMBDA*iteration);
                 decrease_loudness(current, iteration);
@@ -124,18 +128,11 @@ int main()
             }
         }
 
-        best_result = objective_function(get_best(bats));
+        best_result = get_best(bats).fitness;
 
         if (LOG_OBJECTIVE_ENABLED) {
-            /* logger(LOG_OBJECTIVE, "# iteration %i\n", iteration); */
-            /* logger(LOG_OBJECTIVE, "# best %f\n", objective_function(best)); */
-            /* logger(LOG_OBJECTIVE, "# aver %f\n", objective_function(get_average(bats))); */
-            /* logger(LOG_OBJECTIVE, "# worst %f\n", objective_function(get_worst(bats))); */
-            /* for (int j = 0; j < BATS_COUNT; j++) { */
-            /*     logger(LOG_OBJECTIVE, "%f\n", objective_function(bats[j])); */
-            /* } */
-            average_result = objective_function_average(bats);
-            worst_result = objective_function(get_worst(bats));
+            average_result = fitness_average(bats);
+            worst_result = get_worst(bats).fitness;
             logger(
                     LOG_OBJECTIVE,
                     "%f\t%f\t%f\n",
@@ -155,7 +152,7 @@ int main()
     logger(
             LOG_STDOUT,
             "Best of All: %f iterations (%d)",
-            objective_function(best),
+            best.fitness,
             iteration
           );
 
@@ -348,46 +345,12 @@ void log_bat(struct bat bat)
 }
 
 
-struct bat get_average(struct bat bats[])
-{
-    struct bat average;
-
-    average.frequency = 0.0;
-    average.loudness = 0.0;
-    average.pulse_rate = 0.0;
-    for (int j = 0; j < DIMENSIONS; j++) {
-        average.position[j] = 0.0;
-        average.velocity[j] = 0.0;
-    }
-
-    for (int i = 0; i < BATS_COUNT; i++) {
-        average.frequency+=  bats[i].frequency;
-        average.loudness+=  bats[i].loudness;
-        average.pulse_rate+=  bats[i].pulse_rate;
-        for (int j = 0; j < DIMENSIONS; j++) {
-            average.position[j]+= bats[i].position[j];
-            average.velocity[j]+= bats[i].velocity[j];
-        }
-    }
-
-    average.frequency =  average.frequency / BATS_COUNT;
-    average.loudness =  average.loudness / BATS_COUNT;
-    average.pulse_rate =  average.pulse_rate / BATS_COUNT;
-    for (int j = 0; j < DIMENSIONS; j++) {
-        average.position[j] = average.position[j] / BATS_COUNT;
-        average.velocity[j] = average.velocity[j] / BATS_COUNT;
-    }
-
-    return average;
-}
-
-
-double objective_function_average(struct bat bats[])
+double fitness_average(struct bat bats[])
 {
     double result = 0;
 
     for (int i = 0; i < BATS_COUNT; i++) {
-        result+= objective_function(bats[i]);
+        result+= bats[i].fitness;
     }
 
     return result / BATS_COUNT;
@@ -399,11 +362,11 @@ struct bat get_worst(struct bat bats[])
     double current_worst_val;
     double current_val;
 
-    current_val = current_worst_val = objective_function(bats[0]);
+    current_val = current_worst_val = bats[0].fitness;
     struct bat current_worst_bat = bats[0];
     for (int i = 0; i < BATS_COUNT; i++) {
-        current_val = objective_function(bats[i]);
-        if (first_is_better_than_second(current_worst_val, current_val)) {
+        current_val = bats[i].fitness;
+        if (current_worst_val <  current_val) {
             current_worst_val = current_val;
             current_worst_bat = bats[i];
         }
@@ -412,21 +375,16 @@ struct bat get_worst(struct bat bats[])
     return current_worst_bat;
 }
 
-_Bool first_is_better_than_second(double first, double second)
-{
-    return (first < second && !isnan(first));
-}
-
 struct bat get_best(struct bat bats[])
 {
     double current_best_val; 
     double current_val;
 
-    current_val = current_best_val = objective_function(bats[0]);
+    current_val = current_best_val = bats[0].fitness;
     struct bat current_best_bat = bats[0];
     for (int i = 0; i < BATS_COUNT; i++) {
-        current_val = objective_function(bats[i]);
-        if (first_is_better_than_second(current_val, current_best_val)) {
+        current_val = bats[i].fitness;
+        if (current_val < current_best_val) {
             current_best_val = current_val;
             current_best_bat = bats[i];
         }
@@ -458,7 +416,6 @@ double objective_function (struct bat bat)
     /* double result = griewank(bat.position); */
     /* double result = sphere(bat.position); */
     double result = ackley(bat.position);
-    /* printf("Position: %f, Result: %f\n", bat.position[0], result); */
     /* double result = rosenbrock(bat.position); */
     return fabs(result);
 }
