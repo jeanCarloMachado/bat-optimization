@@ -113,7 +113,6 @@ int main()
 
 
             bats[j].fitness = objective_function(bats[j]);
-            bats[j].fitness;
             /* printf("%f\n", bats[j].fitness); */
             candidate.fitness = objective_function(candidate);
 
