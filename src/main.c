@@ -10,7 +10,7 @@
 #define BOUNDRY_MAX 32
 
 #define DIMENSIONS 100
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
@@ -113,7 +113,8 @@ int main()
 
 
             bats[j].fitness = objective_function(bats[j]);
-            printf("%f\n", bats[j].fitness);
+            bats[j].fitness;
+            /* printf("%f\n", bats[j].fitness); */
             candidate.fitness = objective_function(candidate);
 
             if (my_rand(0,1) < bats[j].loudness || candidate.fitness < bats[j].fitness) {
@@ -415,8 +416,10 @@ double objective_function (struct bat bat)
     /* double result = rastringin(bat.position); */
     /* double result = griewank(bat.position); */
     /* double result = sphere(bat.position); */
-    /* double result = ackley(bat.position); */
-    double result = rosenbrock(bat.position);
+    double result;
+
+    result = ackley(bat.position);
+    /* double result = rosenbrock(bat.position); */
     return fabs(result);
 }
 
