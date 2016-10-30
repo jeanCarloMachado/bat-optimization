@@ -58,10 +58,10 @@ double my_rand(int, int);
 void my_seed(void);
 void log_bat(struct bat *bat);
 struct bat get_best(struct bat bats[]);
-void update_velocity(struct bat *bat, struct bat best);
+void update_velocity(struct bat *bat, struct bat *best);
 double generate_frequency();
 void update_position(struct bat *bat);
-void local_search(struct bat *bat, struct bat best, double loudness_average);
+void local_search(struct bat *bat, struct bat *best, double loudness_average);
 double calc_loudness_average(struct bat bats[]);
 double fitness_average(struct bat bats[]);
 void logger(int destination, char *fmt, ...);
@@ -70,15 +70,12 @@ void deallocate_resources();
 void decrease_loudness(struct bat*, int);
 void position_perturbation(struct bat *bat);
 void force_boundry_over_position(struct bat *bat);
-_Bool first_is_better_than_second(double first, double second);
 
-
-double objective_function (struct bat bat);
+void objective_function (struct bat *bat);
 double sphere(double x[]);
 double rastringin (double solution[]);
 double griewank (double solution[]);
 double ackley (double solution[]);
-double rosenbrock(double solution[]);
 
 int main()
 {
@@ -99,22 +96,21 @@ int main()
     for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; j++) {
             bats[j].frequency = generate_frequency(bats[j]);
-            update_velocity(&bats[j], best);
+            update_velocity(&bats[j], &best);
             candidate = bats[j];
 
             update_position(&candidate);
 
             if (my_rand(0,1) < candidate.pulse_rate) {
-                local_search(&candidate, best, calc_loudness_average(bats));
+                local_search(&candidate, &best, calc_loudness_average(bats));
             }
 
             position_perturbation(&candidate);
             force_boundry_over_position(&candidate);
 
 
-            bats[j].fitness = objective_function(bats[j]);
-            /* printf("%f\n", bats[j].fitness); */
-            candidate.fitness = objective_function(candidate);
+            objective_function(&bats[j]);
+            objective_function(&candidate);
 
             if (my_rand(0,1) < bats[j].loudness || candidate.fitness < bats[j].fitness) {
                 memcpy(bats[j].position, candidate.position, sizeof candidate.position);
@@ -215,6 +211,7 @@ void initialize_bats(struct bat bats[])
     for (int i = 0; i < BATS_COUNT; i ++ ) {
         bats[i].pulse_rate = 0;
         bats[i].frequency = 0;
+        bats[i].fitness = 0;
         bats[i].loudness = INITIAL_LOUDNESS;
 
         for (int j = 0; j < DIMENSIONS; j++) {
@@ -267,10 +264,10 @@ void position_perturbation(struct bat *bat)
 }
 
 
-void local_search(struct bat *bat, struct bat best, double loudness_average)
+void local_search(struct bat *bat, struct bat *best, double loudness_average)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->position[i] = best.position[i] + loudness_average * my_rand(0,1);
+        bat->position[i] = best->position[i] + loudness_average * my_rand(0.0,1.0);
     }
 }
 
@@ -287,10 +284,10 @@ double calc_loudness_average(struct bat bats[])
 }
 
 
-void update_velocity(struct bat *bat, struct bat best)
+void update_velocity(struct bat *bat, struct bat *best)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best.position[i]) * bat->frequency;
+        bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best->position[i]) * bat->frequency;
         if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
             bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
@@ -410,16 +407,14 @@ double my_rand(int min, int max)
     return result;
 }
 
-double objective_function (struct bat bat)
+void objective_function (struct bat *bat)
 {
-    /* double result = rastringin(bat.position); */
-    /* double result = griewank(bat.position); */
-    /* double result = sphere(bat.position); */
-    double result;
+    /* bat->fitness = rastringin(bat->position); */
+    /* bat->fitness = griewank(bat->position); */
+    /* bat->fitness = sphere(bat->position); */
 
-    result = ackley(bat.position);
-    /* double result = rosenbrock(bat.position); */
-    return fabs(result);
+    /* bat->fitness = ackley(bat->position); */
+    /* usleep(0); */
 }
 
 //best: 0.632
@@ -477,18 +472,8 @@ double ackley(double solution[])
         aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    result = (-20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1));
+    result = -20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1);
 
     return result;
 }
 
-double rosenbrock(double solution[])
-{
-    double top;
-    for (int i = 0; i < DIMENSIONS-1; i++)
-    {
-        top=top+100.*pow((solution[i+1] - pow(solution[i],2.)),2) + pow((1. - solution[i]),2);
-    }
-
-    return top;
-}
