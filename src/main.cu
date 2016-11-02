@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include <unistd.h>
 extern "C" {
-#include "mersenne.h"
 #include "common.h"
 }
 
@@ -68,41 +67,62 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-struct bat get_worst(struct bat bats[]);
-void initialize_bats(struct bat bats[]);
-double my_rand(int, int);
+struct bat get_worst(struct bat *bats);
+void initialize_bats(struct bat *bats);
 void my_rand_collection(int min, int max, double *collection, int size);
-void my_seed(void);
+void objective_function (struct bat *bat);
 void log_bat(struct bat *bat);
-struct bat get_best(struct bat bats[]);
 void update_velocity(struct bat *bat, struct bat *best);
 double generate_frequency();
 void update_position(struct bat *bat);
 void local_search(struct bat *bat, struct bat *best, double loudness_average);
-double calc_loudness_average(struct bat bats[]);
-double fitness_average(struct bat bats[]);
+double calc_loudness_average(struct bat *bats);
+double fitness_average(struct bat *bats);
 void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources();
 void decrease_loudness(struct bat*, int);
 void position_perturbation(struct bat *bat);
 void force_boundry_over_position(struct bat *bat);
-
 void objective_function (struct bat *bat);
+
+
+struct bat get_best(struct bat *bats, struct bat *best)
+{
+    double current_best_val; 
+    double current_val;
+
+    current_val = current_best_val = bats[0].fitness;
+    struct bat current_best_bat = bats[0];
+    for (int i = 0; i < BATS_COUNT; i++) {
+        current_val = bats[i].fitness;
+        if (current_val < current_best_val) {
+            current_best_val = current_val;
+            current_best_bat = bats[i];
+        }
+    }
+
+    return current_best_bat;
+}
+
+
 
 int main()
 {
     allocate_resources();
-    struct bat bats[BATS_COUNT];
-    struct bat best;
-    struct bat candidate;
+    struct bat *bats;
+    struct bat *best, *candidate;
+    cudaMalloc((void **)&bats, sizeof(bat) * BATS_COUNT);
+    cudaMalloc((void **)&best, sizeof(bat));
+    cudaMalloc((void **)&candidate, sizeof(bat));
+
     int iteration;
     double best_result,average_result,worst_result;
 
     my_seed();
 
     initialize_bats(bats);
-    best = get_best(bats);
+    get_best(bats, best);
 
     for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; j++) {
@@ -163,6 +183,9 @@ int main()
             iteration
           );
 
+    cudaFree(bats);
+    cudaFree(best);
+    cudaFree(candidate);
     deallocate_resources();
     return 0;
 }
@@ -229,18 +252,14 @@ __global__ void initialize_bat(struct bat *bats, double *velocity, double *posit
 }
 
 
-void initialize_bats(struct bat bats[])
+void initialize_bats(struct bat *bats)
 {
-    bat *cuda_bats;
-    int bats_size = sizeof(bat) * BATS_COUNT;
-    cudaMalloc((void **)&cuda_bats, bats_size);
-    cudaMemcpy(cuda_bats, bats, bats_size, cudaMemcpyHostToDevice);
-
     double *velocity, *position;
     double *d_velocity, *d_position;
-    int total,size;
-    total = DIMENSIONS * BATS_COUNT;
-    size = sizeof(double) * total;
+
+    int vector_positions,size;
+    vector_positions = DIMENSIONS * BATS_COUNT;
+    size = sizeof(double) * vector_positions;
 
     velocity  = (double *)malloc(size);
     position  = (double *)malloc(size);
@@ -248,20 +267,17 @@ void initialize_bats(struct bat bats[])
     cudaMalloc((void **)&d_velocity, size);
     cudaMalloc((void **)&d_position, size);
 
-    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, velocity, total);
-    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, position, total);
+    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, velocity, vector_positions);
+    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, position, vector_positions);
 
     cudaMemcpy(d_velocity, velocity, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_position, position, size, cudaMemcpyHostToDevice);
 
 
-    initialize_bat<<<BATS_COUNT,1>>>(cuda_bats, d_velocity, d_position, total);
-
-    cudaMemcpy(bats, cuda_bats, bats_size, cudaMemcpyDeviceToHost);
+    initialize_bat<<<BATS_COUNT,1>>>(bats, d_velocity, d_position, vector_positions);
 
     free(velocity);
     free(position);
-    cudaFree(cuda_bats);
     cudaFree(d_velocity);
     cudaFree(d_position);
 }
@@ -275,7 +291,7 @@ void deallocate_resources()
     if (LOG_ATRIBUTES_ENABLED) {
         fclose(LOG_SCALAR_ATRIBUTES_FILE);
         fclose(LOG_VECTOR_ATRIBUTES_FILE);
-    }
+    
     if (LOG_RANDOM_ENABLED) {
         fclose(LOG_RANDOM_FILE);
     }
@@ -316,7 +332,7 @@ void local_search(struct bat *bat, struct bat *best, double loudness_average)
     }
 }
 
-double calc_loudness_average(struct bat bats[])
+double calc_loudness_average(struct bat *bats)
 {
     double total = 0;
 
@@ -386,7 +402,7 @@ void log_bat(struct bat *bat)
 }
 
 
-double fitness_average(struct bat bats[])
+double fitness_average(struct bat *bats)
 {
     double result = 0;
 
@@ -398,7 +414,7 @@ double fitness_average(struct bat bats[])
 }
 
 
-struct bat get_worst(struct bat bats[])
+struct bat get_worst(struct bat *bats)
 {
     double current_worst_val;
     double current_val;
@@ -414,41 +430,6 @@ struct bat get_worst(struct bat bats[])
     }
 
     return current_worst_bat;
-}
-
-struct bat get_best(struct bat bats[])
-{
-    double current_best_val; 
-    double current_val;
-
-    current_val = current_best_val = bats[0].fitness;
-    struct bat current_best_bat = bats[0];
-    for (int i = 0; i < BATS_COUNT; i++) {
-        current_val = bats[i].fitness;
-        if (current_val < current_best_val) {
-            current_best_val = current_val;
-            current_best_bat = bats[i];
-        }
-    }
-
-    return current_best_bat;
-}
-
-void my_seed(void)
-{
-    MT_seed();
-}
-
-double my_rand(int min, int max)
-{
-
-    double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
-
-    if (LOG_RANDOM_ENABLED) {
-        logger(LOG_RANDOM, "%i-%i: %f\n", min, max, result); 
-    }
-
-    return result;
 }
 
 void my_rand_collection(int min, int max, double *collection, int size)

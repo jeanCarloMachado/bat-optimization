@@ -1,7 +1,7 @@
 #include "common.h"
 #include <math.h>
+#include "mersenne.h"
 
-//best: 0.632
 double sphere (double solution[], int dimensions)
 {
     double total = 0;
@@ -60,3 +60,17 @@ double ackley(double solution[], int dimensions)
 
     return result;
 }
+
+void my_seed(void)
+{
+    MT_seed();
+}
+
+double my_rand(int min, int max)
+{
+
+    double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
+
+    return result;
+}
+
