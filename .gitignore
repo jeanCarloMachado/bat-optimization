@@ -3,3 +3,6 @@ graphic.png
 latest*
 *.o
 *.swp
+a.out
+bat
+bat_gpu

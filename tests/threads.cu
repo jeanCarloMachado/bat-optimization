@@ -3,8 +3,8 @@
 #define N 512
 
 __global__ void add(int *a, int *b, int *c) {
+	printf("teste\n");
 	c[threadIdx.x] = a[threadIdx.x] + b[threadIdx.x];
-	printf("teste");
 }
 
 void random_ints(int *x, int n)
@@ -34,10 +34,7 @@ int main(void) {
 
 	add<<<1,N>>>(d_a, d_b, d_c);
 
-
 	cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
-
-	printf ("%d\n", c[0]);
 
 	free(a);
 	free(b);
