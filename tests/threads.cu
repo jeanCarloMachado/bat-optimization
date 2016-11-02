@@ -4,6 +4,7 @@
 
 __global__ void add(int *a, int *b, int *c) {
 	c[threadIdx.x] = a[threadIdx.x] + b[threadIdx.x];
+	printf("teste");
 }
 
 void random_ints(int *x, int n)

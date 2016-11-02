@@ -4,8 +4,10 @@
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
-#include "mersenne.h"
 #include <unistd.h>
+extern "C" {
+#include "mersenne.h"
+}
 
 //rastringin
 /* #define BOUNDRY_MIN -5.12 */
@@ -69,6 +71,7 @@ struct bat {
 struct bat get_worst(struct bat bats[]);
 void initialize_bats(struct bat bats[]);
 double my_rand(int, int);
+void my_rand_collection(int min, int max, double *collection, int size);
 void my_seed(void);
 void log_bat(struct bat *bat);
 struct bat get_best(struct bat bats[]);
@@ -96,8 +99,6 @@ int main()
     allocate_resources();
     struct bat bats[BATS_COUNT];
     struct bat best;
-    struct bat worst;
-    struct bat average;
     struct bat candidate;
     int iteration;
     double best_result,average_result,worst_result;
@@ -177,7 +178,7 @@ void allocate_resources()
 
     if (LOG_OBJECTIVE_ENABLED) {
         sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
-        LOG_OBJECTIVE_FILE = fopen(fileName,"w");
+        LOG_OBJECTIVE_FILE = fopen(fileName,"w+");
         if (LOG_OBJECTIVE_FILE == NULL)
         {
             printf("Error opening file %s !\n", fileName);
@@ -188,7 +189,7 @@ void allocate_resources()
 
     if (LOG_ATRIBUTES_ENABLED) {
         sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
-        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w");
+        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w+");
         if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
         {
             printf("Error opening file %s !\n", fileName);
@@ -198,7 +199,7 @@ void allocate_resources()
 
 
         sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
-        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w");
+        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w+");
         if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
         {
             printf("Error opening file %s !\n", fileName);
@@ -220,19 +221,53 @@ void allocate_resources()
     }
 }
 
+__global__ void initialize_bat(struct bat *bats, double *velocity, double *position, int size)
+{
+    bats[blockIdx.x].pulse_rate = 0;
+    bats[blockIdx.x].frequency = 0;
+    bats[blockIdx.x].fitness = 0;
+    bats[blockIdx.x].loudness = INITIAL_LOUDNESS;
+
+     memcpy(bats[blockIdx.x].velocity, &velocity[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
+     memcpy(bats[blockIdx.x].position, &position[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
+}
+
+
 void initialize_bats(struct bat bats[])
 {
-    for (int i = 0; i < BATS_COUNT; i ++ ) {
-        bats[i].pulse_rate = 0;
-        bats[i].frequency = 0;
-        bats[i].fitness = 0;
-        bats[i].loudness = INITIAL_LOUDNESS;
+    bat *cuda_bats;
+    int bats_size = sizeof(bat) * BATS_COUNT;
+    cudaMalloc((void **)&cuda_bats, bats_size);
+    cudaMemcpy(cuda_bats, bats, bats_size, cudaMemcpyHostToDevice);
 
-        for (int j = 0; j < DIMENSIONS; j++) {
-            bats[i].velocity[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-            bats[i].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-        }
-    }
+    double *velocity, *position;
+    double *d_velocity, *d_position;
+    int total,size;
+    total = DIMENSIONS * BATS_COUNT;
+    size = sizeof(double) * total;
+
+    velocity  = (double *)malloc(size);
+    position  = (double *)malloc(size);
+
+    cudaMalloc((void **)&d_velocity, size);
+    cudaMalloc((void **)&d_position, size);
+
+    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, velocity, total);
+    my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, position, total);
+
+    cudaMemcpy(d_velocity, velocity, size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_position, position, size, cudaMemcpyHostToDevice);
+
+
+    initialize_bat<<<BATS_COUNT,1>>>(cuda_bats, d_velocity, d_position, total);
+
+    cudaMemcpy(bats, cuda_bats, bats_size, cudaMemcpyDeviceToHost);
+
+    free(velocity);
+    free(position);
+    cudaFree(cuda_bats);
+    cudaFree(d_velocity);
+    cudaFree(d_position);
 }
 
 
@@ -419,6 +454,13 @@ double my_rand(int min, int max)
     }
 
     return result;
+}
+
+void my_rand_collection(int min, int max, double *collection, int size)
+{
+    for (int i = 0; i < size; ++i) {
+        collection[i]  = my_rand(min, max);
+    }
 }
 
 void objective_function (struct bat *bat)

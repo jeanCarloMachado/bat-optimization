@@ -11,7 +11,9 @@ int main()
     cudaGetDevice(device);
     cudaGetDeviceProperties(deviceProp, *device);
 
-
     printf("Name: %s\n", deviceProp->name);
     printf("Global memory: %u\n", deviceProp->totalGlobalMem);
+    printf("Threads per block: %u\n", deviceProp->maxThreadsPerBlock);
+    printf("Shared memory per block: %u\n", deviceProp->sharedMemPerBlock);
+    printf("Max grid size: %u\n", deviceProp->maxGridSize);
 }
