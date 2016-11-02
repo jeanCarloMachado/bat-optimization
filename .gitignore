@@ -2,3 +2,4 @@ dump/*
 graphic.png
 latest*
 *.o
+*.swp

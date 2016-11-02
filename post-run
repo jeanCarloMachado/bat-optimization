@@ -1,13 +1,11 @@
 #!/bin/bash
 
-exit 
-
 rm -rf latest-*
 lastDumpName=`ls -lah dump/ | tail -n1 | rev | cut -d' ' -f1 | rev `
-lastDumpTimestamp=$(cut -d '-' -f1 <<< $lastDumpName)
+lastDumpTimestamp=$(echo $lastDumpName | cut -d '-' -f1 )
 cp -rf dump/$lastDumpTimestamp* .
 
-rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
+rename "s/$lastDumpTimestamp/latest/" $lastDumpTimestamp-*
 
 [ -f latest-scalar_attr ] && {
     echo '
@@ -16,7 +14,9 @@ rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
     plot "latest-scalar_attr" using 3  title "Pulse Rate" with lines,  \
          "" using 4 title "Loudness" with lines
     ' | gnuplot
-    xdg-open latest-scalar_attr.png
+    [[ $(which xdg-open) ]] && {
+        xdg-open latest-scalar_attr.png
+    }
 }
 
 [ -f latest-objective ] && {
@@ -27,8 +27,14 @@ rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
     "" using 2 title "Average" with lines, \
     "" using 3 title "Worst" with lines
     ' | gnuplot
-    xdg-open latest-objective.png
+    [[ $(which xdg-open) ]] && {
+        xdg-open latest-objective.png
+    }
 }
 
 
-notify-send "Execution finished"
+[[ $(which notify-send) ]] && {
+ notify-send "Execution finished"
+}
+
+exit 0

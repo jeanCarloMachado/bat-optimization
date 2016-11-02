@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "mersenne.h"
 #include <unistd.h>
+#include "common.h"
 
 //rastringin
 /* #define BOUNDRY_MIN -5.12 */
@@ -39,8 +40,8 @@
 //affects local search
 #define LAMBDA 0.1
 
-#define LOG_OBJECTIVE_ENABLED 0
-#define LOG_ATRIBUTES_ENABLED 1
+#define LOG_OBJECTIVE_ENABLED 1
+#define LOG_ATRIBUTES_ENABLED 0
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -86,10 +87,6 @@ void position_perturbation(struct bat *bat);
 void force_boundry_over_position(struct bat *bat);
 
 void objective_function (struct bat *bat);
-double sphere(double x[]);
-double rastringin (double solution[]);
-double griewank (double solution[]);
-double ackley (double solution[]);
 
 int main()
 {
@@ -423,71 +420,12 @@ double my_rand(int min, int max)
 
 void objective_function (struct bat *bat)
 {
-    /* bat->fitness = rastringin(bat->position); */
-    /* bat->fitness = griewank(bat->position); */
-    /* bat->fitness = sphere(bat->position); */
+    //bat->fitness = rastringin(bat->position, DIMENSIONS);
+    bat->fitness = griewank(bat->position, DIMENSIONS);
+    /* bat->fitness = sphere(bat->position, DIMENSIONS); */
 
-    bat->fitness = ackley(bat->position);
-    usleep(0);
+    //bat->fitness = ackley(bat->position, DIMENSIONS);
+    //usleep(0);
 }
 
-//best: 0.632
-double sphere (double solution[])
-{
-    double total = 0;
-
-    for (int i = 0; i < DIMENSIONS; i++) {
-        total+= solution[i] * solution[i];
-    }
-
-    return total;
-}
-
-double rastringin (double solution[])
-{
-    double total = 0;
-
-    for(int i=0;i<DIMENSIONS;i++)
-    {
-        total=total+(pow(solution[i],(double)2)-10*cos(2*M_PI*solution[i])+10);
-    }
-
-    return total;
-}
-
-double griewank(double solution[])
-{
-    double total = 0;
-
-    double top1=0;
-    double top2=1;
-
-    for(int i=0;i<DIMENSIONS;i++)
-    {
-        top1=top1+pow((solution[i]),(double)2);
-        top2=top2*cos((((solution[i])/sqrt((double)(i+1)))*M_PI)/180);
-    }
-    total=(1/(double)4000)*top1-top2+1;
-
-    return total;
-}
-
-double ackley(double solution[])
-{
-    int i;
-    double aux, aux1, result;
-
-    for (i = 0; i < DIMENSIONS; i++)
-    {
-        aux += solution[i]*solution[i];
-    }
-    for (i = 0; i < DIMENSIONS; i++)
-    {
-        aux1 += cos(2.0*M_PI*solution[i]);
-    }
-
-    result = -20.0*(exp(-0.2*sqrt(1.0/(float)DIMENSIONS*aux)))-exp(1.0/(float)DIMENSIONS*aux1)+20.0+exp(1);
-
-    return result;
-}
 
