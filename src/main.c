@@ -40,7 +40,7 @@
 #define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 0
+#define LOG_ATRIBUTES_ENABLED 1
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -87,9 +87,10 @@ void logger(int destination, char *fmt, ...)
         printf("%s",formatted_string);
 }
 
-void initialize_bats(struct bat bats[])
+void initialize_bats(struct bat *bats)
 {
-    for (int i = 0; i < BATS_COUNT; i ++ ) {
+
+    for (int i = 0; i < BATS_COUNT; i++) {
         bats[i].pulse_rate = 0;
         bats[i].frequency = 0;
         bats[i].fitness = 0;
@@ -111,22 +112,21 @@ void log_bat(struct bat *bat)
     }
 }
 
-struct bat get_best(struct bat bats[])
+struct bat get_best(struct bat *bats, struct bat *best)
 {
     double current_best_val; 
     double current_val;
 
     current_val = current_best_val = bats[0].fitness;
-    struct bat current_best_bat = bats[0];
+    memcpy(best, &bats[0], sizeof(struct bat));
     for (int i = 0; i < BATS_COUNT; i++) {
         current_val = bats[i].fitness;
         if (current_val < current_best_val) {
             current_best_val = current_val;
-            current_best_bat = bats[i];
+            memcpy(best, &bats[i], sizeof(struct bat));
         }
     }
 
-    return current_best_bat;
 }
 
 void update_velocity(struct bat *bat, struct bat *best)
@@ -163,7 +163,7 @@ void local_search(struct bat *bat, struct bat *best, double loudness_average)
     }
 }
 
-double calc_loudness_average(struct bat bats[])
+double calc_loudness_average(struct bat *bats)
 {
     double total = 0;
 
@@ -308,51 +308,55 @@ void objective_function (struct bat *bat)
 int main()
 {
     allocate_resources();
-    struct bat bats[BATS_COUNT];
-    struct bat best;
-    struct bat worst;
-    struct bat average;
-    struct bat candidate;
+    struct bat *bats;
+    struct bat *best;
+    struct bat *candidate;
+
     int iteration;
     double best_result,average_result,worst_result;
 
     my_seed();
 
+    bats = (struct bat *) malloc(sizeof(struct bat) * BATS_COUNT);
+    best = (struct bat *) malloc(sizeof(struct bat));
+    candidate = (struct bat *) malloc(sizeof(struct bat));
+
     initialize_bats(bats);
-    best = get_best(bats);
+
+    get_best(bats, best); 
 
     for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; j++) {
             bats[j].frequency = generate_frequency();
-            update_velocity(&bats[j], &best);
-            candidate = bats[j];
+            update_velocity(&bats[j], best);
+            memcpy(candidate, &bats[j], sizeof(struct bat));
 
-            update_position(&candidate);
+            update_position(candidate);
 
-            if (my_rand(0,1) < candidate.pulse_rate) {
-                local_search(&candidate, &best, calc_loudness_average(bats));
+            if (my_rand(0,1) < candidate->pulse_rate) {
+                local_search(candidate, best, calc_loudness_average(bats));
             }
 
-            position_perturbation(&candidate);
-            force_boundry_over_position(&candidate);
+            position_perturbation(candidate);
+            force_boundry_over_position(candidate);
 
 
             objective_function(&bats[j]);
-            objective_function(&candidate);
+            objective_function(candidate);
 
-            if (my_rand(0,1) < bats[j].loudness || candidate.fitness < bats[j].fitness) {
-                memcpy(bats[j].position, candidate.position, sizeof candidate.position);
-                bats[j].fitness = candidate.fitness;
+            if (my_rand(0,1) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
+                memcpy(bats[j].position, candidate->position, sizeof candidate->position);
+                bats[j].fitness = candidate->fitness;
                 bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
                 decrease_loudness(&bats[j], iteration);
             }
-            best = get_best(bats);
+            get_best(bats, best);
             if (LOG_ATRIBUTES_ENABLED) {
                 log_bat(&bats[j]);
             }
         }
-
-        best_result = get_best(bats).fitness;
+           get_best(bats, best);
+        best_result = best->fitness;
 
         if (LOG_OBJECTIVE_ENABLED) {
             average_result = fitness_average(bats);
@@ -376,10 +380,13 @@ int main()
     logger(
             LOG_STDOUT,
             "Best of All: %f iterations (%d)",
-            best.fitness,
+            best->fitness,
             iteration
           );
 
+    free(bats);
+    free(best);
+    free(candidate);
     deallocate_resources();
     return 0;
 }
