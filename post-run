@@ -5,7 +5,13 @@ lastDumpName=`ls -lah dump/ | tail -n1 | rev | cut -d' ' -f1 | rev `
 lastDumpTimestamp=$(echo $lastDumpName | cut -d '-' -f1 )
 cp -rf dump/$lastDumpTimestamp* .
 
-rename "s/$lastDumpTimestamp/latest/" $lastDumpTimestamp-*
+
+if [ $(rename --version | rev | cut -d' ' -f1 | rev | tr -d "." ) -lt 2282 ] ; then
+    rename "s/$lastDumpTimestamp/latest/" $lastDumpTimestamp-*
+else
+    rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
+fi
+
 
 [ -f latest-scalar_attr ] && {
     echo '
