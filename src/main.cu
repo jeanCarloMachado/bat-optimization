@@ -294,7 +294,7 @@ void deallocate_resources()
     }
 }
 
-void decrease_loudness(struct bat *bat, int iteration)
+__device__ void decrease_loudness(struct bat *bat, int iteration)
 {
     //linear method
     //bat->loudness = INITIAL_LOUDNESS - ((INITIAL_LOUDNESS/100)*iteration);
@@ -339,30 +339,44 @@ struct bat get_worst(struct bat bats[])
 void objective_function (struct bat *bat)
 {
 
-    double fitness;
-    double *position;
-    position  = (double *)malloc(sizeof(double) * DIMENSIONS);
+    struct bat *local_bat;
 
-    cudaMemcpy(position, bat->position, sizeof(sizeof(double) * DIMENSIONS), cudaMemcpyDeviceToHost);
+    local_bat = (struct bat *) malloc(sizeof(struct bat));
+
+    cudaMemcpy(local_bat, bat, sizeof(struct bat), cudaMemcpyDeviceToHost);
 
     //bat->fitness = rastringin(bat->position, DIMENSIONS);
-    fitness = griewank(position, DIMENSIONS);
+    local_bat->fitness = griewank(local_bat->position, DIMENSIONS);
     /* bat->fitness = sphere(bat->position, DIMENSIONS); */
 
     //bat->fitness = ackley(bat->position, DIMENSIONS);
     //usleep(0);
 
+    /* printf("Fitness: %f\n", local_bat->fitness); */
 
-    cudaMemcpy(&bat->fitness, &fitness, sizeof(sizeof(double)), cudaMemcpyHostToDevice);
-    free(position);
+    cudaMemcpy(bat, local_bat, sizeof(struct bat), cudaMemcpyHostToDevice);
+    free(local_bat);
 }
 
+
+__global__ void greedy_update_on_bat(struct bat *bats, struct bat *candidate, double random, int iteration)
+{
+    /* printf("Greedy Fitness: %f\n", bats[iteration].fitness); */
+    /* printf("Candidate Fitness: %f\n", candidate->fitness); */
+    if (random < bats[iteration].loudness || candidate->fitness < bats[iteration].fitness) {
+        memcpy(bats[iteration].position, candidate->position, sizeof candidate->position);
+        bats[iteration].fitness = candidate->fitness;
+        bats[iteration].pulse_rate = 1 - exp(-LAMBDA*iteration);
+        decrease_loudness(&bats[iteration], iteration);
+    }
+}
 
 int main()
 {
     allocate_resources();
     struct bat *bats;
     struct bat *best;
+    struct bat *best_local;
     struct bat *candidate;
 
     int iteration;
@@ -371,10 +385,13 @@ int main()
 
     my_seed();
 
+    best_local = (struct bat *) malloc(sizeof(struct bat));
     cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
     cudaMalloc((void **)&best, sizeof(struct bat));
     cudaMalloc((void **)&candidate, sizeof(struct bat));
 
+    random_collection = (double *)malloc(sizeof(double) * DIMENSIONS);
+    cudaMalloc((void **)&random_collection_device, sizeof(double) * DIMENSIONS);
     initialize_bats(bats);
 
     /* log_bat(&bats[0]); */
@@ -389,9 +406,6 @@ int main()
 
 
             //////////////
-
-            random_collection = (double *)malloc(sizeof(double) * DIMENSIONS);
-            cudaMalloc((void **)&random_collection_device, sizeof(double) * DIMENSIONS);
 
 
             my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, random_collection, DIMENSIONS);
@@ -426,51 +440,40 @@ int main()
             objective_function(&bats[j]);
             objective_function(candidate);
 
-    /*         if (my_rand(0,1) < bats[j].loudness || candidate->fitness < bats[j].fitness) { */
-    /*             memcpy(bats[j].position, candidate->position, sizeof candidate->position); */
-    /*             bats[j].fitness = candidate->fitness; */
-    /*             bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration); */
-    /*             decrease_loudness(&bats[j], iteration); */
-    /*         } */
-    /*         get_best(bats, best); */
-    /*         if (LOG_ATRIBUTES_ENABLED) { */
-    /*             log_bat(&bats[j]); */
-    /*         } */
-    /*     } */
-           /* get_best<<<1,1>>>(bats, best); */
+            greedy_update_on_bat<<<1,1>>>(bats, candidate, my_rand(0,1), iteration);
+            /* if (LOG_ATRIBUTES_ENABLED) { */
+            /*     log_bat(&bats[j]); */
+            /* } */
     /*     best_result = best->fitness; */
 
-    /*     if (LOG_OBJECTIVE_ENABLED) { */
-    /*         average_result = fitness_average(bats); */
-    /*         worst_result = get_worst(bats).fitness; */
-    /*         logger( */
-    /*                 LOG_OBJECTIVE, */
-    /*                 "%f\t%f\t%f\n", */
-    /*                 best_result, */
-    /*                 average_result, */
-    /*                 worst_result */
-    /*               ); */
+            cudaMemcpy(best_local, best, sizeof(struct bat), cudaMemcpyDeviceToHost);
+            if (LOG_OBJECTIVE_ENABLED) {
+                /* average_result = fitness_average(bats); */
+                /* worst_result = get_worst(bats).fitness; */
+                logger(LOG_OBJECTIVE, "%f\n", best_local->fitness);
 
+            }
         }
 
-    /*     if (fabs(best_result) < 0.0009) { */
-    /*         break; */
-    /*     } */
+        /* if (fabs(best_result) < 0.0009) { */
+        /*     break; */
+        /* } */
 
     }
 
-    /* logger( */
-    /*         LOG_STDOUT, */
-    /*         "Best of All: %f iterations (%d)", */
-    /*         best->fitness, */
-    /*         iteration */
-    /*       ); */
+    logger(
+            LOG_STDOUT,
+            "Best of All: %f iterations (%d)",
+            best_local->fitness,
+            iteration
+          );
 
     cudaFree(bats);
     cudaFree(best);
     cudaFree(candidate);
     cudaFree(random_collection_device);
     free(random_collection);
+    free(best_local);
     deallocate_resources();
     return 0;
 }
