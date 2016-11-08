@@ -128,7 +128,6 @@ void initialize_bats(struct bat *bats)
     cudaMemcpy(d_velocity, velocity, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_position, position, size, cudaMemcpyHostToDevice);
 
-
     initialize_bat<<<BATS_COUNT,1>>>(bats, d_velocity, d_position, vector_positions);
 
     free(velocity);
@@ -140,7 +139,7 @@ void log_bat(struct bat *bat)
 {
     struct bat *l_bat; 
     l_bat = (struct bat *) malloc(sizeof(struct bat));
-	cudaMemcpy(l_bat, bat, sizeof(struct bat), cudaMemcpyDeviceToHost);
+    cudaMemcpy(l_bat, bat, sizeof(struct bat), cudaMemcpyDeviceToHost);
 
 
     logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %f %f %f\n", l_bat->frequency, l_bat->pulse_rate, l_bat->loudness);
@@ -152,7 +151,7 @@ void log_bat(struct bat *bat)
     free(l_bat);
 }
 
-struct bat get_best(struct bat *bats, struct bat *best)
+__global__ void get_best(struct bat *bats, struct bat *best)
 {
     double current_best_val; 
     double current_val;
@@ -166,44 +165,35 @@ struct bat get_best(struct bat *bats, struct bat *best)
             memcpy(best, &bats[i], sizeof(struct bat));
         }
     }
-
 }
 
-void update_velocity(struct bat *bat, struct bat *best)
+__global__ void update_velocity(struct bat *bat, struct bat *best, double random)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
         bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best->position[i]) * bat->frequency;
         if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
-            bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->velocity[i] = random;
         }
     }
 }
 
-double generate_frequency()
+__global__ void generate_frequency(struct bat *bat, double beta)
 {
-    double beta = my_rand(BETA_MIN, BETA_MAX);
-    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
+    bat->frequency = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 }
 
-void update_position(struct bat *bat)
+__global__ void update_position(struct bat *bat, double *random_collection)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
         bat->position[i] = bat->position[i] + bat->velocity[i];
 
         if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->position[i] = random_collection[i];
         }
     }
 }
 
-void local_search(struct bat *bat, struct bat *best, double loudness_average)
-{
-    for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->position[i] = best->position[i] + loudness_average * my_rand(0.0,1.0);
-    }
-}
-
-double calc_loudness_average(struct bat *bats)
+__device__ float calc_loudness_average(struct bat *bats)
 {
     double total = 0;
 
@@ -213,6 +203,19 @@ double calc_loudness_average(struct bat *bats)
     }
 
     return total / BATS_COUNT;
+}
+
+
+__global__ void local_search(struct bat *bat, struct bat *best, struct bat *candidate, struct bat *bats, double rand, double *random_collection)
+{
+    if (rand >= candidate->pulse_rate) {
+        return;
+    }
+
+    double loudness_average = calc_loudness_average(bats);
+    for (int i = 0; i < DIMENSIONS; i++ ) {
+        bat->position[i] = best->position[i] + loudness_average * random_collection[i];
+    }
 }
 
 double fitness_average(struct bat bats[])
@@ -300,17 +303,16 @@ void decrease_loudness(struct bat *bat, int iteration)
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
 }
 
-void position_perturbation(struct bat *bat)
+__global__  void position_perturbation(struct bat *bat, int dimension, double random)
 {
-    int dimension = my_rand(0, DIMENSIONS);
-    bat->position[dimension] = bat->position[dimension] * my_rand(0,1);
+    bat->position[dimension] = bat->position[dimension] * random;
 }
 
-void force_boundry_over_position(struct bat *bat)
+__global__ void force_boundry_over_position(struct bat *bat, double *random_collection)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
         if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bat->position[i] = random_collection[i];
         }
     }
 }
@@ -336,12 +338,23 @@ struct bat get_worst(struct bat bats[])
 
 void objective_function (struct bat *bat)
 {
+
+    double fitness;
+    double *position;
+    position  = (double *)malloc(sizeof(double) * DIMENSIONS);
+
+    cudaMemcpy(position, bat->position, sizeof(sizeof(double) * DIMENSIONS), cudaMemcpyDeviceToHost);
+
     //bat->fitness = rastringin(bat->position, DIMENSIONS);
-    bat->fitness = griewank(bat->position, DIMENSIONS);
+    fitness = griewank(position, DIMENSIONS);
     /* bat->fitness = sphere(bat->position, DIMENSIONS); */
 
     //bat->fitness = ackley(bat->position, DIMENSIONS);
     //usleep(0);
+
+
+    cudaMemcpy(&bat->fitness, &fitness, sizeof(sizeof(double)), cudaMemcpyHostToDevice);
+    free(position);
 }
 
 
@@ -354,36 +367,64 @@ int main()
 
     int iteration;
     double best_result,average_result,worst_result;
+    double *random_collection, *random_collection_device;
 
     my_seed();
 
     cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
-    /* best = (struct bat *) malloc(sizeof(struct bat)); */
-    /* candidate = (struct bat *) malloc(sizeof(struct bat)); */
+    cudaMalloc((void **)&best, sizeof(struct bat));
+    cudaMalloc((void **)&candidate, sizeof(struct bat));
 
     initialize_bats(bats);
 
-    log_bat(&bats[0]);
-    /* get_best(bats, best); */ 
+    /* log_bat(&bats[0]); */
+    get_best<<<1,1>>>(bats, best); 
 
-    /* for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) { */
-    /*     for (int j = 0; j < BATS_COUNT; j++) { */
-    /*         bats[j].frequency = generate_frequency(); */
-    /*         update_velocity(&bats[j], best); */
-    /*         memcpy(candidate, &bats[j], sizeof(struct bat)); */
-
-    /*         update_position(candidate); */
-
-    /*         if (my_rand(0,1) < candidate->pulse_rate) { */
-    /*             local_search(candidate, best, calc_loudness_average(bats)); */
-    /*         } */
-
-    /*         position_perturbation(candidate); */
-    /*         force_boundry_over_position(candidate); */
+    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
+        for (int j = 0; j < BATS_COUNT; j++) {
+            generate_frequency<<<1,1>>>(&bats[j], my_rand(BETA_MIN, BETA_MAX));
+            update_velocity<<<1,1>>>(&bats[j], best, my_rand(BOUNDRY_MIN, BOUNDRY_MAX));
+            cudaMemcpy(candidate, &bats[j], sizeof(struct bat), cudaMemcpyHostToHost);
 
 
-    /*         objective_function(&bats[j]); */
-    /*         objective_function(candidate); */
+
+            //////////////
+
+            random_collection = (double *)malloc(sizeof(double) * DIMENSIONS);
+            cudaMalloc((void **)&random_collection_device, sizeof(double) * DIMENSIONS);
+
+
+            my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, random_collection, DIMENSIONS);
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+            update_position<<<1,1>>>(candidate, random_collection_device);
+
+
+            //////////////
+
+
+
+            my_rand_collection(0.0, 1.0, random_collection, DIMENSIONS);
+
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+
+            local_search<<<1,1>>>(candidate, best, candidate, bats, my_rand(0,1), random_collection_device);
+
+            position_perturbation<<<1,1>>>(candidate, my_rand(0, DIMENSIONS), my_rand(0,1));
+
+
+            //////////////
+
+
+            my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, random_collection, DIMENSIONS);
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+            force_boundry_over_position<<<1,1>>>(candidate, random_collection_device);
+
+
+            objective_function(&bats[j]);
+            objective_function(candidate);
 
     /*         if (my_rand(0,1) < bats[j].loudness || candidate->fitness < bats[j].fitness) { */
     /*             memcpy(bats[j].position, candidate->position, sizeof candidate->position); */
@@ -396,7 +437,7 @@ int main()
     /*             log_bat(&bats[j]); */
     /*         } */
     /*     } */
-    /*        get_best(bats, best); */
+           /* get_best<<<1,1>>>(bats, best); */
     /*     best_result = best->fitness; */
 
     /*     if (LOG_OBJECTIVE_ENABLED) { */
@@ -410,13 +451,13 @@ int main()
     /*                 worst_result */
     /*               ); */
 
-    /*     } */
+        }
 
     /*     if (fabs(best_result) < 0.0009) { */
     /*         break; */
     /*     } */
 
-    /* } */
+    }
 
     /* logger( */
     /*         LOG_STDOUT, */
@@ -425,9 +466,11 @@ int main()
     /*         iteration */
     /*       ); */
 
-    /* cudaFree(bats); */
-    /* cudaFree(best); */
+    cudaFree(bats);
+    cudaFree(best);
     cudaFree(candidate);
+    cudaFree(random_collection_device);
+    free(random_collection);
     deallocate_resources();
     return 0;
 }
