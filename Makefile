@@ -1,4 +1,5 @@
 all: source
+.PHONY: paper
 
 source:
 	gcc -c src/mersenne.c
@@ -26,3 +27,8 @@ device_info:
 clear:
 	rm -rf bat
 	rm -rf dump/*
+
+paper:
+	cd paper ; \
+	rm -rf sbc-template.pdf ; \
+	pdflatex sbc-template.tex
