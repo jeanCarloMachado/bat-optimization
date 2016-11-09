@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 #include <stdarg.h>
 #include <unistd.h>
 extern "C" {
@@ -41,7 +42,7 @@ extern "C" {
 #define LAMBDA 0.1
 
 #define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 0
+#define LOG_ATRIBUTES_ENABLED 1
 #define LOG_RANDOM_ENABLED 0
 
 #define LOG_OBJECTIVE 1
@@ -67,176 +68,31 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-struct bat get_worst(struct bat *bats);
-void initialize_bats(struct bat *bats);
-void my_rand_collection(int min, int max, double *collection, int size);
-void objective_function (struct bat *bat);
-void log_bat(struct bat *bat);
-void update_velocity(struct bat *bat, struct bat *best);
-double generate_frequency();
-void update_position(struct bat *bat);
-void local_search(struct bat *bat, struct bat *best, double loudness_average);
-double calc_loudness_average(struct bat *bats);
-double fitness_average(struct bat *bats);
-void logger(int destination, char *fmt, ...);
-void allocate_resources(void);
-void deallocate_resources();
-void decrease_loudness(struct bat*, int);
-void position_perturbation(struct bat *bat);
-void force_boundry_over_position(struct bat *bat);
-void objective_function (struct bat *bat);
-
-
-struct bat get_best(struct bat *bats, struct bat *best)
+void logger(int destination, char *fmt, ...)
 {
-    double current_best_val; 
-    double current_val;
+    char formatted_string[6666];
 
-    current_val = current_best_val = bats[0].fitness;
-    struct bat current_best_bat = bats[0];
-    for (int i = 0; i < BATS_COUNT; i++) {
-        current_val = bats[i].fitness;
-        if (current_val < current_best_val) {
-            current_best_val = current_val;
-            current_best_bat = bats[i];
-        }
-    }
+    va_list argptr;
+    va_start(argptr,fmt);
+    vsprintf(formatted_string, fmt, argptr);
+    va_end(argptr);
 
-    return current_best_bat;
+    if (destination == LOG_OBJECTIVE) 
+        fprintf(LOG_OBJECTIVE_FILE,"%s",formatted_string);
+    else if (destination == LOG_SCALAR_ATRIBUTES)
+        fprintf(LOG_SCALAR_ATRIBUTES_FILE,"%s",formatted_string);
+    else if (destination == LOG_VECTOR_ATRIBUTES)
+        fprintf(LOG_VECTOR_ATRIBUTES_FILE,"%s",formatted_string);
+    else if (destination == LOG_RANDOM)
+        fprintf(LOG_RANDOM_FILE,"%s",formatted_string);
+    else if (destination == LOG_STDOUT) 
+        printf("%s",formatted_string);
 }
 
-
-
-int main()
+void my_rand_collection(int min, int max, double *collection, int size)
 {
-    allocate_resources();
-    struct bat *bats;
-    struct bat *best, *candidate;
-    cudaMalloc((void **)&bats, sizeof(bat) * BATS_COUNT);
-    cudaMalloc((void **)&best, sizeof(bat));
-    cudaMalloc((void **)&candidate, sizeof(bat));
-
-    int iteration;
-    double best_result,average_result,worst_result;
-
-    my_seed();
-
-    initialize_bats(bats);
-    get_best(bats, best);
-
-    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
-        for (int j = 0; j < BATS_COUNT; j++) {
-            bats[j].frequency = generate_frequency();
-            update_velocity(&bats[j], &best);
-            candidate = bats[j];
-
-            update_position(&candidate);
-
-            if (my_rand(0,1) < candidate.pulse_rate) {
-                local_search(&candidate, &best, calc_loudness_average(bats));
-            }
-
-            position_perturbation(&candidate);
-            force_boundry_over_position(&candidate);
-
-
-            objective_function(&bats[j]);
-            objective_function(&candidate);
-
-            if (my_rand(0,1) < bats[j].loudness || candidate.fitness < bats[j].fitness) {
-                memcpy(bats[j].position, candidate.position, sizeof candidate.position);
-                bats[j].fitness = candidate.fitness;
-                bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
-                decrease_loudness(&bats[j], iteration);
-            }
-            best = get_best(bats);
-            if (LOG_ATRIBUTES_ENABLED) {
-                log_bat(&bats[j]);
-            }
-        }
-
-        best_result = get_best(bats).fitness;
-
-        if (LOG_OBJECTIVE_ENABLED) {
-            average_result = fitness_average(bats);
-            worst_result = get_worst(bats).fitness;
-            logger(
-                    LOG_OBJECTIVE,
-                    "%f\t%f\t%f\n",
-                    best_result,
-                    average_result,
-                    worst_result
-                  );
-
-        }
-
-        if (fabs(best_result) < 0.0009) {
-            break;
-        }
-
-    }
-
-    logger(
-            LOG_STDOUT,
-            "Best of All: %f iterations (%d)",
-            best.fitness,
-            iteration
-          );
-
-    cudaFree(bats);
-    cudaFree(best);
-    cudaFree(candidate);
-    deallocate_resources();
-    return 0;
-}
-
-void allocate_resources()
-{
-    RUN_TIME = time(NULL);
-    char fileName[100];
-
-    if (LOG_OBJECTIVE_ENABLED) {
-        sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
-        LOG_OBJECTIVE_FILE = fopen(fileName,"w+");
-        if (LOG_OBJECTIVE_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Objective log: %s\n", fileName);
-    }
-
-    if (LOG_ATRIBUTES_ENABLED) {
-        sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
-        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w+");
-        if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Scalar atributes log: %s\n", fileName);
-
-
-        sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
-        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w+");
-        if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Vector Atributes log: %s\n", fileName);
-
-    }
-
-    if (LOG_RANDOM_ENABLED) {
-        sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
-        LOG_RANDOM_FILE = fopen(fileName,"w");
-        if (LOG_RANDOM_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Random log: %s\n", fileName);
+    for (int i = 0; i < size; ++i) {
+        collection[i]  = my_rand(min, max);
     }
 }
 
@@ -247,10 +103,9 @@ __global__ void initialize_bat(struct bat *bats, double *velocity, double *posit
     bats[blockIdx.x].fitness = 0;
     bats[blockIdx.x].loudness = INITIAL_LOUDNESS;
 
-     memcpy(bats[blockIdx.x].velocity, &velocity[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
-     memcpy(bats[blockIdx.x].position, &position[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
+    memcpy(bats[blockIdx.x].velocity, &velocity[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
+    memcpy(bats[blockIdx.x].position, &position[blockIdx.x * DIMENSIONS], DIMENSIONS * sizeof(double));
 }
-
 
 void initialize_bats(struct bat *bats)
 {
@@ -273,7 +128,6 @@ void initialize_bats(struct bat *bats)
     cudaMemcpy(d_velocity, velocity, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_position, position, size, cudaMemcpyHostToDevice);
 
-
     initialize_bat<<<BATS_COUNT,1>>>(bats, d_velocity, d_position, vector_positions);
 
     free(velocity);
@@ -281,60 +135,68 @@ void initialize_bats(struct bat *bats)
     cudaFree(d_velocity);
     cudaFree(d_position);
 }
-
-
-void deallocate_resources()
+void log_bat(struct bat *bat)
 {
-    if (LOG_OBJECTIVE_ENABLED) {
-        fclose(LOG_OBJECTIVE_FILE);
+    struct bat *l_bat; 
+    l_bat = (struct bat *) malloc(sizeof(struct bat));
+    cudaMemcpy(l_bat, bat, sizeof(struct bat), cudaMemcpyDeviceToHost);
+
+
+    logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %f %f %f\n", l_bat->frequency, l_bat->pulse_rate, l_bat->loudness);
+
+    for (int i = 0; i < DIMENSIONS; i++) {
+        logger(LOG_VECTOR_ATRIBUTES, "%f\t%f\t%f\n", l_bat->velocity[i], l_bat->position[i], l_bat->fitness);
     }
-    if (LOG_ATRIBUTES_ENABLED) {
-        fclose(LOG_SCALAR_ATRIBUTES_FILE);
-        fclose(LOG_VECTOR_ATRIBUTES_FILE);
-    
-    if (LOG_RANDOM_ENABLED) {
-        fclose(LOG_RANDOM_FILE);
+
+    free(l_bat);
+}
+
+__global__ void get_best(struct bat *bats, struct bat *best)
+{
+    double current_best_val; 
+    double current_val;
+
+    current_val = current_best_val = bats[0].fitness;
+    memcpy(best, &bats[0], sizeof(struct bat));
+    for (int i = 0; i < BATS_COUNT; i++) {
+        current_val = bats[i].fitness;
+        if (current_val < current_best_val) {
+            current_best_val = current_val;
+            memcpy(best, &bats[i], sizeof(struct bat));
+        }
     }
 }
 
-void logger(int destination, char *fmt, ...)
-{
-    char formatted_string[6666];
-
-    va_list argptr;
-    va_start(argptr,fmt);
-    vsprintf(formatted_string, fmt, argptr);
-    va_end(argptr);
-
-    if (destination == LOG_OBJECTIVE) 
-        fprintf(LOG_OBJECTIVE_FILE,"%s",formatted_string);
-    else if (destination == LOG_SCALAR_ATRIBUTES)
-        fprintf(LOG_SCALAR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_VECTOR_ATRIBUTES)
-        fprintf(LOG_VECTOR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_RANDOM)
-        fprintf(LOG_RANDOM_FILE,"%s",formatted_string);
-    else if (destination == LOG_STDOUT) 
-        printf("%s",formatted_string);
-}
-
-void position_perturbation(struct bat *bat)
-{
-    int dimension = my_rand(0, DIMENSIONS);
-    bat->position[dimension] = bat->position[dimension] * my_rand(0,1);
-}
-
-
-void local_search(struct bat *bat, struct bat *best, double loudness_average)
+__global__ void update_velocity(struct bat *bat, struct bat *best, double random)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->position[i] = best->position[i] + loudness_average * my_rand(0.0,1.0);
+        bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best->position[i]) * bat->frequency;
+        if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
+            bat->velocity[i] = random;
+        }
     }
 }
 
-double calc_loudness_average(struct bat *bats)
+__global__ void generate_frequency(struct bat *bat, double beta)
+{
+    bat->frequency = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
+}
+
+__global__ void update_position(struct bat *bat, double *random_collection)
+{
+    for (int i = 0; i < DIMENSIONS; i++ ) {
+        bat->position[i] = bat->position[i] + bat->velocity[i];
+
+        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
+            bat->position[i] = random_collection[i];
+        }
+    }
+}
+
+__device__ float calc_loudness_average(struct bat *bats)
 {
     double total = 0;
+
 
     for(int i=0;i<BATS_COUNT;i++) {
         total+= bats[i].loudness;
@@ -344,65 +206,19 @@ double calc_loudness_average(struct bat *bats)
 }
 
 
-void update_velocity(struct bat *bat, struct bat *best)
+__global__ void local_search(struct bat *bat, struct bat *best, struct bat *candidate, struct bat *bats, double rand, double *random_collection)
 {
+    if (rand >= candidate->pulse_rate) {
+        return;
+    }
+
+    double loudness_average = calc_loudness_average(bats);
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best->position[i]) * bat->frequency;
-        if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
-            bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-        }
+        bat->position[i] = best->position[i] + loudness_average * random_collection[i];
     }
 }
 
-void decrease_loudness(struct bat *bat, int iteration)
-{
-    //linear method
-    //bat->loudness = INITIAL_LOUDNESS - ((INITIAL_LOUDNESS/100)*iteration);
-
-    //geometric method
-    bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
-}
-
-void update_position(struct bat *bat)
-{
-    for (int i = 0; i < DIMENSIONS; i++ ) {
-        bat->position[i] = bat->position[i] + bat->velocity[i];
-
-        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-        }
-    }
-}
-
-
-void force_boundry_over_position(struct bat *bat)
-{
-    for (int i = 0; i < DIMENSIONS; i++ ) {
-        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-        }
-    }
-}
-
-
-
-double generate_frequency()
-{
-    double beta = my_rand(BETA_MIN, BETA_MAX);
-    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
-}
-
-void log_bat(struct bat *bat)
-{
-    logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %f %f %f\n", bat->frequency, bat->pulse_rate, bat->loudness);
-
-    for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_VECTOR_ATRIBUTES, "%f\t%f\t%f\n", bat->velocity[i], bat->position[i], bat->fitness);
-    }
-}
-
-
-double fitness_average(struct bat *bats)
+double fitness_average(struct bat bats[])
 {
     double result = 0;
 
@@ -414,7 +230,94 @@ double fitness_average(struct bat *bats)
 }
 
 
-struct bat get_worst(struct bat *bats)
+void allocate_resources()
+{
+    RUN_TIME = time(NULL);
+    char fileName[100];
+
+    if (LOG_OBJECTIVE_ENABLED) {
+        sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
+        LOG_OBJECTIVE_FILE = fopen(fileName,"w");
+        if (LOG_OBJECTIVE_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Objective log: %s\n", fileName);
+    }
+
+    if (LOG_ATRIBUTES_ENABLED) {
+        sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
+        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w");
+        if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Scalar atributes log: %s\n", fileName);
+
+
+        sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
+        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w");
+        if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Vector Atributes log: %s\n", fileName);
+
+    }
+
+    if (LOG_RANDOM_ENABLED) {
+        sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
+        LOG_RANDOM_FILE = fopen(fileName,"w");
+        if (LOG_RANDOM_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Random log: %s\n", fileName);
+    }
+}
+
+void deallocate_resources()
+{
+    if (LOG_OBJECTIVE_ENABLED) {
+        fclose(LOG_OBJECTIVE_FILE);
+    }
+    if (LOG_ATRIBUTES_ENABLED) {
+        fclose(LOG_SCALAR_ATRIBUTES_FILE);
+        fclose(LOG_VECTOR_ATRIBUTES_FILE);
+    }
+    if (LOG_RANDOM_ENABLED) {
+        fclose(LOG_RANDOM_FILE);
+    }
+}
+
+__device__ void decrease_loudness(struct bat *bat, int iteration)
+{
+    //linear method
+    //bat->loudness = INITIAL_LOUDNESS - ((INITIAL_LOUDNESS/100)*iteration);
+
+    //geometric method
+    bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
+}
+
+__global__  void position_perturbation(struct bat *bat, int dimension, double random)
+{
+    bat->position[dimension] = bat->position[dimension] * random;
+}
+
+__global__ void force_boundry_over_position(struct bat *bat, double *random_collection)
+{
+    for (int i = 0; i < DIMENSIONS; i++ ) {
+        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
+            bat->position[i] = random_collection[i];
+        }
+    }
+}
+
+struct bat get_worst(struct bat bats[])
 {
     double current_worst_val;
     double current_val;
@@ -432,21 +335,147 @@ struct bat get_worst(struct bat *bats)
     return current_worst_bat;
 }
 
-void my_rand_collection(int min, int max, double *collection, int size)
-{
-    for (int i = 0; i < size; ++i) {
-        collection[i]  = my_rand(min, max);
-    }
-}
 
 void objective_function (struct bat *bat)
 {
+
+    struct bat *local_bat;
+
+    local_bat = (struct bat *) malloc(sizeof(struct bat));
+
+    cudaMemcpy(local_bat, bat, sizeof(struct bat), cudaMemcpyDeviceToHost);
+
     //bat->fitness = rastringin(bat->position, DIMENSIONS);
-    bat->fitness = griewank(bat->position, DIMENSIONS);
+    local_bat->fitness = griewank(local_bat->position, DIMENSIONS);
     /* bat->fitness = sphere(bat->position, DIMENSIONS); */
 
     //bat->fitness = ackley(bat->position, DIMENSIONS);
     //usleep(0);
+
+    /* printf("Fitness: %f\n", local_bat->fitness); */
+
+    cudaMemcpy(bat, local_bat, sizeof(struct bat), cudaMemcpyHostToDevice);
+    free(local_bat);
+}
+
+
+__global__ void greedy_update_on_bat(struct bat *bats, struct bat *candidate, double random, int iteration)
+{
+    /* printf("Greedy Fitness: %f\n", bats[iteration].fitness); */
+    /* printf("Candidate Fitness: %f\n", candidate->fitness); */
+    if (random < bats[iteration].loudness || candidate->fitness < bats[iteration].fitness) {
+        memcpy(bats[iteration].position, candidate->position, sizeof candidate->position);
+        bats[iteration].fitness = candidate->fitness;
+        bats[iteration].pulse_rate = 1 - exp(-LAMBDA*iteration);
+        decrease_loudness(&bats[iteration], iteration);
+    }
+}
+
+int main()
+{
+    allocate_resources();
+    struct bat *bats;
+    struct bat *best;
+    struct bat *best_local;
+    struct bat *candidate;
+
+    int iteration;
+    double best_result,average_result,worst_result;
+    double *random_collection, *random_collection_device;
+
+    my_seed();
+
+    best_local = (struct bat *) malloc(sizeof(struct bat));
+    cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
+    cudaMalloc((void **)&best, sizeof(struct bat));
+    cudaMalloc((void **)&candidate, sizeof(struct bat));
+
+    random_collection = (double *)malloc(sizeof(double) * DIMENSIONS);
+    cudaMalloc((void **)&random_collection_device, sizeof(double) * DIMENSIONS);
+    initialize_bats(bats);
+
+    /* log_bat(&bats[0]); */
+    get_best<<<1,1>>>(bats, best); 
+
+    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
+        for (int j = 0; j < BATS_COUNT; j++) {
+            generate_frequency<<<1,1>>>(&bats[j], my_rand(BETA_MIN, BETA_MAX));
+            update_velocity<<<1,1>>>(&bats[j], best, my_rand(BOUNDRY_MIN, BOUNDRY_MAX));
+            cudaMemcpy(candidate, &bats[j], sizeof(struct bat), cudaMemcpyHostToHost);
+
+
+
+            //////////////
+
+
+            my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, random_collection, DIMENSIONS);
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+            update_position<<<1,1>>>(candidate, random_collection_device);
+
+
+            //////////////
+
+
+
+            my_rand_collection(0.0, 1.0, random_collection, DIMENSIONS);
+
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+
+            local_search<<<1,1>>>(candidate, best, candidate, bats, my_rand(0,1), random_collection_device);
+
+            position_perturbation<<<1,1>>>(candidate, my_rand(0, DIMENSIONS), my_rand(0,1));
+
+
+            //////////////
+
+
+            my_rand_collection(BOUNDRY_MIN, BOUNDRY_MAX, random_collection, DIMENSIONS);
+            cudaMemcpy(random_collection_device, random_collection, sizeof(double) * DIMENSIONS, cudaMemcpyHostToDevice);
+
+            force_boundry_over_position<<<1,1>>>(candidate, random_collection_device);
+
+
+            objective_function(&bats[j]);
+            objective_function(candidate);
+
+            greedy_update_on_bat<<<1,1>>>(bats, candidate, my_rand(0,1), iteration);
+            /* if (LOG_ATRIBUTES_ENABLED) { */
+            /*     log_bat(&bats[j]); */
+            /* } */
+    /*     best_result = best->fitness; */
+
+            cudaMemcpy(best_local, best, sizeof(struct bat), cudaMemcpyDeviceToHost);
+            if (LOG_OBJECTIVE_ENABLED) {
+                /* average_result = fitness_average(bats); */
+                /* worst_result = get_worst(bats).fitness; */
+                logger(LOG_OBJECTIVE, "%f\n", best_local->fitness);
+
+            }
+        }
+
+        /* if (fabs(best_result) < 0.0009) { */
+        /*     break; */
+        /* } */
+
+    }
+
+    logger(
+            LOG_STDOUT,
+            "Best of All: %f iterations (%d)",
+            best_local->fitness,
+            iteration
+          );
+
+    cudaFree(bats);
+    cudaFree(best);
+    cudaFree(candidate);
+    cudaFree(random_collection_device);
+    free(random_collection);
+    free(best_local);
+    deallocate_resources();
+    return 0;
 }
 
 

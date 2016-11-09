@@ -11,12 +11,12 @@ run: source
 	./post-run
 
 
-source_gpu:
-	nvcc -c src/mersenne.c 
-	nvcc -c src/common.c 
+gpu:
+	nvcc -c src/mersenne.c -Wno-deprecated-gpu-targets 
+	nvcc -c src/common.c -Wno-deprecated-gpu-targets 
 	nvcc common.o mersenne.o src/main.cu -Wno-deprecated-gpu-targets -lm -o bat_gpu
 
-run_gpu: source_gpu
+run_gpu: gpu
 	./bat_gpu
 	./post-run
 
