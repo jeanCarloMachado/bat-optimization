@@ -30,5 +30,5 @@ clear:
 
 paper:
 	cd paper ; \
-	rm -rf sbc-template.pdf ; \
-	pdflatex sbc-template.tex
+	pdflatex paper.tex
+	mv paper/paper.pdf  paper.pdf
