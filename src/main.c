@@ -7,23 +7,8 @@
 #include <unistd.h>
 #include "common.h"
 
-//rastringin
-/* #define BOUNDRY_MIN -5.12 */
-/* #define BOUNDRY_MAX 5.12 */
-
-//griewank
-/* #define BOUNDRY_MIN -600 */
-/* #define BOUNDRY_MAX 600 */
-
-//sphere
-/* #define BOUNDRY_MIN -100 */
-/* #define BOUNDRY_MAX 100 */
-
-//ackley
-#define BOUNDRY_MIN -32
-#define BOUNDRY_MAX 32
-
-#define DIMENSIONS 200
+#define DIMENSIONS 30
+/* #define MAX_ITERATIONS 12500 */
 #define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
@@ -43,11 +28,17 @@
 #define LOG_ATRIBUTES_ENABLED 1
 #define LOG_RANDOM_ENABLED 0
 
-#define LOG_OBJECTIVE 1
-#define LOG_RANDOM 2
-#define LOG_STDOUT 3
-#define LOG_SCALAR_ATRIBUTES 4
-#define LOG_VECTOR_ATRIBUTES 5
+enum {LOG_OBJECTIVE, LOG_RANDOM, LOG_STDOUT, LOG_SCALAR_ATRIBUTES, LOG_VECTOR_ATRIBUTES};
+
+extern double rosenbrock (double solution[], int dimensions);
+extern double sphere (double solution[], int dimensions);
+extern double schewefel (double solution[], int dimensions);
+
+enum {ROSENBROOK, SPHERE, SCHEWEFEL, ACKLEY, RASTRINGIN, GRIEWANK};
+double (*objective_function)(double[], int);
+
+int BOUNDRY_MAX;
+int BOUNDRY_MIN;
 
 int RUN_TIME;
 FILE *LOG_OBJECTIVE_FILE;
@@ -126,7 +117,6 @@ struct bat get_best(struct bat *bats, struct bat *best)
             memcpy(best, &bats[i], sizeof(struct bat));
         }
     }
-
 }
 
 void update_velocity(struct bat *bat, struct bat *best)
@@ -294,26 +284,55 @@ struct bat get_worst(struct bat bats[])
 }
 
 
-void objective_function (struct bat *bat)
-{
-    //bat->fitness = rastringin(bat->position, DIMENSIONS);
-    bat->fitness = griewank(bat->position, DIMENSIONS);
-    /* bat->fitness = sphere(bat->position, DIMENSIONS); */
-
-    //bat->fitness = ackley(bat->position, DIMENSIONS);
-    //usleep(0);
-}
 
 
 int main()
 {
-    allocate_resources();
     struct bat *bats;
     struct bat *best;
     struct bat *candidate;
-
     int iteration;
     double best_result,average_result,worst_result;
+
+
+    allocate_resources();
+
+
+    const int EVALUTAION_FUNCTION = ROSENBROOK;
+    switch(EVALUTAION_FUNCTION) {
+        case SPHERE:
+            BOUNDRY_MIN = -100;
+            BOUNDRY_MAX = -100;
+            objective_function = &sphere; 
+            break;
+        case RASTRINGIN:
+            BOUNDRY_MIN = -5.12;
+            BOUNDRY_MAX = 5.12;
+            objective_function = &rastringin; 
+            break;
+
+        case GRIEWANK:
+            BOUNDRY_MIN = -600;
+            BOUNDRY_MAX = 600;
+            objective_function = &griewank; 
+            break;
+        case ACKLEY:
+            BOUNDRY_MIN = -32;
+            BOUNDRY_MAX = 32;
+            objective_function = &ackley; 
+            break;
+        case SCHEWEFEL:
+            BOUNDRY_MIN = -500;
+            BOUNDRY_MAX = 500;
+            objective_function = &schewefel; 
+            break;
+        case ROSENBROOK:
+            BOUNDRY_MIN = -30;
+            BOUNDRY_MAX = 30;
+            objective_function = &rosenbrock; 
+            break;
+    }
+
 
     my_seed();
 
@@ -340,9 +359,8 @@ int main()
             position_perturbation(candidate);
             force_boundry_over_position(candidate);
 
-
-            objective_function(&bats[j]);
-            objective_function(candidate);
+            bats[j].fitness = objective_function(bats[j].position, DIMENSIONS);
+            candidate->fitness = objective_function(candidate->position, DIMENSIONS);
 
             if (my_rand(0,1) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
                 memcpy(bats[j].position, candidate->position, sizeof candidate->position);
@@ -355,7 +373,7 @@ int main()
                 log_bat(&bats[j]);
             }
         }
-           get_best(bats, best);
+        get_best(bats, best);
         best_result = best->fitness;
 
         if (LOG_OBJECTIVE_ENABLED) {

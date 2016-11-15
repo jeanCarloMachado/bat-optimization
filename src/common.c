@@ -13,6 +13,31 @@ double sphere (double solution[], int dimensions)
     return total;
 }
 
+
+double rosenbrock (double solution[], int dimensions)
+{
+    double total = 0;
+    for (int i = 0; i < dimensions-1; i++)
+    {
+        total=total+100.*pow((solution[i+1] - pow(solution[i],2.)),2) + pow((1. - solution[i]),2);
+    }
+
+    return total;
+}
+
+
+double schewefel(double solution[], int dimensions)
+{
+    double aux = 0;
+    for (int i=0;i<dimensions;i++)
+    {
+        aux += solution[i]*sin(sqrt(fabs(solution[i]))); 
+    }
+    return(-1*aux/dimensions);
+}
+
+
+
 double rastringin (double solution[], int dimensions)
 {
     double total = 0;
