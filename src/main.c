@@ -8,8 +8,8 @@
 #include "common.h"
 
 #define DIMENSIONS 30
-/* #define MAX_ITERATIONS 12500 */
 #define MAX_ITERATIONS 1000
+//#define MAX_ITERATIONS 1000
 #define BATS_COUNT 40
 #define FREQUENCY_MIN 0.0
 #define FREQUENCY_MAX 1.0
@@ -33,6 +33,9 @@ enum {LOG_OBJECTIVE, LOG_RANDOM, LOG_STDOUT, LOG_SCALAR_ATRIBUTES, LOG_VECTOR_AT
 extern double rosenbrock (double solution[], int dimensions);
 extern double sphere (double solution[], int dimensions);
 extern double schewefel (double solution[], int dimensions);
+extern double ackley (double solution[], int dimensions);
+extern double rastringin (double solution[], int dimensions);
+extern double griewank (double solution[], int dimensions);
 
 enum {ROSENBROOK, SPHERE, SCHEWEFEL, ACKLEY, RASTRINGIN, GRIEWANK};
 double (*objective_function)(double[], int);
@@ -123,8 +126,12 @@ void update_velocity(struct bat *bat, struct bat *best)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
         bat->velocity[i] = bat->velocity[i] + (bat->position[i] - best->position[i]) * bat->frequency;
-        if (bat->velocity[i] > BOUNDRY_MAX || bat->velocity[i] < BOUNDRY_MIN) {
-            bat->velocity[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+
+        if (bat->velocity[i] > BOUNDRY_MAX) {
+            bat->velocity[i] = BOUNDRY_MAX;
+        }
+        if (bat->velocity[i] < BOUNDRY_MIN) {
+            bat->velocity[i] = BOUNDRY_MIN;
         }
     }
 }
@@ -140,8 +147,11 @@ void update_position(struct bat *bat)
     for (int i = 0; i < DIMENSIONS; i++ ) {
         bat->position[i] = bat->position[i] + bat->velocity[i];
 
-        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+        if (bat->position[i] > BOUNDRY_MAX) {
+            bat->position[i] = BOUNDRY_MAX;
+        }
+        if (bat->position[i] < BOUNDRY_MIN) {
+            bat->position[i] = BOUNDRY_MIN;
         }
     }
 }
@@ -259,8 +269,11 @@ void position_perturbation(struct bat *bat)
 void force_boundry_over_position(struct bat *bat)
 {
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        if (bat->position[i] > BOUNDRY_MAX || bat->position[i] < BOUNDRY_MIN) {
-            bat->position[i] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+        if (bat->position[i] > BOUNDRY_MAX) {
+            bat->position[i] = BOUNDRY_MAX;
+        }
+        if (bat->position[i] < BOUNDRY_MIN) {
+            bat->position[i] = BOUNDRY_MIN;
         }
     }
 }
@@ -302,7 +315,7 @@ int main()
     switch(EVALUTAION_FUNCTION) {
         case SPHERE:
             BOUNDRY_MIN = -100;
-            BOUNDRY_MAX = -100;
+            BOUNDRY_MAX = 100;
             objective_function = &sphere; 
             break;
         case RASTRINGIN:
@@ -310,7 +323,6 @@ int main()
             BOUNDRY_MAX = 5.12;
             objective_function = &rastringin; 
             break;
-
         case GRIEWANK:
             BOUNDRY_MIN = -600;
             BOUNDRY_MAX = 600;
@@ -361,7 +373,6 @@ int main()
 
             bats[j].fitness = objective_function(bats[j].position, DIMENSIONS);
             candidate->fitness = objective_function(candidate->position, DIMENSIONS);
-
             if (my_rand(0,1) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
                 memcpy(bats[j].position, candidate->position, sizeof candidate->position);
                 bats[j].fitness = candidate->fitness;
@@ -374,7 +385,6 @@ int main()
             }
         }
         get_best(bats, best);
-        best_result = best->fitness;
 
         if (LOG_OBJECTIVE_ENABLED) {
             average_result = fitness_average(bats);
@@ -382,16 +392,16 @@ int main()
             logger(
                     LOG_OBJECTIVE,
                     "%f\t%f\t%f\n",
-                    best_result,
+                    best->fitness,
                     average_result,
                     worst_result
                   );
 
         }
 
-        if (fabs(best_result) < 0.0009) {
-            break;
-        }
+        /* if (fabs(best_result) < 0.0009) { */
+        /*     break; */
+        /* } */
 
     }
 
