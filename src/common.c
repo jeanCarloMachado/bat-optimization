@@ -26,7 +26,7 @@ double rosenbrock (double solution[], int dimensions)
 }
 
 
-double schewefel(double solution[], int dimensions)
+double schwefel(double solution[], int dimensions)
 {
     double aux = 0;
     for (int i=0;i<dimensions;i++)
@@ -35,8 +35,6 @@ double schewefel(double solution[], int dimensions)
     }
     return(-1*aux/dimensions);
 }
-
-
 
 double rastringin (double solution[], int dimensions)
 {
