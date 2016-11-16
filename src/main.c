@@ -7,12 +7,10 @@
 #include <unistd.h>
 #include "common.h"
 
-#define DIMENSIONS 100
-#define MAX_ITERATIONS 100
+#define DIMENSIONS 10
+#define MAX_ITERATIONS 500
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
-
-#define DUMP_DIR "./dump"
 
 //probability of accepting bad results
 #define ALFA 0.9
@@ -21,36 +19,6 @@
 
 #define BETA_MAX 1.0
 #define BETA_MIN -1.0
-
-#define LOG_OBJECTIVE_ENABLED 1
-#define LOG_ATRIBUTES_ENABLED 1
-#define LOG_RANDOM_ENABLED 0
-
-enum {LOG_OBJECTIVE, LOG_RANDOM, LOG_STDOUT, LOG_SCALAR_ATRIBUTES, LOG_VECTOR_ATRIBUTES};
-
-extern double rosenbrock (double solution[], int dimensions);
-extern double sphere (double solution[], int dimensions);
-extern double schwefel (double solution[], int dimensions);
-extern double ackley (double solution[], int dimensions);
-extern double rastringin (double solution[], int dimensions);
-extern double griewank (double solution[], int dimensions);
-
-enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK};
-double (*objective_function)(double[], int);
-
-int BOUNDRY_MAX;
-int BOUNDRY_MIN;
-int FREQUENCY_MIN;
-int FREQUENCY_MAX;
-
-
-int RUN_TIME;
-int BOUNDRY_SCAPE_COUNT = 0;
-int BOUNDRY_COUNT = 0;
-FILE *LOG_OBJECTIVE_FILE;
-FILE *LOG_SCALAR_ATRIBUTES_FILE;
-FILE *LOG_VECTOR_ATRIBUTES_FILE;
-FILE *LOG_RANDOM_FILE;
 
 struct bat {
     //tends towards 1
@@ -63,26 +31,177 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-void logger(int destination, char *fmt, ...)
+extern void logger(int destination, char *fmt, ...);
+extern double rosenbrock (double solution[], int dimensions);
+extern double sphere (double solution[], int dimensions);
+extern double schwefel (double solution[], int dimensions);
+extern double ackley (double solution[], int dimensions);
+extern double rastringin (double solution[], int dimensions);
+extern double griewank (double solution[], int dimensions);
+extern void deallocate_resources();
+extern void allocate_resources();
+extern double shuber(double solution[], int dimensions);
+
+struct bat get_worst(struct bat bats[]);
+void position_perturbation(struct bat *bat);
+void decrease_loudness(struct bat *bat, int iteration);
+double fitness_average(struct bat bats[]);
+double calc_loudness_average(struct bat *bats);
+void local_search(struct bat *bat, struct bat *best, double loudness_average); 
+void update_position(struct bat *bat);
+double generate_frequency();
+void update_velocity(struct bat *bat, struct bat *best);
+void force_boundry_on_vector(double vector[]);
+void force_boundry_on_value(double* value);
+struct bat get_best(struct bat *bats, struct bat *best);
+void log_bat_stdout(struct bat *bat);
+void log_bat(struct bat *bat);
+void initialize_bats(struct bat *bats);
+
+double (*objective_function)(double[], int);
+
+int BOUNDRY_MAX;
+int BOUNDRY_MIN;
+int FREQUENCY_MIN;
+int FREQUENCY_MAX;
+
+const int LOG_OBJECTIVE_ENABLED=1;
+const int LOG_ATRIBUTES_ENABLED=1;
+const int LOG_RANDOM_ENABLED=0;
+
+int BOUNDRY_SCAPE_COUNT = 0;
+int BOUNDRY_COUNT = 0;
+
+int main()
 {
-    char formatted_string[6666];
+    struct bat *bats;
+    struct bat *best;
+    struct bat *candidate;
+    int iteration;
+    double best_result,average_result,worst_result;
 
-    va_list argptr;
-    va_start(argptr,fmt);
-    vsprintf(formatted_string, fmt, argptr);
-    va_end(argptr);
+    allocate_resources();
 
-    if (destination == LOG_OBJECTIVE) 
-        fprintf(LOG_OBJECTIVE_FILE,"%s",formatted_string);
-    else if (destination == LOG_SCALAR_ATRIBUTES)
-        fprintf(LOG_SCALAR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_VECTOR_ATRIBUTES)
-        fprintf(LOG_VECTOR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_RANDOM)
-        fprintf(LOG_RANDOM_FILE,"%s",formatted_string);
-    else if (destination == LOG_STDOUT) 
-        printf("%s",formatted_string);
+    const int EVALUTAION_FUNCTION = ROSENBROOK;
+    switch(EVALUTAION_FUNCTION) {
+        case SPHERE:
+            BOUNDRY_MIN = -10.00;
+            BOUNDRY_MAX = 100.0;
+            objective_function = &sphere; 
+            break;
+        case RASTRINGIN:
+            BOUNDRY_MIN = -5.12;
+            BOUNDRY_MAX = 5.12;
+            objective_function = &rastringin; 
+            break;
+        case GRIEWANK:
+            BOUNDRY_MIN = -600.0;
+            BOUNDRY_MAX = 600.0;
+            objective_function = &griewank; 
+            break;
+        case ACKLEY:
+            BOUNDRY_MIN = -32.0;
+            BOUNDRY_MAX = 32.0;
+            objective_function = &ackley; 
+            break;
+        case SHUBER:
+            BOUNDRY_MIN = -100.0;
+            BOUNDRY_MAX = 100.0;
+            objective_function = &shuber; 
+            break;
+        case SCHWEFEL:
+            BOUNDRY_MIN = -500.0;
+            BOUNDRY_MAX = 500.0;
+            objective_function = &schwefel; 
+            break;
+        case ROSENBROOK:
+            BOUNDRY_MIN = -30.0;
+            BOUNDRY_MAX = 30.0;
+            objective_function = &rosenbrock; 
+            break;
+    }
+
+    FREQUENCY_MIN=BOUNDRY_MIN;
+    FREQUENCY_MAX=BOUNDRY_MAX;
+
+    my_seed();
+
+    bats = (struct bat *) malloc(sizeof(struct bat) * BATS_COUNT);
+    best = (struct bat *) malloc(sizeof(struct bat));
+    candidate = (struct bat *) malloc(sizeof(struct bat));
+
+    initialize_bats(bats);
+
+
+    for (int j = 0; j < BATS_COUNT; j++) {
+        bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
+    }
+    get_best(bats, best); 
+
+    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
+        for (int j = 0; j < BATS_COUNT; ++j){
+            bats[j].frequency = generate_frequency();
+            update_velocity(&bats[j], best);
+            memcpy(candidate, &bats[j], sizeof(struct bat));
+
+            update_position(candidate);
+
+            if (my_rand(0.0,1.0) < candidate->pulse_rate) {
+                local_search(candidate, best, calc_loudness_average(bats));
+            }
+
+            position_perturbation(candidate);
+            /* log_bat_stdout(candidate); */
+
+            bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
+            //log_bat_stdout(candidate);exit(0);
+            candidate->fitness = fabs((double)objective_function(candidate->position, DIMENSIONS));
+            if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
+                memcpy(bats[j].position, candidate->position, (sizeof(double) * DIMENSIONS));
+                bats[j].fitness = candidate->fitness;
+                bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
+
+                /* bats[j].pulse_rate=(INITIAL_LOUDNESS/MAX_ITERATIONS)*iteration; */
+
+                decrease_loudness(&bats[j], iteration);
+            }
+            get_best(bats, best);
+            if (LOG_ATRIBUTES_ENABLED) {
+                log_bat(&bats[j]);
+            }
+        }
+        /* get_best(bats, best); */
+
+        if (LOG_OBJECTIVE_ENABLED) {
+            average_result = fitness_average(bats);
+            worst_result = get_worst(bats).fitness;
+            logger(
+                    LOG_OBJECTIVE,
+                    "%f\t%f\t%f\n",
+                    best->fitness,
+                    average_result,
+                    worst_result
+                  );
+
+        }
+
+        /* if (fabs(best_result) < 0.0009) { */
+        /*     break; */
+        /* } */
+
+    }
+
+    log_bat_stdout(best);
+    int percentage = (BOUNDRY_SCAPE_COUNT * 100 / BOUNDRY_COUNT);
+    printf("Boundry total: %d,escaped: %d, escaped percentage: %d",BOUNDRY_COUNT, BOUNDRY_SCAPE_COUNT, percentage);
+
+    free(bats);
+    free(best);
+    free(candidate);
+    deallocate_resources();
+    return 0;
 }
+
 
 void initialize_bats(struct bat *bats)
 {
@@ -159,7 +278,6 @@ void force_boundry_on_vector(double vector[])
     }
 }
 
-
 void update_velocity(struct bat *bat, struct bat *best)
 {
     for (int i = 0; i < DIMENSIONS; ++i) {
@@ -206,6 +324,7 @@ double calc_loudness_average(struct bat *bats)
     return total / BATS_COUNT;
 }
 
+
 double fitness_average(struct bat bats[])
 {
     double result = 0;
@@ -217,77 +336,8 @@ double fitness_average(struct bat bats[])
     return result / BATS_COUNT;
 }
 
-
-void allocate_resources()
-{
-    RUN_TIME = time(NULL);
-    char fileName[100];
-
-    if (LOG_OBJECTIVE_ENABLED) {
-        sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
-        LOG_OBJECTIVE_FILE = fopen(fileName,"w");
-        if (LOG_OBJECTIVE_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Objective log: %s\n", fileName);
-    }
-
-    if (LOG_ATRIBUTES_ENABLED) {
-        sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
-        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w");
-        if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Scalar atributes log: %s\n", fileName);
-
-
-        sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
-        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w");
-        if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Vector Atributes log: %s\n", fileName);
-
-    }
-
-    if (LOG_RANDOM_ENABLED) {
-        sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
-        LOG_RANDOM_FILE = fopen(fileName,"w");
-        if (LOG_RANDOM_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Random log: %s\n", fileName);
-    }
-}
-
-void deallocate_resources()
-{
-    if (LOG_OBJECTIVE_ENABLED) {
-        fclose(LOG_OBJECTIVE_FILE);
-    }
-    if (LOG_ATRIBUTES_ENABLED) {
-        fclose(LOG_SCALAR_ATRIBUTES_FILE);
-        fclose(LOG_VECTOR_ATRIBUTES_FILE);
-    }
-    if (LOG_RANDOM_ENABLED) {
-        fclose(LOG_RANDOM_FILE);
-    }
-}
-
 void decrease_loudness(struct bat *bat, int iteration)
 {
-    //linear method
-    /* bat->loudness = INITIAL_LOUDNESS - (INITIAL_LOUDNESS/MAX_ITERATIONS)*iteration; */
-
-    //geometric method
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
 }
 
@@ -297,7 +347,6 @@ void position_perturbation(struct bat *bat)
     bat->position[dimension] = bat->position[dimension] * my_rand(0.0,1.0);
     force_boundry_on_vector(bat->position);
 }
-
 
 struct bat get_worst(struct bat bats[])
 {
@@ -316,132 +365,4 @@ struct bat get_worst(struct bat bats[])
 
     return current_worst_bat;
 }
-
-
-int main()
-{
-    struct bat *bats;
-    struct bat *best;
-    struct bat *candidate;
-    int iteration;
-    double best_result,average_result,worst_result;
-
-    allocate_resources();
-
-    const int EVALUTAION_FUNCTION = ROSENBROOK;
-    switch(EVALUTAION_FUNCTION) {
-        case SPHERE:
-            BOUNDRY_MIN = -10.00;
-            BOUNDRY_MAX = 100.0;
-            objective_function = &sphere; 
-            break;
-        case RASTRINGIN:
-            BOUNDRY_MIN = -5.12;
-            BOUNDRY_MAX = 5.12;
-            objective_function = &rastringin; 
-            break;
-        case GRIEWANK:
-            BOUNDRY_MIN = -600.0;
-            BOUNDRY_MAX = 600.0;
-            objective_function = &griewank; 
-            break;
-        case ACKLEY:
-            BOUNDRY_MIN = -32.0;
-            BOUNDRY_MAX = 32.0;
-            objective_function = &ackley; 
-            break;
-        case SCHWEFEL:
-            BOUNDRY_MIN = -500.0;
-            BOUNDRY_MAX = 500.0;
-            objective_function = &schwefel; 
-            break;
-        case ROSENBROOK:
-            BOUNDRY_MIN = -30.0;
-            BOUNDRY_MAX = 30.0;
-            objective_function = &rosenbrock; 
-            break;
-    }
-
-    FREQUENCY_MIN=BOUNDRY_MIN;
-    FREQUENCY_MAX=BOUNDRY_MAX;
-
-    my_seed();
-
-    bats = (struct bat *) malloc(sizeof(struct bat) * BATS_COUNT);
-    best = (struct bat *) malloc(sizeof(struct bat));
-    candidate = (struct bat *) malloc(sizeof(struct bat));
-
-    initialize_bats(bats);
-
-
-    for (int j = 0; j < BATS_COUNT; j++) {
-            bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
-    }
-    get_best(bats, best); 
-
-    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
-        for (int j = 0; j < BATS_COUNT; ++j){
-            bats[j].frequency = generate_frequency();
-            update_velocity(&bats[j], best);
-            memcpy(candidate, &bats[j], sizeof(struct bat));
-
-            update_position(candidate);
-
-            if (my_rand(0.0,1.0) < candidate->pulse_rate) {
-                local_search(candidate, best, calc_loudness_average(bats));
-            }
-
-            position_perturbation(candidate);
-            /* log_bat_stdout(candidate); */
-
-            bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
-            //log_bat_stdout(candidate);exit(0);
-            candidate->fitness = fabs((double)objective_function(candidate->position, DIMENSIONS));
-            if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
-                memcpy(bats[j].position, candidate->position, (sizeof(double) * DIMENSIONS));
-                bats[j].fitness = candidate->fitness;
-                bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
-
-                /* bats[j].pulse_rate=(INITIAL_LOUDNESS/MAX_ITERATIONS)*iteration; */
-
-                decrease_loudness(&bats[j], iteration);
-            }
-            get_best(bats, best);
-            if (LOG_ATRIBUTES_ENABLED) {
-                log_bat(&bats[j]);
-            }
-        }
-        /* get_best(bats, best); */
-
-        if (LOG_OBJECTIVE_ENABLED) {
-            average_result = fitness_average(bats);
-            worst_result = get_worst(bats).fitness;
-            logger(
-                    LOG_OBJECTIVE,
-                    "%f\t%f\t%f\n",
-                    best->fitness,
-                    average_result,
-                    worst_result
-                  );
-
-        }
-
-        /* if (fabs(best_result) < 0.0009) { */
-        /*     break; */
-        /* } */
-
-    }
-
-    log_bat_stdout(best);
-    int percentage = (BOUNDRY_SCAPE_COUNT * 100 / BOUNDRY_COUNT);
-    printf("Boundry total: %d,escaped: %d, escaped percentage: %d",BOUNDRY_COUNT, BOUNDRY_SCAPE_COUNT, percentage);
-
-
-    free(bats);
-    free(best);
-    free(candidate);
-    deallocate_resources();
-    return 0;
-}
-
 

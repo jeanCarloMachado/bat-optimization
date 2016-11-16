@@ -1,5 +1,6 @@
 all: source
 .PHONY: paper
+.PHONY: tests
 
 source:
 	gcc -c src/mersenne.c
@@ -27,6 +28,10 @@ device_info:
 clear:
 	rm -rf bat
 	rm -rf dump/*
+
+tests:
+	gcc -c src/unity.c
+	gcc unity.o src/tests.c -o bat_tests 
 
 paper:
 	cd paper ; \

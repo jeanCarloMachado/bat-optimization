@@ -1,6 +1,38 @@
 #include "common.h"
 #include <math.h>
+#include <stdarg.h>
 #include "mersenne.h"
+
+extern const int LOG_OBJECTIVE_ENABLED;
+extern const int LOG_ATRIBUTES_ENABLED;
+extern const int LOG_RANDOM_ENABLED;
+
+FILE *LOG_OBJECTIVE_FILE;
+FILE *LOG_SCALAR_ATRIBUTES_FILE;
+FILE *LOG_VECTOR_ATRIBUTES_FILE;
+FILE *LOG_RANDOM_FILE;
+int RUN_TIME;
+
+#define DUMP_DIR "./dump"
+
+double shuber (double solution[], int dimensions)
+{
+/*
+-   Domain  |x| <= 10.0
+-   Number of local minimum = 400
+-   Global minimum fmin = -24.062499 at the ff. points
+-    (-6.774576, -6.774576), ..., (5.791794, 5.791794)
+*/
+	  double sum = 0.0;
+	  for (int i = 0; i < dimensions; i++) {
+		sum += -sin(2.0*solution[i]+1.0)
+	          -2.0*sin(3.0*solution[i]+2.0)
+        	  -3.0*sin(4.0*solution[i]+3.0)
+        	  -4.0*sin(5.0*solution[i]+4.0)
+        	  -5.0*sin(6.0*solution[i]+5.0);
+	  }
+}
+
 
 double sphere (double solution[], int dimensions)
 {
@@ -96,4 +128,90 @@ double my_rand(int min, int max)
 
     return result;
 }
+
+void logger(int destination, char *fmt, ...)
+{
+    char formatted_string[6666];
+
+    va_list argptr;
+    va_start(argptr,fmt);
+    vsprintf(formatted_string, fmt, argptr);
+    va_end(argptr);
+
+    if (destination == LOG_OBJECTIVE) 
+        fprintf(LOG_OBJECTIVE_FILE,"%s",formatted_string);
+    else if (destination == LOG_SCALAR_ATRIBUTES)
+        fprintf(LOG_SCALAR_ATRIBUTES_FILE,"%s",formatted_string);
+    else if (destination == LOG_VECTOR_ATRIBUTES)
+        fprintf(LOG_VECTOR_ATRIBUTES_FILE,"%s",formatted_string);
+    else if (destination == LOG_RANDOM)
+        fprintf(LOG_RANDOM_FILE,"%s",formatted_string);
+    else if (destination == LOG_STDOUT) 
+        printf("%s",formatted_string);
+}
+
+void deallocate_resources()
+{
+    if (LOG_OBJECTIVE_ENABLED) {
+        fclose(LOG_OBJECTIVE_FILE);
+    }
+    if (LOG_ATRIBUTES_ENABLED) {
+        fclose(LOG_SCALAR_ATRIBUTES_FILE);
+        fclose(LOG_VECTOR_ATRIBUTES_FILE);
+    }
+    if (LOG_RANDOM_ENABLED) {
+        fclose(LOG_RANDOM_FILE);
+    }
+}
+
+void allocate_resources()
+{
+    RUN_TIME = time(NULL);
+    char fileName[100];
+
+    if (LOG_OBJECTIVE_ENABLED) {
+        sprintf(fileName, "%s/%i-objective", DUMP_DIR, RUN_TIME);
+        LOG_OBJECTIVE_FILE = fopen(fileName,"w");
+        if (LOG_OBJECTIVE_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Objective log: %s\n", fileName);
+    }
+
+    if (LOG_ATRIBUTES_ENABLED) {
+        sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
+        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w");
+        if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Scalar atributes log: %s\n", fileName);
+
+
+        sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
+        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w");
+        if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Vector Atributes log: %s\n", fileName);
+
+    }
+
+    if (LOG_RANDOM_ENABLED) {
+        sprintf(fileName, "%s/%i-random", DUMP_DIR, RUN_TIME);
+        LOG_RANDOM_FILE = fopen(fileName,"w");
+        if (LOG_RANDOM_FILE == NULL)
+        {
+            printf("Error opening file %s !\n", fileName);
+            exit(1);
+        }
+        printf ("Random log: %s\n", fileName);
+    }
+}
+
 
