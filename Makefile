@@ -3,14 +3,14 @@ all: source
 .PHONY: tests
 
 source:
+	gcc -c src/bat.c 
 	gcc -c src/mersenne.c
 	gcc -c src/common.c 
-	gcc mersenne.o common.o src/main.c -lm -o bat 
+	gcc bat.o mersenne.o common.o  src/main.c -lm -o bat 
 
 run: source
 	./bat
 	./post-run
-
 
 gpu:
 	nvcc -c src/mersenne.c -Wno-deprecated-gpu-targets 
@@ -30,8 +30,15 @@ clear:
 	rm -rf dump/*
 
 tests:
-	gcc -c src/unity.c
-	gcc unity.o src/tests.c -o bat_tests 
+	gcc -c src/mersenne.c
+	gcc -c src/common.c 
+	gcc -c src/bat.c 
+	gcc -c src/unity.c 
+	gcc mersenne.o common.o bat.o unity.o src/tests.c -lm -o bat_tests 
+
+run_tests: tests
+	./bat_tests
+
 
 paper:
 	cd paper ; \
