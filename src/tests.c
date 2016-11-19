@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "unity.h"
 #include "bat.h"
+#define DIMENSIONS 10
 
 int BATS_COUNT = 2;
 struct bat *bats;
@@ -21,11 +22,6 @@ void setUp()
 void tearDown()
 {
     free(bats);
-}
-
-int sum(int a, int b)
-{
-    return a + b;
 }
 
 void test_get_best()

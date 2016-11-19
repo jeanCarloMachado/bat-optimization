@@ -17,24 +17,24 @@ int RUN_TIME;
 
 double shuber (double solution[], int dimensions)
 {
-/*
--   Domain  |x| <= 10.0
--   Number of local minimum = 400
--   Global minimum fmin = -24.062499 at the ff. points
--    (-6.774576, -6.774576), ..., (5.791794, 5.791794)
-*/
-	  double sum = 0.0;
-	  for (int i = 0; i < dimensions; i++) {
-		sum += -sin(2.0*solution[i]+1.0)
-	          -2.0*sin(3.0*solution[i]+2.0)
-        	  -3.0*sin(4.0*solution[i]+3.0)
-        	  -4.0*sin(5.0*solution[i]+4.0)
-        	  -5.0*sin(6.0*solution[i]+5.0);
-	  }
+    /*
+       -   Domain  |x| <= 10.0
+       -   Number of local minimum = 400
+       -   Global minimum fmin = -24.062499 at the ff. points
+       -    (-6.774576, -6.774576), ..., (5.791794, 5.791794)
+       */
+    double sum = 0.0;
+    for (int i = 0; i < dimensions; i++) {
+        sum += -sin(2.0*solution[i]+1.0)
+            -2.0*sin(3.0*solution[i]+2.0)
+            -3.0*sin(4.0*solution[i]+3.0)
+            -4.0*sin(5.0*solution[i]+4.0)
+            -5.0*sin(6.0*solution[i]+5.0);
+    }
 }
 
 
-double sphere (double solution[], int dimensions)
+double sphere (double *solution, int dimensions)
 {
     double total = 0;
 

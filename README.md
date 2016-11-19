@@ -10,7 +10,6 @@ Rationing
 
 O schewel tende a se concentrar no boundry mas converge.
 
-
 O Rosenbrook não converge, e a posição tende a ser o zero.
 O valor do rosenbrook tente a ficar próximo ao número de
 dimensões.
@@ -27,5 +26,16 @@ Hipóteses
 
 Será que o algorítmo rosenbrook não converge pois não funciona
 para o problema? 
+
+
+
+Sat Nov 19 16:31:27 BRST 2016
+=============================
+
+The values are not converging anymore I'll have to see why this is
+happening.
+
+The pulse rate seems to decay the same way of the convergence,
+maybe if I make it endure longer the convergence will follow.
 
 

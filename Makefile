@@ -1,12 +1,14 @@
+CC:="gcc"
+DEBUG="-g"
 all: source
 .PHONY: paper
 .PHONY: tests
 
 source:
-	gcc -c src/bat.c 
-	gcc -c src/mersenne.c
-	gcc -c src/common.c 
-	gcc bat.o mersenne.o common.o  src/main.c -lm -o bat 
+	${CC} ${DEBUG} -c src/bat.c 
+	${CC} ${DEBUG} -c src/mersenne.c
+	${CC} ${DEBUG} -c src/common.c 
+	${CC} ${DEBUG} bat.o mersenne.o common.o  src/main.c -lm -o bat 
 
 run: source
 	./bat
@@ -30,15 +32,14 @@ clear:
 	rm -rf dump/*
 
 tests:
-	gcc -c src/mersenne.c
-	gcc -c src/common.c 
-	gcc -c src/bat.c 
-	gcc -c src/unity.c 
-	gcc mersenne.o common.o bat.o unity.o src/tests.c -lm -o bat_tests 
+	${CC} ${DEBUG} -c src/mersenne.c
+	${CC} ${DEBUG} -c src/common.c 
+	${CC} ${DEBUG} -c src/bat.c 
+	${CC} ${DEBUG} -c src/unity.c 
+	${CC} ${DEBUG} mersenne.o common.o bat.o unity.o src/tests.c -lm -o bat_tests 
 
 run_tests: tests
 	./bat_tests
-
 
 paper:
 	cd paper ; \
