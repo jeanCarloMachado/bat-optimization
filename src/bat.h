@@ -14,5 +14,6 @@ struct bat {
 
 int run_bats();
 struct bat get_best(struct bat *bats, struct bat *best);
+struct bat* get_worst(struct bat *bats);
 
 #endif

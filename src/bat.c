@@ -32,7 +32,7 @@ extern void deallocate_resources();
 extern void allocate_resources();
 extern double shuber(double solution[], int dimensions);
 
-struct bat get_worst(struct bat bats[]);
+struct bat* get_worst(struct bat *bats);
 void position_perturbation(struct bat *bat);
 void decrease_loudness(struct bat *bat, int iteration);
 double fitness_average(struct bat bats[]);
@@ -164,7 +164,7 @@ int run_bats()
 
         if (LOG_OBJECTIVE_ENABLED) {
             average_result = fitness_average(bats);
-            worst_result = get_worst(bats).fitness;
+            worst_result = get_worst(bats)->fitness;
             logger(
                     LOG_OBJECTIVE,
                     "%E\t%E\t%E\n",
@@ -359,21 +359,21 @@ void position_perturbation(struct bat *bat)
     force_boundry_on_vector(bat->position);
 }
 
-struct bat get_worst(struct bat bats[])
+struct bat* get_worst(struct bat *bats)
 {
     double current_worst_val;
     double current_val;
 
     current_val = current_worst_val = bats[0].fitness;
-    struct bat current_worst_bat = bats[0];
+    int worst_indice = 0;
     for (int i = 0; i < BATS_COUNT; i++) {
         current_val = bats[i].fitness;
         if (current_worst_val <  current_val) {
             current_worst_val = current_val;
-            current_worst_bat = bats[i];
+            worst_indice = i;
         }
     }
 
-    return current_worst_bat;
+    return &bats[worst_indice];
 }
 
