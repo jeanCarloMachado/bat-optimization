@@ -16,6 +16,27 @@ void tearDown()
 {
 }
 
+
+void test_copy_bat()
+{
+    struct bat from;
+    struct bat to;
+    double position_from[3] = {1.0,2.0,3.0};
+    double position_to[3] = {4.0,5.0,6.0};
+
+    from.position = position_from;
+    TEST_ASSERT(2.0 == from.position[1]);
+
+    to.position = position_to;
+    TEST_ASSERT(5.0 == to.position[1]);
+
+    copy_bat(&from, &to);
+
+    TEST_ASSERT(2.0 == to.position[1]);
+}
+
+
+
 void test_get_worst()
 {
     struct bat *bats;
@@ -79,6 +100,7 @@ int main() {
     RUN_TEST(test_get_best);
     RUN_TEST(test_get_worst);
     RUN_TEST(test_rosenbrook);
+    RUN_TEST(test_copy_bat);
 
     return UNITY_END();
 }

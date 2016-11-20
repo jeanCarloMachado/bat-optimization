@@ -42,3 +42,6 @@ maybe if I make it endure longer the convergence will follow.
 
 It seems that the algorithms always converges on the 20th
 iteration I should discover why this happens.
+
+Quanto mais morcegos mais rápido o algorítmo converge para um
+valor não ideal.

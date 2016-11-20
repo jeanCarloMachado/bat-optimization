@@ -33,6 +33,7 @@ void allocate_resources(void);
 void deallocate_resources(void);
 double shuber (double solution[], int dimensions);
 void log_bat_stdout(struct bat *bat, int dimensions);
+void copy_bat(struct bat *from, struct bat *to);
 
 
 #endif

@@ -37,6 +37,7 @@ void force_boundry_on_value(double* value);
 void log_bat(struct bat *bat);
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
+void copy_bat(struct bat *from, struct bat *to);
 
 double (*objective_function)(double[], int);
 
@@ -107,17 +108,13 @@ int run_bats(void)
     candidate = (struct bat *) malloc(sizeof(struct bat));
     initialize_bats(bats, best, candidate);
 
-
-    for (int j = 0; j < BATS_COUNT; j++) {
-        bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
-    }
     get_best(bats, best); 
 
     for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; ++j){
             bats[j].frequency = generate_frequency();
             update_velocity(&bats[j], best);
-            memcpy(candidate, &bats[j], sizeof(struct bat));
+            copy_bat(&bats[j], candidate);
 
             update_position(candidate);
 
@@ -126,17 +123,13 @@ int run_bats(void)
             }
 
             position_perturbation(candidate);
-            /* log_bat_stdout(candidate); */
 
             bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
-            //log_bat_stdout(candidate);exit(0);
             candidate->fitness = fabs((double)objective_function(candidate->position, DIMENSIONS));
             if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
                 memcpy(bats[j].position, candidate->position, (sizeof(double) * DIMENSIONS));
                 bats[j].fitness = candidate->fitness;
                 bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
-
-                /* bats[j].pulse_rate=(INITIAL_LOUDNESS/MAX_ITERATIONS)*iteration; */
 
                 decrease_loudness(&bats[j], iteration);
             }
@@ -193,6 +186,11 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 
     candidate->velocity = (double *) malloc(sizeof(double) * DIMENSIONS);
     candidate->position = (double *) malloc(sizeof(double) * DIMENSIONS);
+
+
+    for (int j = 0; j < BATS_COUNT; j++) {
+        bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
+    }
 }
 
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate)
@@ -349,4 +347,12 @@ struct bat* get_worst(struct bat *bats)
 
     return &bats[worst_indice];
 }
+
+void copy_bat(struct bat *from, struct bat *to)
+{
+    memcpy(to, from, sizeof(struct bat));
+    memcpy(to->position, from->position, sizeof(double) * DIMENSIONS);
+    memcpy(to->velocity, from->velocity, sizeof(double) * DIMENSIONS);
+}
+
 
