@@ -16,6 +16,8 @@ enum {LOG_OBJECTIVE, LOG_RANDOM, LOG_STDOUT, LOG_SCALAR_ATRIBUTES, LOG_VECTOR_AT
 
 enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
 
+
+int  run_bats(void);
 struct bat get_best(struct bat *bats, struct bat *best);
 struct bat* get_worst(struct bat *bats);
 double sphere(double x[], int dimensions);
@@ -27,8 +29,9 @@ double schwefel(double solution[], int dimensions);
 void my_seed(void);
 double my_rand(int, int);
 void logger(int destination, char *fmt, ...);
-void allocate_resources();
-void deallocate_resources();
+void allocate_resources(void);
+void deallocate_resources(void);
 double shuber (double solution[], int dimensions);
+
 
 #endif

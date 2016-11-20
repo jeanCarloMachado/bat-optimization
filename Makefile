@@ -5,9 +5,10 @@ all: source
 .PHONY: tests
 
 source:
+	${CC} ${DEBUG} -c src/bat.c 
 	${CC} ${DEBUG} -c src/mersenne.c
 	${CC} ${DEBUG} -c src/common.c 
-	${CC} ${DEBUG}  mersenne.o common.o  src/main.c -lm -o bat 
+	${CC} ${DEBUG} bat.o mersenne.o common.o  src/main.c -lm -o bat 
 
 run: source
 	./bat
@@ -34,8 +35,9 @@ clear:
 tests:
 	${CC} ${DEBUG} -c src/mersenne.c
 	${CC} ${DEBUG} -c src/common.c 
+	${CC} ${DEBUG} -c src/bat.c 
 	${CC} ${DEBUG} -c src/unity.c 
-	${CC} ${DEBUG} mersenne.o common.o  unity.o src/tests.c -lm -o bat_tests 
+	${CC} ${DEBUG} mersenne.o common.o bat.o unity.o src/tests.c -lm -o bat_tests 
 
 run_tests: tests
 	./bat_tests
