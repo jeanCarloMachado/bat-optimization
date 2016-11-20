@@ -7,18 +7,20 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 500
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 100
 
 //probability of accepting bad results
-#define ALFA 0.9
+#define ALFA 0.90
 //affects local search
-#define LAMBDA 0.9
+#define LAMBDA 0.90
 
 #define BETA_MAX 1.0
 #define BETA_MIN -1.0
+
+const int EVALUTAION_FUNCTION = SCHWEFEL;
 
 const int LOG_OBJECTIVE_ENABLED=1;
 const int LOG_ATRIBUTES_ENABLED=1;
@@ -37,6 +39,7 @@ void force_boundry_on_value(double* value);
 void log_bat(struct bat *bat);
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
+void initialize_function(void);
 
 double (*objective_function)(double[], int);
 
@@ -58,44 +61,7 @@ int run_bats(void)
 
     allocate_resources();
 
-    const int EVALUTAION_FUNCTION = ROSENBROOK;
-    switch(EVALUTAION_FUNCTION) {
-        case SPHERE:
-            BOUNDRY_MIN = -10.00;
-            BOUNDRY_MAX = 100.0;
-            objective_function = &sphere; 
-            break;
-        case RASTRINGIN:
-            BOUNDRY_MIN = -5.12;
-            BOUNDRY_MAX = 5.12;
-            objective_function = &rastringin; 
-            break;
-        case GRIEWANK:
-            BOUNDRY_MIN = -600.0;
-            BOUNDRY_MAX = 600.0;
-            objective_function = &griewank; 
-            break;
-        case ACKLEY:
-            BOUNDRY_MIN = -32.0;
-            BOUNDRY_MAX = 32.0;
-            objective_function = &ackley; 
-            break;
-        case SHUBER:
-            BOUNDRY_MIN = -100.0;
-            BOUNDRY_MAX = 100.0;
-            objective_function = &shuber; 
-            break;
-        case SCHWEFEL:
-            BOUNDRY_MIN = -500.0;
-            BOUNDRY_MAX = 500.0;
-            objective_function = &schwefel; 
-            break;
-        case ROSENBROOK:
-            BOUNDRY_MIN = -30.0;
-            BOUNDRY_MAX = 30.0;
-            objective_function = &rosenbrock; 
-            break;
-    }
+    initialize_function();
 
     FREQUENCY_MIN=BOUNDRY_MIN;
     FREQUENCY_MAX=BOUNDRY_MAX;
@@ -123,8 +89,8 @@ int run_bats(void)
 
             position_perturbation(candidate);
 
-            bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
-            candidate->fitness = fabs((double)objective_function(candidate->position, DIMENSIONS));
+            bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
+            candidate->fitness = fabs(objective_function(candidate->position, DIMENSIONS));
             if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
                 copy_bat(candidate, &bats[j]);
                 bats[j].fitness = candidate->fitness;
@@ -137,7 +103,6 @@ int run_bats(void)
                 log_bat(&bats[j]);
             }
         }
-        /* get_best(bats, best); */
 
         if (LOG_OBJECTIVE_ENABLED) {
             average_result = fitness_average(bats);
@@ -167,9 +132,9 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 {
 
     for (int i = 0; i < BATS_COUNT; i++) {
-        bats[i].pulse_rate = 0;
-        bats[i].frequency = 0;
-        bats[i].fitness = 0;
+        bats[i].pulse_rate = 0.0;
+        bats[i].frequency = 0.0;
+        bats[i].fitness;
         bats[i].loudness = INITIAL_LOUDNESS;
 
         bats[i].velocity = (double *) malloc(sizeof(double) * DIMENSIONS);
@@ -178,7 +143,10 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
             bats[i].velocity[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
             bats[i].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
         }
+
+        bats[i].fitness = fabs(objective_function(bats[i].position, DIMENSIONS));
     }
+
 
     best->velocity = (double *) malloc(sizeof(double) * DIMENSIONS);
     best->position = (double *) malloc(sizeof(double) * DIMENSIONS);
@@ -187,9 +155,6 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
     candidate->position = (double *) malloc(sizeof(double) * DIMENSIONS);
 
 
-    for (int j = 0; j < BATS_COUNT; j++) {
-        bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
-    }
 }
 
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate)
@@ -216,7 +181,7 @@ void log_bat(struct bat *bat)
     logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %E %E %E\n", bat->frequency, bat->pulse_rate, bat->loudness);
 
     for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_VECTOR_ATRIBUTES, "%E\t%E\t%E\n", bat->velocity[i], bat->position[i], bat->fitness);
+        logger(LOG_VECTOR_ATRIBUTES, "%E\t%f\t%f\n", bat->velocity[i], bat->position[i], bat->fitness);
     }
 }
 
@@ -285,11 +250,8 @@ void update_position(struct bat *bat)
 
 void local_search(struct bat *bat, struct bat *best, double loudness_average)
 {
-    //double tmp;
     for (int i = 0; i < DIMENSIONS; i++ ) {
-        //tmp=best->position[i];
-        bat->position[i] = best->position[i] + loudness_average * my_rand(-1.0,1.0);
-        /* printf("Position from: %E, Position to %E\n", tmp, bat->position[i]); */
+        bat->position[i] = best->position[i] + loudness_average * my_rand(-1.0, 1.0);
     }
 }
 
@@ -350,8 +312,47 @@ struct bat* get_worst(struct bat *bats)
 void copy_bat(struct bat *from, struct bat *to)
 {
     memcpy(to, from, sizeof(struct bat));
-    memcpy(to->position, from->position, sizeof(double) * DIMENSIONS);
-    memcpy(to->velocity, from->velocity, sizeof(double) * DIMENSIONS);
 }
 
+
+void initialize_function(void)
+{
+    switch(EVALUTAION_FUNCTION) {
+        case SPHERE:
+            BOUNDRY_MIN = -10.00;
+            BOUNDRY_MAX = 100.0;
+            objective_function = &sphere; 
+            break;
+        case RASTRINGIN:
+            BOUNDRY_MIN = -5.12;
+            BOUNDRY_MAX = 5.12;
+            objective_function = &rastringin; 
+            break;
+        case GRIEWANK:
+            BOUNDRY_MIN = -600.0;
+            BOUNDRY_MAX = 600.0;
+            objective_function = &griewank; 
+            break;
+        case ACKLEY:
+            BOUNDRY_MIN = -32.0;
+            BOUNDRY_MAX = 32.0;
+            objective_function = &ackley; 
+            break;
+        case SHUBER:
+            BOUNDRY_MIN = -100.0;
+            BOUNDRY_MAX = 100.0;
+            objective_function = &shuber; 
+            break;
+        case SCHWEFEL:
+            BOUNDRY_MIN = -500.0;
+            BOUNDRY_MAX = 500.0;
+            objective_function = &schwefel; 
+            break;
+        case ROSENBROOK:
+            BOUNDRY_MIN = -30.0;
+            BOUNDRY_MAX = 30.0;
+            objective_function = &rosenbrock; 
+            break;
+    }
+}
 
