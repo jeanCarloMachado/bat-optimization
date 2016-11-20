@@ -7,20 +7,20 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define MAX_ITERATIONS 500
+#define ITERATIONS 500
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 100
 
 //probability of accepting bad results
-#define ALFA 0.90
+#define ALFA 0.9
 //affects local search
-#define LAMBDA 0.90
+#define LAMBDA 0.10
 
 #define BETA_MAX 1.0
 #define BETA_MIN -1.0
 
-const int EVALUTAION_FUNCTION = SCHWEFEL;
+const int EVALUTAION_FUNCTION = SHUBER;
 
 const int LOG_OBJECTIVE_ENABLED=1;
 const int LOG_ATRIBUTES_ENABLED=1;
@@ -75,7 +75,7 @@ int run_bats(void)
 
     get_best(bats, best); 
 
-    for (iteration = 0; iteration < MAX_ITERATIONS ; ++iteration) {
+    for (iteration = 0; iteration < ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; ++j){
             bats[j].frequency = generate_frequency();
             update_velocity(&bats[j], best);
@@ -111,8 +111,8 @@ int run_bats(void)
                     LOG_OBJECTIVE,
                     "%E\t%E\t%E\n",
                     best->fitness,
-                    average_result,
-                    worst_result
+                    average_result
+                    /* worst_result */
                   );
 
         }
@@ -198,7 +198,7 @@ struct bat get_best(struct bat *bats, struct bat *best)
             best_indice = i;
         }
     }
-    memcpy(best, &bats[best_indice], sizeof(struct bat));
+    copy_bat(&bats[best_indice], best);
 }
 
 void force_boundry_on_value(double* value)
@@ -281,7 +281,11 @@ double fitness_average(struct bat bats[])
 
 void decrease_loudness(struct bat *bat, int iteration)
 {
+    // Se a diminuição for lenta o suficiente, o valor encontrado no
+    // final da execução tende a ser o ótimo global
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
+
+    /* bat->loudness = INITIAL_LOUDNESS - (INITIAL_LOUDNESS / ITERATIONS) * iteration; */
 }
 
 void position_perturbation(struct bat *bat)

@@ -105,3 +105,21 @@ Falhas do algorítmo
 Me parece certo dizer que o algorítmo proposto tem um falha de
 fugir dos boundries com muita frequência, já aconteceu em 18% dos
 números em uma execução.
+
+Hipótese:
+--------
+Se a diminuição for lenta o suficiente, o valor
+encontrado no final da execução tende a ser o ótimo global
+
+Diminuindo  o loudness linearmente não surtiu efeito, voltei para
+o decrescimo geométrico.
+
+----
+Parece que o problema é a busca local, eu não consigo visualizar
+algum erro no algorítmo. Possivelmente o autor do paper teria os
+mesmo problemas com a rosenbrook.
+
+Acho que o negócio é ir adiante, nos próximos passos e parar de
+perder tempo com isso, provavelmente é o que o Parpinelli espera
+de mim também.
+
