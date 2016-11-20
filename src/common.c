@@ -1,4 +1,4 @@
-#include "common.h"
+#include "bat.h"
 #include <math.h>
 #include <stdarg.h>
 #include "mersenne.h"
