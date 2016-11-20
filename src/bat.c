@@ -37,7 +37,6 @@ void force_boundry_on_value(double* value);
 void log_bat(struct bat *bat);
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
-void copy_bat(struct bat *from, struct bat *to);
 
 double (*objective_function)(double[], int);
 
@@ -127,7 +126,7 @@ int run_bats(void)
             bats[j].fitness = fabs((double)objective_function(bats[j].position, DIMENSIONS));
             candidate->fitness = fabs((double)objective_function(candidate->position, DIMENSIONS));
             if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
-                memcpy(bats[j].position, candidate->position, (sizeof(double) * DIMENSIONS));
+                copy_bat(candidate, &bats[j]);
                 bats[j].fitness = candidate->fitness;
                 bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
 
