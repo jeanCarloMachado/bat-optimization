@@ -55,12 +55,30 @@ void test_get_best()
     free(bats);
 }
 
+void test_rosenbrook()
+{
+    double solution[3];
+    solution[0]=1;
+    solution[1]=1;
+    solution[2]=1;
+
+    TEST_ASSERT(0.0 == rosenbrock(solution, 3));
+
+
+    solution[0]=1;
+    solution[1]=0;
+    solution[2]=0;
+
+    TEST_ASSERT(101 == (int) rosenbrock(solution, 3));
+}
+
 int main() {
 
     UNITY_BEGIN();
 
     RUN_TEST(test_get_best);
     RUN_TEST(test_get_worst);
+    RUN_TEST(test_rosenbrook);
 
     return UNITY_END();
 }

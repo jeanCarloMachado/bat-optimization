@@ -24,7 +24,6 @@ const int LOG_OBJECTIVE_ENABLED=1;
 const int LOG_ATRIBUTES_ENABLED=1;
 const int LOG_RANDOM_ENABLED=0;
 
-struct bat* get_worst(struct bat *bats);
 void position_perturbation(struct bat *bat);
 void decrease_loudness(struct bat *bat, int iteration);
 double fitness_average(struct bat bats[]);
@@ -35,8 +34,6 @@ double generate_frequency();
 void update_velocity(struct bat *bat, struct bat *best);
 void force_boundry_on_vector(double vector[]);
 void force_boundry_on_value(double* value);
-struct bat get_best(struct bat *bats, struct bat *best);
-void log_bat_stdout(struct bat *bat);
 void log_bat(struct bat *bat);
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
@@ -61,7 +58,7 @@ int run_bats(void)
 
     allocate_resources();
 
-    const int EVALUTAION_FUNCTION = SPHERE;
+    const int EVALUTAION_FUNCTION = ROSENBROOK;
     switch(EVALUTAION_FUNCTION) {
         case SPHERE:
             BOUNDRY_MIN = -10.00;
@@ -164,7 +161,7 @@ int run_bats(void)
         }
     }
 
-    log_bat_stdout(best);
+    log_bat_stdout(best, DIMENSIONS);
     int percentage = (BOUNDRY_SCAPE_COUNT * 100 / BOUNDRY_COUNT);
     printf("Boundry total: %d,escaped: %d, escaped percentage: %d",BOUNDRY_COUNT, BOUNDRY_SCAPE_COUNT, percentage);
 
@@ -224,18 +221,6 @@ void log_bat(struct bat *bat)
     for (int i = 0; i < DIMENSIONS; i++) {
         logger(LOG_VECTOR_ATRIBUTES, "%E\t%E\t%E\n", bat->velocity[i], bat->position[i], bat->fitness);
     }
-}
-
-void log_bat_stdout(struct bat *bat) 
-{
-    logger(LOG_STDOUT, "Best BAT");
-    for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_STDOUT, "[%i] = %E\n", i, bat->position[i]);
-    }
-    logger(LOG_STDOUT, "Frequency: %E\n", bat->frequency);
-    logger(LOG_STDOUT, "Pulse-rate: %E\n", bat->pulse_rate);
-    logger(LOG_STDOUT, "Loudness: %E\n", bat->loudness);
-    logger(LOG_STDOUT, "Fitness: %E\n", bat->fitness);
 }
 
 struct bat get_best(struct bat *bats, struct bat *best)

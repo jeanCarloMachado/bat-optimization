@@ -29,8 +29,7 @@ para o problema?
 
 
 
-Sat Nov 19 16:31:27 BRST 2016
-=============================
+### Sat Nov 19 16:31:27 BRST 2016
 
 The values are not converging anymore I'll have to see why this is
 happening.
@@ -39,3 +38,7 @@ The pulse rate seems to decay the same way of the convergence,
 maybe if I make it endure longer the convergence will follow.
 
 
+### Sun Nov 20 11:13:01 BRST 2016
+
+It seems that the algorithms always converges on the 20th
+iteration I should discover why this happens.

@@ -32,6 +32,7 @@ void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources(void);
 double shuber (double solution[], int dimensions);
+void log_bat_stdout(struct bat *bat, int dimensions);
 
 
 #endif
