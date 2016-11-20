@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+[ $(ls dump/ | wc -l) -lt 1 ] && {
+    echo "No dumps no reports"
+    exit 0
+}
+
 rm -rf latest-*
 lastDumpName=`ls -lah dump/ | tail -n1 | rev | cut -d' ' -f1 | rev `
 lastDumpTimestamp=$(echo $lastDumpName | cut -d '-' -f1 )

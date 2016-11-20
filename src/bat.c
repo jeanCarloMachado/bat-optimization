@@ -13,17 +13,17 @@
 #define DIMENSIONS 100
 
 //probability of accepting bad results
-#define ALFA 0.9
+#define ALFA 0.5
 //affects local search
-#define LAMBDA 0.10
+#define LAMBDA 0.1
 
 #define BETA_MAX 1.0
 #define BETA_MIN -1.0
 
-const int EVALUTAION_FUNCTION = SHUBER;
+const int EVALUTAION_FUNCTION = ROSENBROOK;
 
-const int LOG_OBJECTIVE_ENABLED=1;
-const int LOG_ATRIBUTES_ENABLED=1;
+const int LOG_OBJECTIVE_ENABLED=0;
+const int LOG_ATRIBUTES_ENABLED=0;
 const int LOG_RANDOM_ENABLED=0;
 
 void position_perturbation(struct bat *bat);

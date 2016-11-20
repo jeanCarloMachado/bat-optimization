@@ -1,0 +1,12 @@
+#!/bin/bash
+
+total=20
+rm -rf fitness
+
+for i in $(seq 1 $total); do 
+    ./bat | grep "Fitness F" | cut -d" " -f 3 >> fitness
+done
+
+
+echo "Average"
+awk "{s+=\$1} END {s/=$total; print s}" fitness
