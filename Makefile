@@ -16,8 +16,7 @@ run: source
 
 gpu:
 	nvcc -c src/mersenne.c -Wno-deprecated-gpu-targets 
-	nvcc -c src/common.c -Wno-deprecated-gpu-targets 
-	nvcc common.o mersenne.o src/main.cu -Wno-deprecated-gpu-targets -lm -o bat_gpu
+	nvcc mersenne.o src/main.cu -Wno-deprecated-gpu-targets -lm -o bat_gpu
 
 run_gpu: gpu
 	./bat_gpu

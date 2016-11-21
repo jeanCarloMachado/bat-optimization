@@ -2,16 +2,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-__device__ void dobra(int num)
-{
-	printf ("thread x2", num*2);
-}
-
 __global__ void sumAll(int *total)
 {
 	__shared__ int shared;
 	shared+=threadIdx.x;
-	dobra(threadIdx.x);
+	printf ("thread x2", threadIdx.x);
 
 	__syncthreads();
 

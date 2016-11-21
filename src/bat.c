@@ -26,6 +26,7 @@ const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
 const int LOG_RANDOM_ENABLED=0;
 
+int run_bats(void);
 void position_perturbation(struct bat *bat);
 void decrease_loudness(struct bat *bat, int iteration);
 double fitness_average(struct bat bats[]);

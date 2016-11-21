@@ -123,3 +123,27 @@ Acho que o negócio é ir adiante, nos próximos passos e parar de
 perder tempo com isso, provavelmente é o que o Parpinelli espera
 de mim também.
 
+GPU
+===
+
+
+
+GPU INFO
+--------
+
+01:00.0 VGA compatible controller: NVIDIA Corporation GK208 [GeForce GT 720] (rev a1) (prog-if 00 [VGA controller])
+        Subsystem: NVIDIA Corporation GK208 [GeForce GT 720]
+        Flags: bus master, fast devsel, latency 0, IRQ 32
+        Memory at f6000000 (32-bit, non-prefetchable) [size=16M]
+        Memory at e8000000 (64-bit, prefetchable) [size=128M]
+        Memory at f0000000 (64-bit, prefetchable) [size=32M]
+        I/O ports at e000 [size=128]
+        Expansion ROM at f7000000 [disabled] [size=512K]
+        Capabilities: <access denied>
+        Kernel driver in use: nouveau
+        Kernel modules: nvidiafb, nouveau, nvidia_367, nvidia_367_drm
+
+Random Numbers
+--------------
+
+http://cs.umw.edu/~finlayson/class/fall14/cpsc425/notes/23-cuda-random.html
