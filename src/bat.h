@@ -19,7 +19,7 @@ enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
 
 struct bat get_best(struct bat *bats, struct bat *best);
 struct bat* get_worst(struct bat *bats);
-double sphere(double x[], int dimensions);
+/* double sphere(double x[], int dimensions); */
 double rastringin (double solution[], int dimensions);
 double griewank (double solution[], int dimensions);
 double ackley (double solution[], int dimensions);
@@ -31,7 +31,7 @@ void logger(int destination, char *fmt, ...);
 void allocate_resources(void);
 void deallocate_resources(void);
 double shuber (double solution[], int dimensions);
-void log_bat_stdout(struct bat *bat, int dimensions);
+/* void log_bat_stdout(struct bat *bat, int dimensions); */
 void copy_bat(struct bat *from, struct bat *to);
 
 
