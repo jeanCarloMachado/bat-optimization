@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define ITERATIONS 500
+#define ITERATIONS 10000
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 100
@@ -18,7 +18,7 @@
 #define LAMBDA 0.1
 
 #define BETA_MAX 1.0
-#define BETA_MIN -1.0
+#define BETA_MIN 0.0
 
 const int EVALUTAION_FUNCTION = ROSENBROOK;
 
@@ -43,6 +43,7 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void initialize_function(void);
 
+double sphere (double *solution, int dimensions);
 double (*objective_function)(double[], int);
 
 int BOUNDRY_MAX;
@@ -325,39 +326,39 @@ void initialize_function(void)
 {
     switch(EVALUTAION_FUNCTION) {
         case SPHERE:
-            BOUNDRY_MIN = -10.00;
+            BOUNDRY_MIN = 0.0;
             BOUNDRY_MAX = 100.0;
-            objective_function = &sphere; 
+            objective_function = &sphere;
             break;
         case RASTRINGIN:
             BOUNDRY_MIN = -5.12;
             BOUNDRY_MAX = 5.12;
-            objective_function = &rastringin; 
+            objective_function = &rastringin;
             break;
         case GRIEWANK:
             BOUNDRY_MIN = -600.0;
             BOUNDRY_MAX = 600.0;
-            objective_function = &griewank; 
+            objective_function = &griewank;
             break;
         case ACKLEY:
             BOUNDRY_MIN = -32.0;
             BOUNDRY_MAX = 32.0;
-            objective_function = &ackley; 
+            objective_function = &ackley;
             break;
         case SHUBER:
             BOUNDRY_MIN = -100.0;
             BOUNDRY_MAX = 100.0;
-            objective_function = &shuber; 
+            objective_function = &shuber;
             break;
         case SCHWEFEL:
             BOUNDRY_MIN = -500.0;
             BOUNDRY_MAX = 500.0;
-            objective_function = &schwefel; 
+            objective_function = &schwefel;
             break;
         case ROSENBROOK:
             BOUNDRY_MIN = -30.0;
             BOUNDRY_MAX = 30.0;
-            objective_function = &rosenbrock; 
+            objective_function = &rosenbrock;
             break;
     }
 }
