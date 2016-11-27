@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  27 NOV 2016 16:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  27 NOV 2016 18:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -252,13 +252,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 44--45
  []
 
 
-LaTeX Warning: Citation `knuth:84' on page 1 undefined on input line 102.
+LaTeX Warning: Citation `knuth:84' on page 1 undefined on input line 96.
 
 
-LaTeX Warning: Citation `boulic:91' on page 1 undefined on input line 103.
+LaTeX Warning: Citation `boulic:91' on page 1 undefined on input line 97.
 
 
-LaTeX Warning: Citation `smith:99' on page 1 undefined on input line 103.
+LaTeX Warning: Citation `smith:99' on page 1 undefined on input line 97.
 
 No file paper.bbl.
 [1
@@ -269,10 +269,10 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 2577 strings out of 493013
- 35955 string characters out of 6139316
- 102801 words of memory out of 5000000
- 6087 multiletter control sequences out of 15000+600000
+ 2583 strings out of 493013
+ 36055 string characters out of 6139316
+ 103801 words of memory out of 5000000
+ 6093 multiletter control sequences out of 15000+600000
  16030 words of font info for 36 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  40i,8n,28p,231b,214s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -280,7 +280,7 @@ Here is how much of TeX's memory you used:
 ts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/urw/tim
 es/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/sh
 are/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on paper.pdf (1 page, 44791 bytes).
+Output written on paper.pdf (1 page, 47884 bytes).
 PDF statistics:
  25 PDF objects out of 1000 (max. 8388607)
  17 compressed objects within 1 object stream

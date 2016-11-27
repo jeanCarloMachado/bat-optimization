@@ -7,10 +7,11 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define ITERATIONS 1000
-#define BATS_COUNT 40
-#define INITIAL_LOUDNESS 1.0
+#define ITERATIONS 10000
+#define BATS_COUNT 256
 #define DIMENSIONS 100
+
+#define INITIAL_LOUDNESS 1.0
 
 //probability of accepting bad results
 #define ALFA 0.5
@@ -20,7 +21,7 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 
-const int EVALUTAION_FUNCTION = SPHERE;
+const int EVALUTAION_FUNCTION = GRIEWANK;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
@@ -122,14 +123,32 @@ int run_bats(void)
     }
 
     log_bat_stdout(best, DIMENSIONS);
-    int percentage = (BOUNDRY_SCAPE_COUNT * 100 / BOUNDRY_COUNT);
-    printf("Boundry total: %d,escaped: %d, escaped percentage: %d",BOUNDRY_COUNT, BOUNDRY_SCAPE_COUNT, percentage);
 
     deallocate_bats(bats, best, candidate);
     deallocate_resources();
     return 0;
 }
 
+
+void log_bat_stdout(struct bat *bat, int dimensions) 
+{
+    logger(LOG_STDOUT, "Best BAT \n");
+    double position_average =  0;
+    for (int i = 0; i < dimensions; i++) {
+        /* logger(LOG_STDOUT, "[%i] = %f\n", i, bat->position[i]); */
+        position_average+=bat->position[i];
+    }
+    position_average/=dimensions;
+    /* logger(LOG_STDOUT, "Frequency: %E\n", bat->frequency); */
+    /* logger(LOG_STDOUT, "Pulse-rate: %E\n", bat->pulse_rate); */
+    /* logger(LOG_STDOUT, "Loudness: %E\n", bat->loudness); */
+    /* logger(LOG_STDOUT, "Position Average: %f\n", position_average); */
+    printf("ITERATIONS: %d\n", ITERATIONS);
+    printf("BATS_COUNT: %d\n", BATS_COUNT);
+    printf("DIMENSIONS: %d\n", DIMENSIONS);
+    logger(LOG_STDOUT, "Fitness E: %E\n", bat->fitness);
+    /* logger(LOG_STDOUT, "Fitness F: %f\n", bat->fitness); */
+}
 
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 {

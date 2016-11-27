@@ -47,54 +47,48 @@ For the GPU version the approach used was the split of each individual in one th
 It was observed speedups with big populations.
 
 
-The tests were executed on an I5 with...
+\section{Experiment}
+
+Experiment 1
+
+Function: Griewank
+Numero de indivíduos: 256
+Numero de iteracoes: 10000
+
+
+Experiment 2
+
+Function: Griewank
+Numero de indivíduos: 768
+Numero de iteracoes: 10000
 
 
 
-% Figure and table captions should be centered if less than one line
-% (Figure~\ref{fig:exampleFig1}), otherwise justified and indented by 0.8cm on
-% both margins, as shown in Figure~\ref{fig:exampleFig2}. The caption font must
-% be Helvetica, 10 point, boldface, with 6 points of space before and after each
-% caption.
+\section{Results}
 
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=.5\textwidth]{fig1.jpg}
-% \caption{A typical figure}
-% \label{fig:exampleFig1}
-% \end{figure}
 
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=.3\textwidth]{fig2.jpg}
-% \caption{This figure is an example of a figure caption taking more than one
-%   line and justified considering margins mentioned in Section~\ref{sec:figs}.}
-% \label{fig:exampleFig2}
-% \end{figure}
 
-% In tables, try to avoid the use of colored or shaded backgrounds, and avoid
-% thick, doubled, or unnecessary framing lines. When reporting empirical data,
-% do not use more decimal digits than warranted by their precision and
-% reproducibility. Table caption must be placed before the table (see Table 1)
-% and the font used must also be Helvetica, 10 point, boldface, with 6 points of
-% space before and after each caption.
+\subsection{Device details}
 
-% \begin{table}[ht]
-% \centering
-% \caption{Variables to be considered on the evaluation of interaction
-%   techniques}
-% \label{tab:exTable1}
-% \includegraphics[width=.7\textwidth]{table.jpg}
-% \end{table}
+The experiments were executed on a machine with the following configuration:
 
-% \section{Images}
+Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz
 
-% All images and illustrations should be in black-and-white, or gray tones,
-% excepting for the papers that will be electronically available (on CD-ROMs,
-% internet, etc.). The image resolution on paper should be about 600 dpi for
-% black-and-white images, and 150-300 dpi for grayscale images.  Do not include
-% images with excessive resolution, as they may take hours to print, without any
-% visible difference in the result. 
+GK208 GeForce GT 720
+
+\subsection{E1}
+
+1m4.888s
+0m55.439s
+Speedup: 1.16x
+
+
+\subsection{E2}
+
+2m27.902s
+0m21.976s
+Speedup: 7x
+
 
 \section{References}
 
@@ -102,9 +96,6 @@ Bibliographic references must be unambiguous and uniform.  We recommend giving
 the author names references in brackets, e.g. \cite{knuth:84},
 \cite{boulic:91}, and \cite{smith:99}.
 
-The references must be listed using 12 point font size, with 6 points of space
-before each reference. The first line of each reference should not be
-indented, while the subsequent should be indented by 0.5 cm.
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}

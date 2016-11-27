@@ -1,0 +1,121 @@
+Results
+=======
+
+
+40 bats 10 iterations 100 D
+-------
+
+GPU bat:
+
+1m28.761s
+
+CPU bat:
+
+0m4.875s
+
+
+1024 bats 1k iterations 100D
+---------
+
+GPU bat:
+
+0m9.635s
+
+
+CPU bat:
+13.052s
+
+
+1024 bats 10k iterations 100 D
+------------------------
+
+GPU bat:
+1m5.760s
+
+
+CPU bat:
+2m16.548s
+
+1024 bats 10k iterations 200 D
+----------------------------
+
+GPU bat:
+2m9.264s
+
+CPU bat:
+3m26s
+
+Sun Nov 27 17:57:31 BRST 2016
+=============================
+
+SPHERE
+------
+
+### GPU
+
+ITERATIONS: 10000
+BATS_COUNT: 512
+DIMENSIONS: 100
+Fitness E: 1.337154E-19
+
+real    1m16.561s
+user    1m1.472s
+sys     0m15.012s
+
+
+### CPU
+ITERATIONS: 10000
+BATS_COUNT: 512
+DIMENSIONS: 100
+Fitness E: 1.124854E-09
+Fitness F: 0.000000
+Boundry total: 1536000000,escaped: 454092743, escaped percentage: -1
+real    0m41.943s
+user    0m41.936s
+sys     0m0.000s
+
+
+GRIEWANK
+--------
+
+### CPU
+ITERATIONS: 10000
+BATS_COUNT: 768
+DIMENSIONS: 100
+Fitness E: 5.743184E-13
+Boundry total: -1990967296,escaped: 226985405, escaped percentage: 0
+real    2m27.902s
+user    2m27.892s
+sys     0m0.000s
+
+### GPU
+
+ITERATIONS: 10000
+BATS_COUNT: 768
+DIMENSIONS: 100
+Fitness E: 5.387380E-07
+
+real    0m21.976s
+user    0m17.548s
+sys     0m4.360s
+
+
+### CPU
+ITERATIONS: 10000
+BATS_COUNT: 256
+DIMENSIONS: 100
+Fitness E: 1.548206E-12
+real    1m4.888s
+user    1m4.880s
+sys     0m0.000s
+
+
+### GPU
+ITERATIONS: 10000
+BATS_COUNT: 256
+DIMENSIONS: 100
+Fitness E: 1.016548E-04
+
+real    0m55.439s
+user    0m45.204s
+sys     0m10.160s

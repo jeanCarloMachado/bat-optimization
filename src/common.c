@@ -214,21 +214,5 @@ void allocate_resources()
 }
 
 
-void log_bat_stdout(struct bat *bat, int dimensions) 
-{
-    logger(LOG_STDOUT, "Best BAT \n");
-    double position_average =  0;
-    for (int i = 0; i < dimensions; i++) {
-        /* logger(LOG_STDOUT, "[%i] = %f\n", i, bat->position[i]); */
-        position_average+=bat->position[i];
-    }
-    position_average/=dimensions;
-    logger(LOG_STDOUT, "Frequency: %E\n", bat->frequency);
-    logger(LOG_STDOUT, "Pulse-rate: %E\n", bat->pulse_rate);
-    logger(LOG_STDOUT, "Loudness: %E\n", bat->loudness);
-    logger(LOG_STDOUT, "Position Average: %f\n", position_average);
-    logger(LOG_STDOUT, "Fitness E: %E\n", bat->fitness);
-    logger(LOG_STDOUT, "Fitness F: %f\n", bat->fitness);
-}
 
 

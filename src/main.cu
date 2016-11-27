@@ -3,10 +3,11 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-#define ITERATIONS 1000
-#define BATS_COUNT 40
-#define INITIAL_LOUDNESS 1.0
+#define ITERATIONS 10000
+#define BATS_COUNT 764
 #define DIMENSIONS 100
+
+#define INITIAL_LOUDNESS 1.0
 
 //probability of accepting bad results #define ALFA 0.5
 //affects local search
@@ -17,7 +18,7 @@
 #define BETA_MIN 0.0
 
 enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
-const int EVALUTAION_FUNCTION = SPHERE;
+const int EVALUTAION_FUNCTION = GRIEWANK;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;
@@ -64,6 +65,7 @@ __device__ double shuber (double solution[], int dimensions)
             -4.0*sin(5.0*solution[i]+4.0)
             -5.0*sin(6.0*solution[i]+5.0);
     }
+    return sum;
 }
 
 __device__ double griewank(double solution[], int dimensions)
@@ -99,21 +101,22 @@ __device__ double rastringin (double solution[], int dimensions)
 
 __device__ double ackley(double solution[], int dimensions)
 {
-    /* int i; */
-    /* double aux, aux1, result; */
+    int i;
+    double aux, aux1, result;
 
-    /* for (i = 0; i < dimensions; i++) */
-    /* { */
-    /*     aux += solution[i]*solution[i]; */
-    /* } */
-    /* for (i = 0; i < dimensions; i++) */
-    /* { */
-    /*     aux1 += cos(2.0*M_PI*solution[i]); */
-    /* } */
+    for (i = 0; i < dimensions; i++)
+    {
+        aux += solution[i]*solution[i];
+    }
+    for (i = 0; i < dimensions; i++)
+    {
+        aux1 += cos(2.0*M_PI*solution[i]);
+    }
 
-    /* result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1); */
+    //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1);
+    result = 666;
 
-    /* return result; */
+    return result;
 }
 
 
@@ -169,10 +172,13 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
     for (int i = 0; i < dimensions; i++) {
         position_average+=bat->position[i];
     }
-    printf("Frequency: %f\n", bat->frequency);
-    printf("Pulse-rate: %f\n", bat->pulse_rate);
-    printf("Loudness: %f\n", bat->loudness);
-    printf("Fitness F: %f\n", bat->fitness);
+    /* printf("Frequency: %f\n", bat->frequency); */
+    /* printf("Pulse-rate: %f\n", bat->pulse_rate); */
+    /* printf("Loudness: %f\n", bat->loudness); */
+    printf("ITERATIONS: %d\n", ITERATIONS);
+    printf("BATS_COUNT: %d\n", BATS_COUNT);
+    printf("DIMENSIONS: %d\n", DIMENSIONS);
+    printf("Fitness E: %E\n", bat->fitness);
 }
 
 
@@ -250,7 +256,6 @@ __global__ void run_bats(unsigned int seed, struct bat *bats, struct bat *candid
     loudness_average = 1.0;
     bats[threadIdx.x].pulse_rate = 0.0;
     bats[threadIdx.x].frequency = 0.0;
-    bats[threadIdx.x].fitness;
     bats[threadIdx.x].loudness = INITIAL_LOUDNESS;
     for (int j = 0; j < DIMENSIONS; j++) {
         bats[threadIdx.x].velocity[j] = 0;
@@ -326,27 +331,27 @@ __global__ void run_bats(unsigned int seed, struct bat *bats, struct bat *candid
             iteration++;
     }
 
-    log_bat_stdout(best, DIMENSIONS);
+    if (threadIdx.x == 0) {
+        log_bat_stdout(best, DIMENSIONS);
+    }
 }
-
 
 
 int main(void)
 {
     struct bat *bats;
     struct bat *candidates;
-    struct bat *best;
     cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
     cudaMalloc((void **)&candidates, sizeof(struct bat) * BATS_COUNT);
 
     run_bats<<<1,BATS_COUNT>>>(time(NULL), bats, candidates);
+    cudaFree(bats);
 
     cudaError_t cudaerr = cudaDeviceSynchronize();
     if (cudaerr != cudaSuccess)
         printf("kernel launch failed with error \"%s\".\n",
                cudaGetErrorString(cudaerr));
 
-    cudaFree(bats);
     return 0;
 }
 
