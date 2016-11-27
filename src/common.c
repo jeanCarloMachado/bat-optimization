@@ -123,7 +123,6 @@ void my_seed(void)
 
 double my_rand(int min, int max)
 {
-
     double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
 
     return result;

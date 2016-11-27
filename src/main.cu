@@ -3,7 +3,7 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-#define ITERATIONS 10000
+#define ITERATIONS 1000
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 100
@@ -326,9 +326,7 @@ __global__ void run_bats(unsigned int seed, struct bat *bats, struct bat *candid
             iteration++;
     }
 
-    if (threadIdx.x == 0) {
-        log_bat_stdout(best, DIMENSIONS);
-    }
+    log_bat_stdout(best, DIMENSIONS);
 }
 
 
@@ -342,7 +340,11 @@ int main(void)
     cudaMalloc((void **)&candidates, sizeof(struct bat) * BATS_COUNT);
 
     run_bats<<<1,BATS_COUNT>>>(time(NULL), bats, candidates);
-    cudaDeviceSynchronize();
+
+    cudaError_t cudaerr = cudaDeviceSynchronize();
+    if (cudaerr != cudaSuccess)
+        printf("kernel launch failed with error \"%s\".\n",
+               cudaGetErrorString(cudaerr));
 
     cudaFree(bats);
     return 0;

@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define ITERATIONS 10000
+#define ITERATIONS 1000
 #define BATS_COUNT 40
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 100
@@ -20,7 +20,7 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = SPHERE;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
@@ -76,7 +76,7 @@ int run_bats(void)
     candidate = (struct bat *) malloc(sizeof(struct bat));
     initialize_bats(bats, best, candidate);
 
-    get_best(bats, best); 
+    get_best(bats, best);
 
     for (iteration = 0; iteration < ITERATIONS ; ++iteration) {
         for (int j = 0; j < BATS_COUNT; ++j){
