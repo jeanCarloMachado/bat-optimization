@@ -4,7 +4,7 @@
 #include <curand_kernel.h>
 
 #define ITERATIONS 10000
-#define BATS_COUNT 764
+#define BATS_COUNT 256
 #define DIMENSIONS 100
 
 #define INITIAL_LOUDNESS 1.0
@@ -18,7 +18,7 @@
 #define BETA_MIN 0.0
 
 enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
-const int EVALUTAION_FUNCTION = GRIEWANK;
+const int EVALUTAION_FUNCTION = ROSENBROOK;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;

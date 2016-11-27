@@ -25,7 +25,7 @@
 \begin{abstract}
 \end{abstract}
 
-\begin{resumo} 
+\begin{resumo}
 \end{resumo}
 
 
@@ -33,10 +33,13 @@
 
 The bat algorithm was introduced...
 
+Many populational optimization algorithms can benefit from paralization. This work attemps to investigate the 
+applicability of GPU parallization on the bat algorithm.
+
+
 In this work the bath algorithm used was the one proposed by (parpinelli reference).
 
 It was developed two versions of the algorithm. One that runs on CPU and the other which uses CPU.
-
 
 
 The benchmark functions used were the following:
@@ -52,20 +55,19 @@ It was observed speedups with big populations.
 Experiment 1
 
 Function: Griewank
-Numero de indivíduos: 256
-Numero de iteracoes: 10000
+Bats: 256
+Iterations: 10000
 
 
 Experiment 2
 
 Function: Griewank
-Numero de indivíduos: 768
-Numero de iteracoes: 10000
+Bats: 768
+Iterations: 10000
 
 
 
 \section{Results}
-
 
 
 \subsection{Device details}
@@ -74,8 +76,7 @@ The experiments were executed on a machine with the following configuration:
 
 Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz
 
-GK208 GeForce GT 720
-
+GK208 GeForce GT 720 1024 MB of vram
 \subsection{E1}
 
 1m4.888s
@@ -88,6 +89,15 @@ Speedup: 1.16x
 2m27.902s
 0m21.976s
 Speedup: 7x
+
+\section{Conclusion}
+
+With this work it's clear that is possible to speedup the bat methaueristic using GPU but
+the best results are only achieved by a great population size.
+
+\section{Further works}
+
+It may be explored the usage of blocks as representation for the dimensions in which each bat deals.
 
 
 \section{References}

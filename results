@@ -119,3 +119,52 @@ Fitness E: 1.016548E-04
 real    0m55.439s
 user    0m45.204s
 sys     0m10.160s
+
+
+ROSENBROOK
+----------
+
+### GPU
+ITERATIONS: 10000
+BATS_COUNT: 764
+DIMENSIONS: 100
+Fitness E: 9.800573E+01
+
+real    0m15.492s
+user    0m12.160s
+sys     0m3.264s
+
+
+### CPU
+Best BAT
+ITERATIONS: 10000
+BATS_COUNT: 764
+DIMENSIONS: 100
+Fitness E: 8.585494E+01
+
+real    1m32.849s
+user    1m32.840s
+sys     0m0.000s
+
+
+### CPU
+Best BAT
+ITERATIONS: 10000
+BATS_COUNT: 256
+DIMENSIONS: 100
+Fitness E: 9.407757E+01
+
+real    0m24.969s
+user    0m24.964s
+sys     0m0.000s
+
+### GPU
+ITERATIONS: 10000
+BATS_COUNT: 256
+DIMENSIONS: 100
+Fitness E: 1.389120E+02
+
+real    0m37.458s
+user    0m29.640s
+sys     0m7.748s
+
