@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 
-\usepackage{sbc-template}
+\usepackage{sbc}
 
 \usepackage{graphicx,url}
 
@@ -31,83 +31,98 @@
 
 \section{General Information}
 
-The bat algorithm was introduced...
+The bat algorithm was introduced by \cite{original}. It uses the inspiration of microbas to look at their preys.
 
-Many populational optimization algorithms can benefit from paralization. This work attemps to investigate the 
-applicability of GPU parallization on the bat algorithm.
+Many populational optimization algorithms can benefit from paralization.
 
+This work attemps to investigate the applicability of GPU parallization
+on the bat algorithm. Previously some demonstrations of the bat
+algorithm paralelized on CPU were presented (reference referece),
+however, til the day of this publication no implementation of the bat
+algorithm was found on GPU.
 
-In this work the bath algorithm used was the one proposed by (parpinelli reference).
+In this work the bath algorithm used was the one proposed by
+\cite{parpinelli}, since it represents a concrete demonstration of how
+the bat metha-heuristic.
 
-It was developed two versions of the algorithm. One that runs on CPU and the other which uses CPU.
+It was developed two versions of the algorithm. One that runs on CPU and
+the other which uses CPU.
 
+\section{Bat Design on CPU}
+
+The CPU version was single threaded.
+
+\section{Bat Design on GPU}
+
+Since the BAT agorithm uses a population of bats, the most intuitive
+parallization method to apply on it is to use each bat on a GPU core.
+\cite{pso-gpu} used a similar method for a GPU implementation for the PSO algorithm.
+
+For the GPU version the approach used was the split of each individual in one thread.
 
 The benchmark functions used were the following:
 
 ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER
 
-For the GPU version the approach used was the split of each individual in one thread.
-It was observed speedups with big populations.
-
-
 \section{Experiment}
 
-Experiment 1
+\subsection{Experiment 1}
 
-Function: Griewank
-Bats: 256
-Iterations: 10000
-
-
-Experiment 2
-
-Function: Griewank
-Bats: 768
-Iterations: 10000
+\begin{itemize}
+\item \textbf{Function:} Griewank
+\item \textbf{Bats:} 256
+\item \textbf{Iterations:} 10000
+\end{itemize}
 
 
+\subsection{Experiment 2}
+
+\begin{itemize}
+\item \textbf{Function:} Griewank
+\item \textbf{Bats:} 768
+\item \textbf{Iterations:} 10000
+\end{itemize}
 
 \section{Results}
-
 
 \subsection{Device details}
 
 The experiments were executed on a machine with the following configuration:
 
-Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz
+\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz}
+\textit{GK208 GeForce GT 720 1024 MB of vram}
 
-GK208 GeForce GT 720 1024 MB of vram
-\subsection{E1}
+\subsection{Experiment 1}
 
-1m4.888s
-0m55.439s
-Speedup: 1.16x
+\begin{itemize}
+    \item \textbf{CPU:} 1m4.888s
+    \item \textbf{GPU:} 0m55.439s
+\end{itemize}
 
+\textbf{Speedup:} 1.16x
 
-\subsection{E2}
+\subsection{Experiment 2}
 
-2m27.902s
-0m21.976s
-Speedup: 7x
+\begin{itemize}
+    \item \textbf{CPU:} 2m27.902s
+    \item \textbf{GPU:} 0m21.976s
+\end{itemize}
+
+\textbf{Speedup:} 7x
 
 \section{Conclusion}
 
-With this work it's clear that is possible to speedup the bat methaueristic using GPU but
-the best results are only achieved by a great population size.
+It was observed speedups with big populations. The original BAT was proposed with 40 individuals and the speedups was seen with 250 individuals.
+The advantages of the algorithm may be tested against a CPU implementation to be fair.
+With this work it's clear that is possible to speedup the bat methaueristic using GPU but the best results are only achieved by a great population size.
 
 \section{Further works}
 
 It may be explored the usage of blocks as representation for the dimensions in which each bat deals.
 
-
 \section{References}
 
-Bibliographic references must be unambiguous and uniform.  We recommend giving
-the author names references in brackets, e.g. \cite{knuth:84},
-\cite{boulic:91}, and \cite{smith:99}.
-
-
 \bibliographystyle{sbc}
-\bibliography{sbc-template}
+\bibliography{paper}
 
 \end{document}

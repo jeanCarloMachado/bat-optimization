@@ -83,7 +83,6 @@ ITERATIONS: 10000
 BATS_COUNT: 768
 DIMENSIONS: 100
 Fitness E: 5.743184E-13
-Boundry total: -1990967296,escaped: 226985405, escaped percentage: 0
 real    2m27.902s
 user    2m27.892s
 sys     0m0.000s

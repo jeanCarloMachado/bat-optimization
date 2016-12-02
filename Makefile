@@ -43,5 +43,7 @@ run_tests: tests
 
 paper:
 	cd paper ; \
-	pdflatex paper.tex
-	mv paper/paper.pdf  paper.pdf
+	pdflatex paper.tex ; \
+	bibtex paper.aux ;\
+	pdflatex paper.tex ; \
+	mv paper.pdf  ../paper.pdf
