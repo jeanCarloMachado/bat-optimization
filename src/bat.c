@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define ITERATIONS 10000
-#define BATS_COUNT 256
-#define DIMENSIONS 100
+#define ITERATIONS 1000
+#define BATS_COUNT 768
+#define DIMENSIONS 1000
 
 #define INITIAL_LOUDNESS 1.0
 
@@ -21,10 +21,10 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = GRIEWANK;
 
-const int LOG_OBJECTIVE_ENABLED=0;
-const int LOG_ATRIBUTES_ENABLED=0;
+const int LOG_OBJECTIVE_ENABLED=1;
+const int LOG_ATRIBUTES_ENABLED=1;
 const int LOG_RANDOM_ENABLED=0;
 
 void log_bat_stdout(struct bat *bat, int dimensions);
