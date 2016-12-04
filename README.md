@@ -11,7 +11,7 @@ usar ackley, griewank, rastringin, rosenbrook
 
 Padrão de escrita: i3e max 10 pg
 
-Modelo de carta de referência. 
+Modelo de carta de referência.
 Usar boundries menores.
 
 Event to submit
