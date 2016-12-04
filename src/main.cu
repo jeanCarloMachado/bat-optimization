@@ -132,7 +132,6 @@ __device__ double rosenbrock (double solution[], int dimensions)
 }
 
 
-
 __device__ double sphere (double *solution, int dimensions)
 {
     double total = 0;
