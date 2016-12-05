@@ -1,12 +1,24 @@
 #!/bin/bash
 
+cmd="./bat"
+device=cpu
+cmd="./bat_gpu"
+device=GPU
 total=20
-rm -rf fitness
+date=$(date "+%Y-%m-%d_%H-%M-%S")
+mkdir -p "experiments/$date"_"$device"
+fitnessFile="experiments/$date"_"$device/fitness"
+outputFile="experiments/$date"_"$device/output"
+timeFile="experiments/$date"_"$device/timefile"
 
-for i in $(seq 1 $total); do 
-    ./bat | grep "Fitness F" | cut -d" " -f 3 >> fitness
+for i in $(seq 1 $total); do
+    $cmd > $outputFile
+    cat $outputFile | grep "Fitnes" | cut -d":" -f2  | tr -d " " >> $fitnessFile
+    cat $outputFile | grep "Time" | cut -d":" -f2 | tr -d " " >> $timeFile
 done
 
+echo "$device Fitness Average:"
+awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile
 
-echo "Average"
-awk "{s+=\$1} END {s/=$total; print s}" fitness
+echo "$device time Average:"
+awk "{s+=\$1} END {s/=$total; print s}" $timeFile

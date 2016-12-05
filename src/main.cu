@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <curand.h>
 #include <curand_kernel.h>
+#include <time.h>
 
 #define ITERATIONS 10000
 #define BATS_COUNT 256
@@ -18,7 +19,7 @@
 #define BETA_MIN 0.0
 
 enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = ACKLEY;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;
@@ -323,8 +324,8 @@ __global__ void run_bats(unsigned int seed, struct bat *bats, struct bat *candid
             }
             loudness_average=0;
             loudness_average+=bats[threadIdx.x].loudness;
-            get_best(bats, best);
             __syncthreads();
+            get_best(bats, best);
             loudness_average/= BATS_COUNT;
 
             iteration++;
@@ -338,6 +339,7 @@ __global__ void run_bats(unsigned int seed, struct bat *bats, struct bat *candid
 
 int main(void)
 {
+    clock_t begin = clock();
     struct bat *bats;
     struct bat *candidates;
     cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
@@ -351,6 +353,9 @@ int main(void)
         printf("kernel launch failed with error \"%s\".\n",
                cudaGetErrorString(cudaerr));
 
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Time took: %f\n", time_spent);
     return 0;
 }
 
