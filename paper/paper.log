@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  4 DEC 2016 19:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  5 DEC 2016 19:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -177,18 +177,18 @@ LaTeX Warning: Label `Pseudo Code' multiply defined.
 )
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 132.
+LaTeX Font Info:    ... okay on input line 132.
 
 -- Lines per column: 56 (exact).
 
@@ -201,22 +201,10 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Underfull \hbox (badness 2065) in paragraph at lines 401--403
+Underfull \hbox (badness 2065) in paragraph at lines 256--258
 []\OT1/ptm/m/it/10 Intel(R) Core(TM) i5-4460 CPU @ 3.20GHz GK208
  []
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.404 Each experiment runned a total of 1x10^
-                                             4\ times.
-? 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.405 
-      
-? 
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
 Missing character: There is no Ã in font ptmri7t!
@@ -250,7 +238,7 @@ Here is how much of TeX's memory you used:
  5267 multiletter control sequences out of 15000+600000
  40808 words of font info for 77 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 27i,16n,20p,229b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 27i,16n,20p,230b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-dist/fon
 ts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/publi
 c/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
@@ -260,7 +248,7 @@ t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></
 usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fo
 nts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (2 pages, 108199 bytes).
+Output written on paper.pdf (2 pages, 107229 bytes).
 PDF statistics:
  52 PDF objects out of 1000 (max. 8388607)
  37 compressed objects within 1 object stream

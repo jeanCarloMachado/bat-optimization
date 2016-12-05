@@ -4,15 +4,14 @@
 %\setlength{\mathindent}{0pt}
 \interdisplaylinepenalty=2500
 
-
-
 % *** SPECIALIZED LIST PACKAGES ***
 %
-%\usepackage{algorithmic}
+"%\usepackage{algorithmic}
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
 % environment to provide for a floating algorithm. Do NOT use the algorithm
+"
 % floating environment provided by algorithm.sty (by the same authors) or
 % algorithm2e.sty (by Christophe Fiorio) as the IEEE does not use dedicated
 % algorithm float types and packages that provide these will not provide
@@ -22,9 +21,6 @@
 % Also of interest may be the (relatively newer and more customizable)
 % algorithmicx.sty package by Szasz Janos:
 % http://www.ctan.org/pkg/algorithmicx
-
-
-
 
 % *** ALIGNMENT PACKAGES ***
 %
@@ -147,32 +143,32 @@ Email: contato@jeancarlomachado.com.br}}
 
 \section{Introduction}
 
+The bat algorithm was introduced by Yang \cite{original}. It uses the
+inspiration of micro-bats to look at their preys.
 
-The bat algorithm was introduced by \cite{original}. It uses the inspiration of microbas to look at their preys.
+Many populational optimization algorithms can benefit from
+parallelization.
 
-Many populational optimization algorithms can benefit from paralization.
-
-This work attemps to investigate the applicability of GPU parallization
-on the bat algorithm. Previously some demonstrations of the bat
-algorithm paralelized on CPU were presented (reference referece),
+This work attempts to investigate the applicability of GPU parable
+libation on the bat algorithm. Previously some demonstrations of the
+bat algorithm parallelized on CPU were presented (reference reference),
 however, til the day of this publication no implementation of the bat
 algorithm was found on GPU.
 
 It was developed two versions of the algorithm. One that runs on CPU and
 the other which uses CPU.
 
-\hfill mds
 \hfill December 21, 2016
 
 \section{Bat Design on CPU}
 
 In this work the bath algorithm used was the one proposed by
 \cite{parpinelli}, since it represents a concrete demonstration of how
-the bat metha-heuristic.
+the bat metaheuristic.
 
 The CPU version was single threaded.
 
-The random algorightm used was the mersenne twister.
+The random algorithm used was the mersenne twister.
 
 \subsection{Pseudo-code}
 
@@ -205,8 +201,8 @@ The random algorightm used was the mersenne twister.
 
 \section{Bat Design on GPU}
 
-Since the BAT agorithm uses a population of bats, the most intuitive
-parallization method to apply on it is to use each bat on a GPU core.
+Since the BAT algorithm uses a population of bats, the most intuitive
+parallelization method to apply on it is to use each bat on a GPU core.
 \cite{pso-gpu} used a similar method for a GPU implementation for the PSO algorithm.
 For the GPU version the approach used was the split of each individual in one thread.
 
@@ -215,8 +211,8 @@ For the GPU version the approach used was the split of each individual in one th
 \begin{split}
 \label{Pseudo Code}
 \text{Parameters:} n, \alpha\, \lambda\\
-\text{Initialize bats assicrously}\\
-\text{syncronize threads}\\
+\text{Initialize bats assycrously}\\
+\text{synchronize threads}\\
 \text{Evaluate fitness bats}\\
 \text{Selects best}\\
 \text{\textbf{while} stop criteria false \textbf{do}}\\
@@ -233,7 +229,7 @@ For the GPU version the approach used was the split of each individual in one th
         r_i = exp(\lambda * i)\\
         A_i =  A_{0} * \alpha^i\\
         \text{\bf end if}\\
-        \text{syncronize threads}\\
+        \text{synchronize threads}\\
         \text{Selects best}\\
     \text{\bf end for}\\
 \text{\bf end while}
@@ -251,13 +247,11 @@ The benchmark functions used were the following:
     \item Rosenbrook
 \end{itemize}
 
-
 The experiments were executed on a machine with the following configuration:
 
-\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz}
-\textit{GK208 GeForce GT 720 1024 MB of vram}
+\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram}
 
-Each experiment runned a total of 1x10^4\ times.
+Each experiment runned a total of 20 times with 10 thousand iterations each.
 
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
@@ -281,43 +275,41 @@ Each experiment runned a total of 1x10^4\ times.
 
 \section{Results}
 
-
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
     \caption{Results}
     \label{results}
     \centering
-    \begin{tabular}{c|c|c|c}
+    \begin{tabular}{c|c|c|c|c}
     \hline
-        \bf Name & Total CPU & Total GPU & Speedup\\
+        \bf Name & Fitness C & Total C & Fitness G & Total G & Speedup\\
     \hline
-        E3 & 1m4.888s & 0m55.439s & 1.16x\\
-        E4 & 2m27.902s & 0m21.976s & 7x
+        E1 & 57.3774s & 1.69691e-06 &\\
     \end{tabular}
 \end{table}
 
-
 \section{Conclusion}
 
-It was observed speedups with big populations. The original BAT was proposed with 40 individuals and the speedups was seen with 250 individuals.
-The advantages of the algorithm may be tested against a CPU implementation to be fair.
-With this work it's clear that is possible to speedup the bat methaueristic using GPU but the best results are only achieved by a great population size.
+It was observed speedups with big populations. The original BAT was
+proposed with 40 individuals and the speedups was seen with 250
+individuals. The advantages of the algorithm may be tested against a CPU
+implementation to be fair. With this work it's clear that is possible to
+speedup the bat metaheuristic using GPU but the best results are only
+achieved by a great population size.
 
 \section{Further works}
 
-It may be explored the usage of blocks as representation for the dimensions in which each bat deals.
-
+It may be explored the usage of blocks as representation for the
+dimensions in which each bat details.
 
 \begin{thebibliography}{1}
 
 \bibitem{original}
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
-
 \bibitem{parpinelli}
     Jelson A. Cordeiro, Rafael Stubs Parpinelli Heitor Silvério Lopes \emph{Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho}.
 \bibitem{pso-gpu}
     PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
-
 \end{thebibliography}
 
 \end{document}
