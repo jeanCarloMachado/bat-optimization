@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include "bat.h"
 
-#define ITERATIONS 1000
-#define BATS_COUNT 768
-#define DIMENSIONS 1000
+#define ITERATIONS 10000
+#define BATS_COUNT 256
+#define DIMENSIONS 100
 
 #define INITIAL_LOUDNESS 1.0
 
@@ -21,10 +21,10 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 
-const int EVALUTAION_FUNCTION = GRIEWANK;
+const int EVALUTAION_FUNCTION = ACKLEY;
 
-const int LOG_OBJECTIVE_ENABLED=1;
-const int LOG_ATRIBUTES_ENABLED=1;
+const int LOG_OBJECTIVE_ENABLED=0;
+const int LOG_ATRIBUTES_ENABLED=0;
 const int LOG_RANDOM_ENABLED=0;
 
 void log_bat_stdout(struct bat *bat, int dimensions);
@@ -103,23 +103,23 @@ int run_bats(void)
                 decrease_loudness(&bats[j], iteration);
             }
             get_best(bats, best);
-            if (LOG_ATRIBUTES_ENABLED) {
-                log_bat(&bats[j]);
-            }
+            /* if (LOG_ATRIBUTES_ENABLED) { */
+            /*     log_bat(&bats[j]); */
+            /* } */
         }
 
-        if (LOG_OBJECTIVE_ENABLED) {
-            average_result = fitness_average(bats);
-            worst_result = get_worst(bats)->fitness;
-            logger(
-                    LOG_OBJECTIVE,
-                    "%E\t%E\t%E\n",
-                    best->fitness,
-                    average_result
-                    /* worst_result */
-                  );
+        /* if (LOG_OBJECTIVE_ENABLED) { */
+        /*     average_result = fitness_average(bats); */
+        /*     worst_result = get_worst(bats)->fitness; */
+        /*     logger( */
+        /*             LOG_OBJECTIVE, */
+        /*             "%E\t%E\t%E\n", */
+        /*             best->fitness, */
+        /*             average_result */
+        /*             /1* worst_result *1/ */
+        /*           ); */
 
-        }
+        /* } */
     }
 
     log_bat_stdout(best, DIMENSIONS);
@@ -288,7 +288,6 @@ double calc_loudness_average(struct bat *bats)
 
     return total / BATS_COUNT;
 }
-
 
 double fitness_average(struct bat bats[])
 {
