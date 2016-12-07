@@ -87,31 +87,30 @@ parallelization method to apply on it is to use each bat on a GPU core.
 For the GPU version the approach used was the split of each individual in one thread.
 
 \subsection{Pseudo-code GPU}
-\begin{algorithmic}
-\label{Pseudo Code}
-\STATE Parameters: n, \alpha\, \lambda
-\STATE Initialize bats assycrously
+\begin{algorithmic}[1]
+\STATE Parameters: n,\alpha, \lambda\\
+\STATE Initialize bats asynchronously
 \STATE synchronize threads
 \STATE Evaluate fitness bats
 \STATE Selects best
-\STATE \textbf{while stop criteria false \textbf{do}}
-    \STATE for each thread  i 
-        f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
-        \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
-        \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+    \WHILE {stop criteria false}
+    \FORALL{threads} 
+        \STATE f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
+        \STATE \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+        \STATE \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
         \STATE \bf if  rand < r_i, rand \in [0,1] \textbf{then} {local search}\\
-            \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
+        \STATE \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
         \STATE \bf end if
         \STATE Single dimension perturbation in x_{temp}
         \STATE \bf if a < A_i^t , a \in [0,1]
-        \vec{x}_i^t = \vec{x}_{temp}\\
-        r_i = exp(\lambda * i)\\
-        A_i =  A_{0} * \alpha^i\\
+        \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+        \STATE r_i = exp(\lambda * i)\\
+        \STATE A_i =  A_{0} * \alpha^i\\
         \STATE \bf end if
         \STATE synchronize threads
         \STATE Selects best
-    \STATE \bf end for
-\STATE \bf end while
+    \ENDFOR
+    \ENDWHILE
 \end{algorithmic}
 
 \section{Experiments}
