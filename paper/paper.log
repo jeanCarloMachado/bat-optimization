@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  6 DEC 2016 21:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  6 DEC 2016 22:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -170,6 +170,23 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 635.
 \mathdisplay@stack=\toks19
 LaTeX Info: Redefining \[ on input line 2739.
 LaTeX Info: Redefining \] on input line 2740.
+)
+(/usr/share/texmf-dist/tex/latex/algorithms/algorithmic.sty
+Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
+
+(/usr/share/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks20
+)
+\c@ALC@unique=\count106
+\c@ALC@line=\count107
+\c@ALC@rem=\count108
+\c@ALC@depth=\count109
+\ALC@tlm=\skip47
+\algorithmicindent=\skip48
 ) (./paper.aux
 
 LaTeX Warning: Label `Pseudo Code' multiply defined.
@@ -177,18 +194,18 @@ LaTeX Warning: Label `Pseudo Code' multiply defined.
 )
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 9.
+LaTeX Font Info:    ... okay on input line 9.
 
 -- Lines per column: 56 (exact).
 Missing character: There is no Ã in font ptmr7t!
@@ -207,16 +224,415 @@ Missing character: There is no £ in font ptmr7t!
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+! Missing $ inserted.
+<inserted text> 
+                $
+l.92 \STATE Parameters: n, \alpha
+                                 \, \lambda
+? 
 
- [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+! LaTeX Error: Command \item invalid in math mode.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.93 \STATE
+            Initialize bats assycrously
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.93 \STATE
+            Initialize bats assycrously
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.93 \STATE
+            Initialize bats assycrously
+? 
+
+! LaTeX Error: Command \item invalid in math mode.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.94 \STATE
+            synchronize threads
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.94 \STATE
+            synchronize threads
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.94 \STATE
+            synchronize threads
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.94 \STATE
+            synchronize threads
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.99         f_
+               i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.99 ...f_{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.99 ...f_{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.99 ...f_{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.99 ...f_{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100         \vec{v}
+                     _i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.100         \vec{v}_
+                      i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{...
+
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.100 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.100 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.100 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.101         \vec{x}
+                     _{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.101         \vec{x}_
+                      {temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+? 
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
 ]
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.101 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.101 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.101 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.101 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.102         \STATE \bf if  rand < r_
+                                      i, rand \in [0,1] \textbf{then} {local...
+
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.102 ... \in [0,1] \textbf{then} {local search}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.102 ... \in [0,1] \textbf{then} {local search}\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.102 ... \in [0,1] \textbf{then} {local search}\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.102 ... \in [0,1] \textbf{then} {local search}\\
+                                                  
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.103             \vec{x}
+                         _{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.103             \vec{x}_
+                          {temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-...
+
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.103 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.103 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.103 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.103 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.105 ...STATE Single dimension perturbation in x_
+                                                  {temp}
+? 
+
+! LaTeX Error: Command \item invalid in math mode.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.106         \STATE
+                     \bf if a < A_i^t , a \in [0,1]
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.106         \STATE
+                     \bf if a < A_i^t , a \in [0,1]
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.106         \STATE
+                     \bf if a < A_i^t , a \in [0,1]
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.107         \vec{x}_i^t = \vec{x}_{temp}\\
+                                            
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.107         \vec{x}_i^t = \vec{x}_{temp}\\
+                                            
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.107         \vec{x}_i^t = \vec{x}_{temp}\\
+                                            
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.107         \vec{x}_i^t = \vec{x}_{temp}\\
+                                            
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.108         r_
+                i = exp(\lambda * i)\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.108         r_i = exp(\lambda * i)\\
+                                      
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.108         r_i = exp(\lambda * i)\\
+                                      
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.108         r_i = exp(\lambda * i)\\
+                                      
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.108         r_i = exp(\lambda * i)\\
+                                      
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.109         A_
+                i =  A_{0} * \alpha^i\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.109         A_i =  A_{0} * \alpha^i\\
+                                       
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.109         A_i =  A_{0} * \alpha^i\\
+                                       
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.109         A_i =  A_{0} * \alpha^i\\
+                                       
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.109         A_i =  A_{0} * \alpha^i\\
+                                       
+? 
 ! Extra alignment tab has been changed to \cr.
 <recently read> \endtemplate 
                              
-l.165 ...Fitness C & Total C & Fitness G & Total &
+l.163 ...Fitness C & Total C & Fitness G & Total &
                                                    Speedup\\
 ? 
 Missing character: There is no Ã in font ptmr7t!
@@ -246,26 +662,28 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 1682 strings out of 493013
- 26198 string characters out of 6139316
- 101320 words of memory out of 5000000
- 5267 multiletter control sequences out of 15000+600000
- 40808 words of font info for 77 fonts, out of 8000000 for 9000
+ 1898 strings out of 493013
+ 28698 string characters out of 6139316
+ 106408 words of memory out of 5000000
+ 5467 multiletter control sequences out of 15000+600000
+ 42356 words of font info for 82 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 27i,16n,20p,230b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 27i,16n,20p,225b,290s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/s
-hare/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/u
-rw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></
-usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fo
-nts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (2 pages, 107278 bytes).
+ts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmbx7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/sha
+re/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-dist/fonts/ty
+pe1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmri8a.p
+fb>
+Output written on paper.pdf (2 pages, 129111 bytes).
 PDF statistics:
- 52 PDF objects out of 1000 (max. 8388607)
- 37 compressed objects within 1 object stream
+ 60 PDF objects out of 1000 (max. 8388607)
+ 43 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

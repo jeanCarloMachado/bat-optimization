@@ -1,6 +1,7 @@
 \documentclass[conference]{IEEEtran}
 
 \usepackage[fleqn]{amsmath}
+\usepackage{algorithmic}
 %\setlength{\mathindent}{0pt}
 \interdisplaylinepenalty=2500
 \hyphenation{op-tical net-works semi-conduc-tor}
@@ -86,34 +87,32 @@ parallelization method to apply on it is to use each bat on a GPU core.
 For the GPU version the approach used was the split of each individual in one thread.
 
 \subsection{Pseudo-code GPU}
-\begin{flalign}
-\begin{split}
+\begin{algorithmic}
 \label{Pseudo Code}
-\text{Parameters:} n, \alpha\, \lambda\\
-\text{Initialize bats assycrously}\\
-\text{synchronize threads}\\
-\text{Evaluate fitness bats}\\
-\text{Selects best}\\
-\text{\textbf{while} stop criteria false \textbf{do}}\\
-    \text{for each thread } i \\
+\STATE Parameters: n, \alpha\, \lambda
+\STATE Initialize bats assycrously
+\STATE synchronize threads
+\STATE Evaluate fitness bats
+\STATE Selects best
+\STATE \textbf{while stop criteria false \textbf{do}}
+    \STATE for each thread  i 
         f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
         \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
         \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
-        \text{\bf if } rand < r_i, rand \in [0,1] \text{\textbf{then} {local search}}\\
+        \STATE \bf if  rand < r_i, rand \in [0,1] \textbf{then} {local search}\\
             \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
-        \text{\bf end if}\\
-        \text{Single dimension perturbation in} x_{temp}\\
-        \text{\bf if} a < A_i^t , a \in [0,1]\\
+        \STATE \bf end if
+        \STATE Single dimension perturbation in x_{temp}
+        \STATE \bf if a < A_i^t , a \in [0,1]
         \vec{x}_i^t = \vec{x}_{temp}\\
         r_i = exp(\lambda * i)\\
         A_i =  A_{0} * \alpha^i\\
-        \text{\bf end if}\\
-        \text{synchronize threads}\\
-        \text{Selects best}\\
-    \text{\bf end for}\\
-\text{\bf end while}
-\end{split}
-\end{flalign}
+        \STATE \bf end if
+        \STATE synchronize threads
+        \STATE Selects best
+    \STATE \bf end for
+\STATE \bf end while
+\end{algorithmic}
 
 \section{Experiments}
 
