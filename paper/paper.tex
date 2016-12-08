@@ -1,12 +1,9 @@
 \documentclass[conference]{IEEEtran}
 
 \usepackage[fleqn]{amsmath}
-\usepackage{algorithm,algorithmic}
-%\setlength{\mathindent}{0pt}
+\usepackage{algpseudocode}
 \interdisplaylinepenalty=2500
 \hyphenation{op-tical net-works semi-conduc-tor}
-
-
 
 \begin{document}
 \title{Bat Optimization on GPU}
@@ -57,34 +54,37 @@ the bat metaheuristic given that the original papers lacks it.
 The CPU version developed was single threaded.
 The random algorithm used was the mersenne twister.
 
-\subsection{Pseudo-code}
+\begin{figure}
+\begin{algorithmic}[1]
+\State $Parameters:\ n,\alpha,\ \lambda$
+\State $initialize\ bats$
+\State $evaluate\ fitness$
+\State $selects\ best$
+\While {$stop\ criteria\ false$}
+    \For{$each bat$}
 
-\begin{flalign}
-\begin{split}
-\label{Pseudo Code}
-\text{Parameters:} n, \alpha\, \lambda\\
-\text{Initialize Bats}\\
-\text{Evaluate fitness bats}\\
-\text{Selects best}\\
-\text{\textbf{while} stop criteria false \textbf{do}}\\
-    \text{\textbf{for} i=1\ to\ n\ \bf do}\\
-        f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
-        \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
-        \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
-        \text{\bf if } rand < r_i, rand \in [0,1] \text{\textbf{then} {local search}}\\
-            \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
-        \text{\bf end if}\\
-        \text{Single dimension perturbation in} x_{temp}\\
-        \text{\bf if} a < A_i^t , a \in [0,1]\\
-        \vec{x}_i^t = \vec{x}_{temp}\\
-        r_i = exp(\lambda * i)\\
-        A_i =  A_{0} * \alpha^i\\
-        \text{\bf end if}\\
-        \text{Selects best}\\
-    \text{\bf end for}\\
-\text{\bf end while}
-\end{split}
-\end{flalign}
+        \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
+        \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
+        \State $\vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}$
+        \If {$rand < r_i, rand \in [0,1] $}
+
+
+            \State $\vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]$
+        \EndIf
+
+        \State $single\ dimension\ perturbation\ in\ x_{temp}$
+        \If {$a < A_i^t , a \in [0,1] $}
+            \State $\vec{x}_i^t = \vec{x}_{temp}$
+            \State $r_i = exp(\lambda * i)$
+            \State $A_i =  A_{0} * \alpha^i$
+        \EndIf
+        \State $selects\ best$
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\caption{Pseudo-code CPU}\label{GPU}
+\end{figure}
+
 
 \section{Bat Design on GPU}
 
@@ -94,39 +94,42 @@ parallelization method to apply on it is to use each bat on a GPU core.
 For the GPU version the approach used was the split of each individual in one thread.
 
 The random number generator used on the GPU was the MTGP32, to
-maintain the compability with the CPU version. Notwithstanding it's
+maintain the compatibility with the CPU version. Notwithstanding it's
 not recommended to use more than 256 threads per block with it
 \cite{curandIssue}.
 
-\subsection{Pseudo-code GPU}
-\newpage
-\begin{algorithmic}
-\begin{ALC@g}
-\STATE Parameters: n,\alpha, \lambda\\
-\STATE Initialize bats asynchronously
-\STATE synchronize threads
-\STATE Evaluate fitness bats
-\STATE Selects best
-\WHILE {stop criteria false}
-    \FORALL{threads}
-        \STATE f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
-        \STATE \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
-        \STATE \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
-        \IF{rand < r_i, rand \in [0,1] }\\
-            \STATE \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
-        \ENDIF
-        \STATE Single dimension perturbation in x_{temp}
-        \IF {a < A_i^t , a \in [0,1] }
-            \STATE \vec{x}_i^t = \vec{x}_{temp}\\
-            \STATE r_i = exp(\lambda * i)\\
-            \STATE A_i =  A_{0} * \alpha^i\\
-        \ENDIF
-        \STATE synchronize threads
-        \STATE Selects best
-    \ENDFOR
-\ENDWHILE
-\end{ALC@g}
+\begin{figure}
+\begin{algorithmic}[1]
+\State $Parameters:\ n,\alpha,\ \lambda$
+\State $initialize\ bats\ asynchronously$
+\State $evaluate\ fitness$
+\State $synchronize\ threads$
+\State $selects\ best$
+\While {$stop\ criteria\ false$}
+    \For{$each thread$}
+
+        \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
+        \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
+        \State $\vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}$
+        \If {$rand < r_i, rand \in [0,1] $}
+
+
+            \State $\vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]$
+        \EndIf
+
+        \State $single\ dimension\ perturbation\ in\ x_{temp}$
+        \If {$a < A_i^t , a \in [0,1] $}
+            \State $\vec{x}_i^t = \vec{x}_{temp}$
+            \State $r_i = exp(\lambda * i)$
+            \State $A_i =  A_{0} * \alpha^i$
+        \EndIf
+        \State $synchronize\ threads$
+        \State $selects\ best$
+    \EndFor
+\EndWhile
 \end{algorithmic}
+\caption{Pseudo-code GPU}\label{GPU}
+\end{figure}
 
 \section{Experiments}
 
@@ -147,7 +150,7 @@ The experiments were executed on a machine with the following configuration:
 
 \textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram}
 
-Each experiment runned a total of 20 times with 10 thousand iterations each and 100 dimensions in each function.
+Each experiment was executed a total of 20 times with 10 thousand iterations each and 100 dimensions in each function.
 
 \begin{table}[!htbp]
     \renewcommand{\arraystretch}{1.3}
@@ -185,6 +188,7 @@ Below are described the speedup and convergence results. The time spent in each 
         E1 & 57.3774 & ?? & ?? \\
         E3 & 54.6234 & 20.2427 & 2.6984 \\
         E5 & 42.3531 & 32.1898 & 1.3157 \\
+        E7 & 24.7752 & 26.4898 & 0.9352 \\
     \end{tabular}
 \end{table}
 
@@ -200,6 +204,7 @@ Below are described the speedup and convergence results. The time spent in each 
         E1 & 1.69691e-06 & ?? \\
         E3 & 8.34383e-13 &  2.0095e-15  \\
         E3 & 6.50132e-07 & 0 \\
+        E7 & 93.884 & 96.7034 & \\
     \end{tabular}
 \end{table}
 

@@ -43,5 +43,5 @@ run_tests: tests
 
 paper:
 	cd paper ; \
-	pdflatex paper.tex ; \
+	pdflatex -interaction=nonstopmode paper.tex ; \
 	mv paper.pdf  ../paper.pdf
