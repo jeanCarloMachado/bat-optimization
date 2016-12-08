@@ -1,178 +1,61 @@
 \documentclass[conference]{IEEEtran}
 
 \usepackage[fleqn]{amsmath}
+\usepackage{algorithm,algorithmic}
 %\setlength{\mathindent}{0pt}
 \interdisplaylinepenalty=2500
-
-
-
-% *** SPECIALIZED LIST PACKAGES ***
-%
-%\usepackage{algorithmic}
-% algorithmic.sty was written by Peter Williams and Rogerio Brito.
-% This package provides an algorithmic environment fo describing algorithms.
-% You can use the algorithmic environment in-text or within a figure
-% environment to provide for a floating algorithm. Do NOT use the algorithm
-% floating environment provided by algorithm.sty (by the same authors) or
-% algorithm2e.sty (by Christophe Fiorio) as the IEEE does not use dedicated
-% algorithm float types and packages that provide these will not provide
-% correct IEEE style captions. The latest version and documentation of
-% algorithmic.sty can be obtained at:
-% http://www.ctan.org/pkg/algorithms
-% Also of interest may be the (relatively newer and more customizable)
-% algorithmicx.sty package by Szasz Janos:
-% http://www.ctan.org/pkg/algorithmicx
-
-
-
-
-% *** ALIGNMENT PACKAGES ***
-%
-%\usepackage{array}
-% Frank Mittelbach's and David Carlisle's array.sty patches and improves
-% the standard LaTeX2e array and tabular environments to provide better
-% appearance and additional user controls. As the default LaTeX2e table
-% generation code is lacking to the point of almost being broken with
-% respect to the quality of the end results, all users are strongly
-% advised to use an enhanced (at the very least that provided by array.sty)
-% set of table tools. array.sty is already installed on most systems. The
-% latest version and documentation can be obtained at:
-% http://www.ctan.org/pkg/array
-
-
-% *** SUBFIGURE PACKAGES ***
-%\ifCLASSOPTIONcompsoc
-%  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-%\else
-%  \usepackage[caption=false,font=footnotesize]{subfig}
-%\fi
-% subfig.sty, written by Steven Douglas Cochran, is the modern replacement
-% for subfigure.sty, the latter of which is no longer maintained and is
-% incompatible with some LaTeX packages including fixltx2e. However,
-% subfig.sty requires and automatically loads Axel Sommerfeldt's caption.sty
-% which will override IEEEtran.cls' handling of captions and this will result
-% in non-IEEE style figure/table captions. To prevent this problem, be sure
-% and invoke subfig.sty's "caption=false" package option (available since
-% subfig.sty version 1.3, 2005/06/28) as this is will preserve IEEEtran.cls
-% handling of captions.
-% Note that the Computer Society format requires a larger sans serif font
-% than the serif footnote size font used in traditional IEEE formatting
-% and thus the need to invoke different subfig.sty package options depending
-% on whether compsoc mode has been enabled.
-%
-% The latest version and documentation of subfig.sty can be obtained at:
-% http://www.ctan.org/pkg/subfig
-
-
-% *** FLOAT PACKAGES ***
-%
-%\usepackage{fixltx2e}
-% fixltx2e, the successor to the earlier fix2col.sty, was written by
-% Frank Mittelbach and David Carlisle. This package corrects a few problems
-% in the LaTeX2e kernel, the most notable of which is that in current
-% LaTeX2e releases, the ordering of single and double column floats is not
-% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
-% single column figure to be placed prior to an earlier double column
-% figure.
-% Be aware that LaTeX2e kernels dated 2015 and later have fixltx2e.sty's
-% corrections already built into the system in which case a warning will
-% be issued if an attempt is made to load fixltx2e.sty as it is no longer
-% needed.
-% The latest version and documentation can be found at:
-% http://www.ctan.org/pkg/fixltx2e
-
-
-%\usepackage{stfloats}
-% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
-% the ability to do double column floats at the bottom of the page as well
-% as the top. (e.g., "\begin{figure*}[!b]" is not normally possible in
-% LaTeX2e). It also provides a command:
-%\fnbelowfloat
-% to enable the placement of footnotes below bottom floats (the standard
-% LaTeX2e kernel puts them above bottom floats). This is an invasive package
-% which rewrites many portions of the LaTeX2e float routines. It may not work
-% with other packages that modify the LaTeX2e float routines. The latest
-% version and documentation can be obtained at:
-% http://www.ctan.org/pkg/stfloats
-% Do not use the stfloats baselinefloat ability as the IEEE does not allow
-% \baselineskip to stretch. Authors submitting work to the IEEE should note
-% that the IEEE rarely uses double column equations and that authors should try
-% to avoid such use. Do not be tempted to use the cuted.sty or midfloat.sty
-% packages (also by Sigitas Tolusis) as the IEEE does not format its papers in
-% such ways.
-% Do not attempt to use stfloats with fixltx2e as they are incompatible.
-% Instead, use Morten Hogholm'a dblfloatfix which combines the features
-% of both fixltx2e and stfloats:
-%
-% \usepackage{dblfloatfix}
-% The latest version can be found at:
-% http://www.ctan.org/pkg/dblfloatfix
-
-
-% *** PDF, URL AND HYPERLINK PACKAGES ***
-%
-%\usepackage{url}
-% url.sty was written by Donald Arseneau. It provides better support for
-% handling and breaking URLs. url.sty is already installed on most LaTeX
-% systems. The latest version and documentation can be obtained at:
-% http://www.ctan.org/pkg/url
-% Basically, \url{my_url_here}.
-
-
-% *** Do not adjust lengths that control margins, column widths, etc. ***
-% *** Do not use packages that alter fonts (such as pslatex).         ***
-% There should be no need to do such things with IEEEtran.cls V1.6 and later.
-% (Unless specifically asked to do so by the journal or conference you plan
-% to submit to, of course. )
-
-
-% correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
+
+
 
 \begin{document}
 \title{Bat Optimization on GPU}
 
 \author{\IEEEauthorblockN{Jean Carlo Machado}
-\IEEEauthorblockA{Univerisdade do Estado de Santa Catarina\\Computer Engineering\\
+\IEEEauthorblockA{Univerisdade do Estado de Santa Catarina\\Mestrado de Computação Aplicada\\
 UDESC\\
 Santa Catarina, Joinville,\\
 Email: contato@jeancarlomachado.com.br}}
 
 \maketitle
 \begin{abstract}
-    This works presents the Bat in GPU.
-    The results show that...
+This work developed a CPU implementation and a GPU one. And a set of
+experiments where made in order to measure the speedup. The research
+shows that the GPU version is able to achieve relevant speedups in
+highly populational problems.
 \end{abstract}
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
 
+The bat algorithm is a populational meta-heuristic introduced by Yang in
+2010. It uses the inspiration of micro-bats which uses a type of sonar,
+called echolocation, to detect prey, avoid obstacles, and locate their
+roosting crevices in the dark \cite{original}.
 
-The bat algorithm was introduced by \cite{original}. It uses the inspiration of microbas to look at their preys.
+All populational meta-heuristic theoretically can benefit from implicit
+parallelization, which is the approach that each individual of the
+populations executes concurrently.
 
-Many populational optimization algorithms can benefit from paralization.
+This work attempts to investigate the applicability of the BAT algorithm
+concurrently on the GPU. Previously some demonstrations of the bat
+algorithm parallelized on CPU were presented in \cite{paralellCPUFirst}
+and \cite{paralellCPU}, however, til the day of this publication no
+implementation of the bat algorithm was found on GPU. The GPU is a
+great place to run populational algorithms because GPUs are able to
+parallelize high loads of concurrent individuals doing part of the hole
+job.
 
-This work attemps to investigate the applicability of GPU parallization
-on the bat algorithm. Previously some demonstrations of the bat
-algorithm paralelized on CPU were presented (reference referece),
-however, til the day of this publication no implementation of the bat
-algorithm was found on GPU.
-
-It was developed two versions of the algorithm. One that runs on CPU and
-the other which uses CPU.
-
-\hfill mds
 \hfill December 21, 2016
 
 \section{Bat Design on CPU}
 
 In this work the bath algorithm used was the one proposed by
 \cite{parpinelli}, since it represents a concrete demonstration of how
-the bat metha-heuristic.
+the bat metaheuristic given that the original papers lacks it.
 
-The CPU version was single threaded.
-
-The random algorightm used was the mersenne twister.
+The CPU version developed was single threaded.
+The random algorithm used was the mersenne twister.
 
 \subsection{Pseudo-code}
 
@@ -205,42 +88,51 @@ The random algorightm used was the mersenne twister.
 
 \section{Bat Design on GPU}
 
-Since the BAT agorithm uses a population of bats, the most intuitive
-parallization method to apply on it is to use each bat on a GPU core.
+Since the BAT algorithm uses a population of bats, the most intuitive
+parallelization method to apply on it is to use each bat on a GPU core.
 \cite{pso-gpu} used a similar method for a GPU implementation for the PSO algorithm.
 For the GPU version the approach used was the split of each individual in one thread.
 
+The random number generator used on the GPU was the MTGP32, to
+maintain the compability with the CPU version. Notwithstanding it's
+not recommended to use more than 256 threads per block with it
+\cite{curandIssue}.
+
 \subsection{Pseudo-code GPU}
-\begin{flalign}
-\begin{split}
-\label{Pseudo Code}
-\text{Parameters:} n, \alpha\, \lambda\\
-\text{Initialize bats assicrously}\\
-\text{syncronize threads}\\
-\text{Evaluate fitness bats}\\
-\text{Selects best}\\
-\text{\textbf{while} stop criteria false \textbf{do}}\\
-    \text{for each thread } i \\
-        f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
-        \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
-        \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
-        \text{\bf if } rand < r_i, rand \in [0,1] \text{\textbf{then} {local search}}\\
-            \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
-        \text{\bf end if}\\
-        \text{Single dimension perturbation in} x_{temp}\\
-        \text{\bf if} a < A_i^t , a \in [0,1]\\
-        \vec{x}_i^t = \vec{x}_{temp}\\
-        r_i = exp(\lambda * i)\\
-        A_i =  A_{0} * \alpha^i\\
-        \text{\bf end if}\\
-        \text{syncronize threads}\\
-        \text{Selects best}\\
-    \text{\bf end for}\\
-\text{\bf end while}
-\end{split}
-\end{flalign}
+\newpage
+\begin{algorithmic}
+\begin{ALC@g}
+\STATE Parameters: n,\alpha, \lambda\\
+\STATE Initialize bats asynchronously
+\STATE synchronize threads
+\STATE Evaluate fitness bats
+\STATE Selects best
+\WHILE {stop criteria false}
+    \FORALL{threads}
+        \STATE f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
+        \STATE \vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+        \STATE \vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+        \IF{rand < r_i, rand \in [0,1] }\\
+            \STATE \vec{x}_{temp} = \vec{x}_* + \epsilon A_m, \epsilon \in [-1, 1]\\
+        \ENDIF
+        \STATE Single dimension perturbation in x_{temp}
+        \IF {a < A_i^t , a \in [0,1] }
+            \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+            \STATE r_i = exp(\lambda * i)\\
+            \STATE A_i =  A_{0} * \alpha^i\\
+        \ENDIF
+        \STATE synchronize threads
+        \STATE Selects best
+    \ENDFOR
+\ENDWHILE
+\end{ALC@g}
+\end{algorithmic}
 
 \section{Experiments}
+
+For testing the performance of the algorithm a set of experiments where
+developed using diverse benchmark functions tested against a set of
+individuals in a highly dimensional problem.
 
 The benchmark functions used were the following:
 
@@ -251,15 +143,13 @@ The benchmark functions used were the following:
     \item Rosenbrook
 \end{itemize}
 
-
 The experiments were executed on a machine with the following configuration:
 
-\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz}
-\textit{GK208 GeForce GT 720 1024 MB of vram}
+\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram}
 
-Each experiment runned a total of 1x10^4\ times.
+Each experiment runned a total of 20 times with 10 thousand iterations each and 100 dimensions in each function.
 
-\begin{table}[!t]
+\begin{table}[!htbp]
     \renewcommand{\arraystretch}{1.3}
     \caption{Experiments}
     \label{experiments}
@@ -281,42 +171,69 @@ Each experiment runned a total of 1x10^4\ times.
 
 \section{Results}
 
+Below are described the speedup and convergence results. The time spent in each execution of the algorithms is described in seconds.
 
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
-    \caption{Results}
+    \caption{Speedup Results}
     \label{results}
     \centering
     \begin{tabular}{c|c|c|c}
     \hline
-        \bf Name & Total CPU & Total GPU & Speedup\\
+        \bf Name & Time CPU & Time GPU & Speedup\\
     \hline
-        E3 & 1m4.888s & 0m55.439s & 1.16x\\
-        E4 & 2m27.902s & 0m21.976s & 7x
+        E1 & 57.3774 & ?? & ?? \\
+        E3 & 54.6234 & 20.2427 & 2.6984 \\
+        E5 & 42.3531 & 32.1898 & 1.3157 \\
     \end{tabular}
 \end{table}
 
+\begin{table}[!t]
+    \renewcommand{\arraystretch}{1.3}
+    \caption{Convergence Results}
+    \label{results}
+    \centering
+    \begin{tabular}{c|c|c}
+    \hline
+        \bf Name & Fitness CPU & Fitness GPU \\
+    \hline
+        E1 & 1.69691e-06 & ?? \\
+        E3 & 8.34383e-13 &  2.0095e-15  \\
+        E3 & 6.50132e-07 & 0 \\
+    \end{tabular}
+\end{table}
 
 \section{Conclusion}
 
-It was observed speedups with big populations. The original BAT was proposed with 40 individuals and the speedups was seen with 250 individuals.
-The advantages of the algorithm may be tested against a CPU implementation to be fair.
-With this work it's clear that is possible to speedup the bat methaueristic using GPU but the best results are only achieved by a great population size.
+It was observed speedups with big populations. The original BAT was
+proposed with 40 individuals and the speedups was seen with 250
+individuals.
+The advantages of the algorithm may be tested against a threaded CPU implementation to be fair.
+
+With this work it's clear that is possible to speedup the bat metaheuristic using GPU. Notwithstanding the best results are only achievable on really complex problems with many dimensions.
 
 \section{Further works}
 
-It may be explored the usage of blocks as representation for the dimensions in which each bat deals.
+In the future it may be explored the usage of blocks as representation for the
+dimensions in which each bat details.
 
+A subpopulation approach may also work, considering each GPU block as it's boundaries, somewhat similar to the work made on parallel bat on CPU by FU \cite{paralellCPU}.
 
 \begin{thebibliography}{1}
 
 \bibitem{original}
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
-
 \bibitem{parpinelli}
     Jelson A. Cordeiro, Rafael Stubs Parpinelli Heitor Silvério Lopes \emph{Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho}.
 \bibitem{pso-gpu}
     PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
+\bibitem{curandIssue}
+    \url{http://docs.nvidia.com/cuda/curand/device-api-overview.html#device-api-overview}
+\bibitem{paralellCPU}
+    Parallelized Bat Algorithm with a Communication Strategy. Cheng-Fu Tsai, Thin-Kien Dao, Wei-Jie Yang, et al, University of applied sciences
+
+\bibitem{paralellCPUFirst}
+    Parallel bat algorithm for optimizing makespan in job scheduling problems, Thi-Kien Dao, Tien-Szu Pan, Trong-The Nguyen, Jeng-Shyang Pan,2015, Springer Sience Review
 
 \end{thebibliography}
 

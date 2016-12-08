@@ -6,3 +6,4 @@ latest*
 a.out
 bat
 bat_gpu
+*.aux

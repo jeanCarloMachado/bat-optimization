@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  4 DEC 2016 19:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  7 DEC 2016 22:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -170,30 +170,71 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 635.
 \mathdisplay@stack=\toks19
 LaTeX Info: Redefining \[ on input line 2739.
 LaTeX Info: Redefining \] on input line 2740.
+)
+(/usr/share/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/share/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count106
+\float@exts=\toks20
+\float@box=\box30
+\@float@everytoks=\toks21
+\@floatcapt=\box31
+)
+(/usr/share/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks22
+\c@algorithm=\count107
+)
+(/usr/share/texmf-dist/tex/latex/algorithms/algorithmic.sty
+Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks23
+)
+\c@ALC@unique=\count108
+\c@ALC@line=\count109
+\c@ALC@rem=\count110
+\c@ALC@depth=\count111
+\ALC@tlm=\skip47
+\algorithmicindent=\skip48
 ) (./paper.aux
 
-LaTeX Warning: Label `Pseudo Code' multiply defined.
+LaTeX Warning: Label `results' multiply defined.
 
 )
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 223.
-LaTeX Font Info:    ... okay on input line 223.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
 
 -- Lines per column: 56 (exact).
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no § in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no £ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no § in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no £ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no § in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no £ in font ptmr7t!
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -201,21 +242,601 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Underfull \hbox (badness 2065) in paragraph at lines 401--403
-[]\OT1/ptm/m/it/10 Intel(R) Core(TM) i5-4460 CPU @ 3.20GHz GK208
- []
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.404 Each experiment runned a total of 1x10^
-                                             4\ times.
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.104 \begin{ALC@g}
+                   
 ? 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.405 
-      
+l.105 \STATE Parameters: n,\alpha
+                                 , \lambda\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.105 \STATE Parameters: n,\alpha, \lambda\\
+                                            
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.105 \STATE Parameters: n,\alpha, \lambda\\
+                                            
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.105 \STATE Parameters: n,\alpha, \lambda\\
+                                            
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.105 \STATE Parameters: n,\alpha, \lambda\\
+                                            
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.112         \STATE f_
+                       i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.112 ..._{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.112 ..._{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.112 ..._{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.112 ..._{max} - f_{min})\beta, \in \beta [0,1]\\
+                                                  
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.113         \STATE \vec{v}
+                            _i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.113         \STATE \vec{v}_
+                             i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec...
+
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.113 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.113 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.113 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.113 ...t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i\\
+                                                  
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.114         \STATE \vec{x}
+                            _{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.114         \STATE \vec{x}_
+                             {temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.114 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.114 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.114 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.114 ...temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.115         \IF{rand < r_i, rand \in [0,1] }
+                                              \\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.115         \IF{rand < r_i, rand \in [0,1] }\\
+                                                
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.116             \STATE \vec{x}
+                                _{temp} = \vec{x}_* + \epsilon A_m, \epsilon...
+
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.116             \STATE \vec{x}_
+                                 {temp} = \vec{x}_* + \epsilon A_m, \epsilon...
+
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.116 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.116 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.116 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.116 ..._* + \epsilon A_m, \epsilon \in [-1, 1]\\
+                                                  
+? 
+
+! LaTeX Error: \begin{ALC@for} on input line 111 ended by \end{ALC@if}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.117         \ENDIF
+                    
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.118 ...STATE Single dimension perturbation in x_
+                                                  {temp}
+? 
+
+! LaTeX Error: Command \item invalid in math mode.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+! Extra }, or forgotten \endgroup.
+\@par ... \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.119         \IF {a < A_i^t , a \in [0,1] }
+                                            
+? 
+
+! Package amsmath Error: \vec allowed only in math mode.
+
+See the amsmath package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.120             \STATE \vec{x}
+                                _i^t = \vec{x}_{temp}\\
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.120             \STATE \vec{x}_
+                                 i^t = \vec{x}_{temp}\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.120 ...    \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.120 ...    \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.120 ...    \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.120 ...    \STATE \vec{x}_i^t = \vec{x}_{temp}\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.121             \STATE r_
+                           i = exp(\lambda * i)\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.121             \STATE r_i = exp(\lambda * i)\\
+                                                 
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.121             \STATE r_i = exp(\lambda * i)\\
+                                                 
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.121             \STATE r_i = exp(\lambda * i)\\
+                                                 
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.121             \STATE r_i = exp(\lambda * i)\\
+                                                 
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.122             \STATE A_
+                           i =  A_{0} * \alpha^i\\
+? 
+
+! LaTeX Error: There's no line here to end.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.122             \STATE A_i =  A_{0} * \alpha^i\\
+                                                  
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.122             \STATE A_i =  A_{0} * \alpha^i\\
+                                                  
+? 
+! Missing } inserted.
+<inserted text> 
+                }
+l.122             \STATE A_i =  A_{0} * \alpha^i\\
+                                                  
+? 
+! Extra }, or forgotten \endgroup.
+\par ...m \@noitemerr {\@@par }\fi \else {\@@par }
+                                                  \fi 
+l.122             \STATE A_i =  A_{0} * \alpha^i\\
+                                                  
+? 
+
+! LaTeX Error: \begin{ALC@whl} on input line 110 ended by \end{ALC@if}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.123         \ENDIF
+                    
+? 
+
+! LaTeX Error: \begin{ALC@g} on input line 104 ended by \end{ALC@g}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.126     \ENDFOR
+                 
+? 
+
+! LaTeX Error: \begin{list} on input line 104 ended by \end{ALC@for}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.126     \ENDFOR
+                 
+? 
+
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.126     \ENDFOR
+                 
+? 
+
+! LaTeX Error: \begin{algorithmic} on input line 103 ended by \end{list}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.127 \ENDWHILE
+               
+? 
+
+! LaTeX Error: \begin{document} ended by \end{ALC@g}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.127 \ENDWHILE
+               
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.127 \ENDWHILE
+               
+? 
+
+! LaTeX Error: \begin{document} ended by \end{ALC@whl}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.127 \ENDWHILE
+               
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.127 \ENDWHILE
+               
+? 
+! Undefined control sequence.
+\ENDWHILE ->\end {ALC@whl}\ALC@it 
+                                  \algorithmicendwhile 
+l.127 \ENDWHILE
+               
+? 
+
+! LaTeX Error: \begin{document} ended by \end{ALC@g}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.128 \end{ALC@g}
+                 
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.128 \end{ALC@g}
+                 
+? 
+
+! LaTeX Error: \begin{document} ended by \end{list}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.129 \end{algorithmic}
+                       
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.129 \end{algorithmic}
+                       
+? 
+
+! LaTeX Error: \begin{document} ended by \end{algorithmic}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.129 \end{algorithmic}
+                       
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.129 \end{algorithmic}
+                       
 ? 
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
@@ -227,6 +848,21 @@ Missing character: There is no Ã in font ptmri7t!
 Missing character: There is no § in font ptmri7t!
 Missing character: There is no Ã in font ptmri7t!
 Missing character: There is no £ in font ptmri7t!
+! Undefined control sequence.
+l.231     \url
+              {http://docs.nvidia.com/cuda/curand/device-api-overview.html#d...
+
+? 
+! You can't use `macro parameter character #' in horizontal mode.
+l.231 ...com/cuda/curand/device-api-overview.html#
+                                                  device-api-overview}
+? 
+
+Underfull \hbox (badness 10000) in paragraph at lines 231--232
+[]\OT1/ptm/m/n/8 http://docs.nvidia.com/cuda/curand/device-api-overview.htmldev
+ice-api-
+ []
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -244,13 +880,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 1682 strings out of 493013
- 26198 string characters out of 6139316
- 102320 words of memory out of 5000000
- 5267 multiletter control sequences out of 15000+600000
+ 1991 strings out of 493013
+ 29985 string characters out of 6139316
+ 111083 words of memory out of 5000000
+ 5558 multiletter control sequences out of 15000+600000
  40808 words of font info for 77 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 27i,16n,20p,229b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 27i,16n,20p,235b,423s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-dist/fon
 ts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/publi
 c/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
@@ -260,7 +896,7 @@ t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></
 usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fo
 nts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (2 pages, 108199 bytes).
+Output written on paper.pdf (2 pages, 110458 bytes).
 PDF statistics:
  52 PDF objects out of 1000 (max. 8388607)
  37 compressed objects within 1 object stream
