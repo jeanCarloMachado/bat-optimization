@@ -6,22 +6,20 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include "bat.h"
-
-#define ITERATIONS 10000
-#define BATS_COUNT 256
-#define DIMENSIONS 100
-
-#define INITIAL_LOUDNESS 1.0
-
-//probability of accepting bad results
 #define ALFA 0.5
-//affects local search
 #define LAMBDA 0.1
 
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 
-const int EVALUTAION_FUNCTION = ACKLEY;
+#define INITIAL_LOUDNESS 1.0
+
+#define ITERATIONS 10000
+#define BATS_COUNT 256
+#define DIMENSIONS 100
+
+
+const int EVALUTAION_FUNCTION = ROSENBROOK;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
