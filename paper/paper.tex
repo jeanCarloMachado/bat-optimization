@@ -48,6 +48,21 @@ great place to run populational algorithms because GPUs are able to
 parallelize high loads of concurrent individuals doing part of the hole
 job.
 
+\section{CUDA optimizations}
+
+GPU optimizations may vary in speedups from 10 to 450 \cite{gpuOptimization}.
+
+A good approach is to use the threaded model since it has the great benefit in performance.
+
+Using cuda also imply in  some limitations on the architecture.
+
+\begin{itemize}
+\item No recursion
+\item No static variables
+\item No variable numbers arguments
+\end{itemize}
+
+
 \hfill December 21, 2016
 
 \section{Bat Design on CPU}
@@ -78,7 +93,7 @@ The random algorithm used was the mersenne twister.
         \EndIf
 
         \State $single\ dimension\ perturbation\ in\ x_{temp}$
-        \If {$a < A_i^t , a \in [0,1] $}
+        \If {$a < A_i^t\ \textbf{and}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
             \State $\vec{x}_i^t = \vec{x}_{temp}$
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
@@ -123,7 +138,7 @@ not recommended to use more than 256 threads per block with it
         \EndIf
 
         \State $single\ dimension\ perturbation\ in\ x_{temp}$
-        \If {$a < A_i^t , a \in [0,1] $}
+        \If {$a < A_i^t\ \textbf{and}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
             \State $\vec{x}_i^t = \vec{x}_{temp}$
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
@@ -244,6 +259,8 @@ A subpopulation approach may also work, considering each GPU block as it's bound
 
 \bibitem{paralellCPUFirst}
     Parallel bat algorithm for optimizing makespan in job scheduling problems, Thi-Kien Dao, Tien-Szu Pan, Trong-The Nguyen, Jeng-Shyang Pan,2015, Springer Sience Review
+\bibitem{gpuOptimization}
+    Optimization Principles and Application Performance Evaluation of a Multithreaded GPU using Cuda, Shane Ryo
 
 \end{thebibliography}
 
