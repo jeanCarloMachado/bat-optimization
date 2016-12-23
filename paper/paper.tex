@@ -21,10 +21,13 @@ Santa Catarina, Joinville
 
 \maketitle
 \begin{abstract}
-This work developed a CPU implementation and a GPU one. And a set of
-experiments where made in order to measure the speedup. The research
-shows that the GPU version is able to achieve relevant speedups in
-highly populational problems.
+The ever increasing paralell processing power of GPUs is an attractive
+motive to implement optimization algorithms on this resource. This work
+aimed to develop a GPU version of the bat methaheuristic, a CPU version
+were developed as well, as a way of comparation. A set of experiments where
+made in order to measure the speedup. The research shows that the GPU
+version is able to achieve relevant speedups in highly populational
+problems but for simpler cases the CPU version might perform better.
 \end{abstract}
 \IEEEpeerreviewmaketitle
 
@@ -71,6 +74,14 @@ In this work the bath algorithm used was the one proposed by
 \cite{parpinelli}, since it represents a concrete demonstration of how
 the bat metaheuristic given that the original papers lacks it.
 
+Some distinctions of the original paper are worth noticing.
+
+- The selection of new reuslts on the original paper tends to be more greedy (line 14).
+On this paper the or operator were used but in the original one an And were proposed.
+The or operator tends to explore the search space better (more diversitiy).
+
+- There's a distorion on a single dimension of the searchspace in order to increase the diversity factor.
+
 The CPU version developed was single threaded.
 The random algorithm used was the mersenne twister.
 
@@ -93,7 +104,7 @@ The random algorithm used was the mersenne twister.
         \EndIf
 
         \State $single\ dimension\ perturbation\ in\ x_{temp}$
-        \If {$a < A_i^t\ \textbf{and}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
+        \If {$a < A_i^t\ \textbf{or}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
             \State $\vec{x}_i^t = \vec{x}_{temp}$
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
@@ -138,7 +149,7 @@ not recommended to use more than 256 threads per block with it
         \EndIf
 
         \State $single\ dimension\ perturbation\ in\ x_{temp}$
-        \If {$a < A_i^t\ \textbf{and}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
+        \If {$a < A_i^t\ \textbf{or}\ f(\vec{x}_{temp}) \leq f(\vec{x}_i), a \in [0,1] $}
             \State $\vec{x}_i^t = \vec{x}_{temp}$
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
@@ -223,7 +234,7 @@ Below are described the speedup and convergence results. The time spent in each 
     \hline
         E1 & 1.69691e-06 & ?? \\
         E3 & 8.34383e-13 &  2.0095e-15  \\
-        E3 & 6.50132e-07 & 0 \\
+        E5 & 6.50132e-07 & 0 \\
         E7 & 93.884 & 96.7034 & \\
     \end{tabular}
 \end{table}
