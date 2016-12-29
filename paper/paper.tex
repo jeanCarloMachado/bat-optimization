@@ -6,7 +6,7 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 \begin{document}
-\title{Bat Optimization on GPU}
+\title{Parallel Bat Optimization on GPU using CUDA}
 
 \author{\IEEEauthorblockN{Jean Carlo Machado}
 \IEEEauthorblockA{Univerisdade do Estado de Santa Catarina\\Mestrado de Computação Aplicada\\
@@ -21,13 +21,13 @@ Santa Catarina, Joinville
 
 \maketitle
 \begin{abstract}
-The ever increasing paralell processing power of GPUs is an attractive
-motive to implement optimization algorithms on this resource. This work
-aimed to develop a GPU version of the bat methaheuristic, a CPU version
-were developed as well, as a way of comparation. A set of experiments where
+The ever increasing parallel processing power of GP's is an attractive
+motive to implement optimization algorithms on this platform. This work
+aimed to develop a GPU version of the bat metaheuristic, a CPU version
+were developed as well, as a way of comparison. A set of experiments where
 made in order to measure the speedup. The research shows that the GPU
 version is able to achieve relevant speedups in highly populational
-problems but for simpler cases the CPU version might perform better.
+problems but for simpler cases the CPU version might outperform GPU.
 \end{abstract}
 \IEEEpeerreviewmaketitle
 
@@ -40,50 +40,46 @@ roosting crevices in the dark \cite{original}.
 
 All populational meta-heuristic theoretically can benefit from implicit
 parallelization, which is the approach that each individual of the
-populations executes concurrently.
+populations executes concurrently. The GPU is a great place to run populational algorithms because GPUs are able to
+parallelize high loads of concurrent individuals doing part of the hole
+job.
+For highly parallel general processing application, speedups may vary from 10 to 450 \cite{cuda_optimizations}.
+
 
 This work attempts to investigate the applicability of the BAT algorithm
 concurrently on the GPU. Previously some demonstrations of the bat
 algorithm parallelized on CPU were presented in \cite{paralellCPUFirst}
 and \cite{paralellCPU}, however, til the day of this publication no
-implementation of the bat algorithm was found on GPU. The GPU is a
-great place to run populational algorithms because GPUs are able to
-parallelize high loads of concurrent individuals doing part of the hole
-job.
+implementation of the bat algorithm was found for GPU. 
 
-\section{CUDA optimizations}
+\section{The CUDA platform}
 
-GPU optimizations may vary in speedups from 10 to 450 \cite{gpuOptimization}.
+The CUDA platform uses a parallelization schema in "each cuda device supports the Single-Program Multiple-Data (SPMD)" \cite{cuda_optimizations}, where all concurrent threads are based on the same code but they may follow different paths.
+
 
 A good approach is to use the threaded model since it has the great benefit in performance.
 
-Using cuda also imply in  some limitations on the architecture.
 
-\begin{itemize}
-\item No recursion
-\item No static variables
-\item No variable numbers arguments
-\end{itemize}
-
-
-\hfill December 21, 2016
+"..when attempting to achieve an application's maximum
+performance, the primary concern often is managing global memory
+latency." \cite{cuda_optimizations}
 
 \section{Bat Design on CPU}
 
 In this work the bath algorithm used was the one proposed by
-\cite{parpinelli}, since it represents a concrete demonstration of how
-the bat metaheuristic given that the original papers lacks it.
+\autocite{jelson}, since it represents a concrete demonstration of how
+the bat metaheuristic given that the original paper dont show clearly the expected behavior of the algorithm.
 
 Some distinctions of the original paper are worth noticing.
 
-- The selection of new reuslts on the original paper tends to be more greedy (line 14).
+- The selection of new results on the original paper tends to be more greedy (line 14).
 On this paper the or operator were used but in the original one an And were proposed.
-The or operator tends to explore the search space better (more diversitiy).
+The or operator tends to explore the search space better (more diversity).
 
-- There's a distorion on a single dimension of the searchspace in order to increase the diversity factor.
+- There's a distortion on a single dimension of the search space in order to increase the diversity factor.
 
 The CPU version developed was single threaded.
-The random algorithm used was the mersenne twister.
+The random algorithm used was the Mersenne twister.
 
 \begin{figure}
 \begin{algorithmic}[1]
@@ -92,7 +88,7 @@ The random algorithm used was the mersenne twister.
 \State $evaluate\ fitness$
 \State $selects\ best$
 \While {$stop\ criteria\ false$}
-    \For{$each bat$}
+    \For{$each\ bat$}
 
         \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
         \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
@@ -123,6 +119,8 @@ Since the BAT algorithm uses a population of bats, the most intuitive
 parallelization method to apply on it is to use each bat on a GPU core.
 \cite{pso-gpu} used a similar method for a GPU implementation for the PSO algorithm.
 For the GPU version the approach used was the split of each individual in one thread.
+
+In the bat algorithm synchronization must occur on the selection of the best individual of the iteration. The best individual is kept in the threaded memory of the GPU which has a limit of 16KB, not feasible for the most complex problems.
 
 The random number generator used on the GPU was the MTGP32, to
 maintain the compatibility with the CPU version. Notwithstanding it's
@@ -205,7 +203,8 @@ Each experiment was executed a total of 20 times with 10 thousand iterations eac
 
 \section{Results}
 
-Below are described the speedup and convergence results. The time spent in each execution of the algorithms is described in seconds.
+Below are described the speedup and convergence results. The time spent
+in each execution of the algorithms is described in seconds.
 
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
@@ -239,6 +238,10 @@ Below are described the speedup and convergence results. The time spent in each 
     \end{tabular}
 \end{table}
 
+Rosenbrook function had the poorest speedups in relation with the CPU version, this is probably because this function has much float point operations in relation to the others.
+
+The convergence results of the Rosenbrook function are specially worse than the others but it seems to be a problem with the algorithm since it misbehaves equally bad on CPU.
+
 \section{Conclusion}
 
 It was observed speedups with big populations. The original BAT was
@@ -259,7 +262,7 @@ A subpopulation approach may also work, considering each GPU block as it's bound
 
 \bibitem{original}
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
-\bibitem{parpinelli}
+\bibitem{jelson}
     Jelson A. Cordeiro, Rafael Stubs Parpinelli Heitor Silvério Lopes \emph{Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho}.
 \bibitem{pso-gpu}
     PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
@@ -272,7 +275,8 @@ A subpopulation approach may also work, considering each GPU block as it's bound
     Parallel bat algorithm for optimizing makespan in job scheduling problems, Thi-Kien Dao, Tien-Szu Pan, Trong-The Nguyen, Jeng-Shyang Pan,2015, Springer Sience Review
 \bibitem{gpuOptimization}
     Optimization Principles and Application Performance Evaluation of a Multithreaded GPU using Cuda, Shane Ryo
+\bibitem{cuda_optimizations}
+    Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
 
 \end{thebibliography}
-
 \end{document}
