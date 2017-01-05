@@ -21,13 +21,14 @@ Santa Catarina, Joinville
 
 \maketitle
 \begin{abstract}
-The ever increasing parallel processing power of GP's is an attractive
-motive to implement optimization algorithms on this platform. This work
-aimed to develop a GPU version of the bat metaheuristic, a CPU version
-were developed as well, as a way of comparison. A set of experiments where
-made in order to measure the speedup. The research shows that the GPU
-version is able to achieve relevant speedups in highly populational
-problems but for simpler cases the CPU version might outperform GPU.
+The ever increasing parallel processing power of GPU's is an attractive
+motive to implement performance demanding algorithms, like optimization
+techniques, using this approach. This work aimed to develop a GPU
+version of the bat metaheuristic, a CPU version were developed as well,
+as a way of comparison. A set of experiments where made in order to
+measure the speedup. The research shows that the GPU version is able
+to achieve relevant speedups in highly populational problems but for
+simpler cases the CPU version might outperform GPU.
 \end{abstract}
 \IEEEpeerreviewmaketitle
 
@@ -39,11 +40,13 @@ called echolocation, to detect prey, avoid obstacles, and locate their
 roosting crevices in the dark \cite{original}.
 
 All populational meta-heuristic theoretically can benefit from implicit
-parallelization, which is the approach that each individual of the
-populations executes concurrently. The GPU is a great place to run populational algorithms because GPUs are able to
-parallelize high loads of concurrent individuals doing part of the hole
-job.
-For highly parallel general processing application, speedups may vary from 10 to 450 \cite{cuda_optimizations}.
+parallel cation, which is the approach that each individual of the
+populations executes concurrently.
+
+Compute unified device architecture (CUDA)[ ] is a platform to execute software concurrently, it uses a single data
+multiple execution approach.
+
+Previous researches suggests that highly parallel general processing application, speedups may vary from 10 to 450 \cite{cuda_optimizations}.
 
 
 This work attempts to investigate the applicability of the BAT algorithm
@@ -67,7 +70,7 @@ latency." \cite{cuda_optimizations}
 \section{Bat Design on CPU}
 
 In this work the bath algorithm used was the one proposed by
-\autocite{jelson}, since it represents a concrete demonstration of how
+\autocite{Jelson et al.}, since it represents a concrete demonstration of how
 the bat metaheuristic given that the original paper dont show clearly the expected behavior of the algorithm.
 
 Some distinctions of the original paper are worth noticing.
@@ -262,7 +265,7 @@ A subpopulation approach may also work, considering each GPU block as it's bound
 
 \bibitem{original}
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
-\bibitem{jelson}
+\bibitem{Jelson et al.}
     Jelson A. Cordeiro, Rafael Stubs Parpinelli Heitor Silvério Lopes \emph{Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho}.
 \bibitem{pso-gpu}
     PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
