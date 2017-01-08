@@ -1,7 +1,10 @@
 #include "bat.h"
 #include <math.h>
+#include <time.h>
 #include <stdarg.h>
-#include "mersenne.h"
+#include <inttypes.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 extern const int LOG_OBJECTIVE_ENABLED;
 extern const int LOG_ATRIBUTES_ENABLED;
@@ -118,12 +121,23 @@ double ackley(double solution[], int dimensions)
 
 void my_seed(void)
 {
-    MT_seed();
+}
+
+uint32_t xorwow() {
+  static uint32_t x = 123456789, y = 362436069, z = 521288629, w = 88675123,
+                  v = 5783321, d = 6615241;
+  uint32_t t = (x ^ (x >> 2));
+  x = y;
+  y = z;
+  z = w;
+  w = v;
+  v = (v ^ (v << 4)) ^ (t ^ (t << 1));
+  return (d += 362437) + v;
 }
 
 double my_rand(int min, int max)
 {
-    double result = (double)min + ((max - min)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
+    double result = (double)min + ((max - min)*(double)xorwow()/(RAND_MAX+1.0));
 
     return result;
 }

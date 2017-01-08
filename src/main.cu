@@ -3,10 +3,6 @@
 #include <curand.h>
 #include <curand_kernel.h>
 #include <time.h>
-/* include MTGP host helper functions */
-#include <curand_mtgp32_host.h>
-/* include MTGP pre-computed parameter sets */
-#include <curand_mtgp32dc_p_11213.h>
 
 enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
 
@@ -21,8 +17,7 @@ enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
 #define BATS_COUNT 256
 #define DIMENSIONS 100
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
-
+const int EVALUTAION_FUNCTION = GRIEWANK;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;
@@ -90,7 +85,6 @@ __device__ double ackley(double solution[], int dimensions)
     }
 
     //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1);
-    result = 666;
 
     return result;
 }
@@ -157,7 +151,7 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
 }
 
 
-__device__ double  my_rand(curandStateMtgp32 *state, double min, double max)
+__device__ double  my_rand(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
     myrandf *= (max - min );
@@ -167,7 +161,7 @@ __device__ double  my_rand(curandStateMtgp32 *state, double min, double max)
 }
 
 
-__device__ int my_rand_int(curandStateMtgp32 *state, double min, double max)
+__device__ int my_rand_int(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
     myrandf *= (max - min );
@@ -205,7 +199,7 @@ __device__ void initialize_function(void)
             break;
     }
 }
-__global__ void run_bats(curandStateMtgp32 *state, unsigned int seed, struct bat *bats, struct bat *candidates)
+__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates)
 {
     initialize_function();
     //curand_init(seed, threadIdx.x, 0, &state);
@@ -307,18 +301,10 @@ int main(void)
     struct bat *candidates;
     cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
     cudaMalloc((void **)&candidates, sizeof(struct bat) * BATS_COUNT);
+    curandState *deviceStates;
+    cudaMalloc((void **)&deviceStates, BATS_COUNT *sizeof(curandState));
 
-
-    curandStateMtgp32 *devMTGPStates;
-    mtgp32_kernel_params *devKernelParams;
-    cudaMalloc((void **)&devMTGPStates, 64 * 
-                          sizeof(curandStateMtgp32));
-    cudaMalloc((void**)&devKernelParams, sizeof(mtgp32_kernel_params));
-    curandMakeMTGP32Constants(mtgp32dc_params_fast_11213, devKernelParams);
-    curandMakeMTGP32KernelState(devMTGPStates, 
-    mtgp32dc_params_fast_11213, devKernelParams, 64, 1234);
-
-    run_bats<<<1,BATS_COUNT>>>(devMTGPStates, time(NULL), bats, candidates);
+    run_bats<<<1,BATS_COUNT>>>(deviceStates, time(NULL), bats, candidates);
     cudaFree(bats);
 
     cudaError_t cudaerr = cudaDeviceSynchronize();

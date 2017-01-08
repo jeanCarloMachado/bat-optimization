@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include "bat.h"
+
 #define ALFA 0.5
 #define LAMBDA 0.1
 
@@ -19,7 +20,7 @@
 #define DIMENSIONS 100
 
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = GRIEWANK;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
