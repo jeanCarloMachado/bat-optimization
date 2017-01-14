@@ -1,22 +1,57 @@
 #!/bin/bash
 
-cmd="./bat"
-device=cPU
-total=20
+[ -z ${1+x} ] || [[ ! $1 =~ (CPU|GPU) ]] && {
+    echo " You must pass if you want to build for GPU or CPU"
+    exit 1
+}
+
+
+device="CPU"
+total=${TOTAL:-20}
 date=$(date "+%Y-%m-%d_%H-%M-%S")
-mkdir -p "experiments/$date"_"$device"
+directory="experiments/$date"_"$device"
+mkdir -p $directory
 fitnessFile="experiments/$date"_"$device/fitness"
 outputFile="experiments/$date"_"$device/output"
+all_output="experiments/$date"_"$device/all_output"
 timeFile="experiments/$date"_"$device/timefile"
 
+echo "Directory: $directory"
+
+[ $device == "CPU" ] && {
+    make
+} || {
+    make gpu
+}
+
 for i in $(seq 1 $total); do
-    $cmd > $outputFile
+
+    [ $device == "CPU" ] && {
+        ./bat > $outputFile
+    } || {
+        ./bat_gpu > $outputFile
+    }
+
     cat $outputFile | grep "Fitnes" | cut -d":" -f2  | tr -d " " >> $fitnessFile
     cat $outputFile | grep "Time" | cut -d":" -f2 | tr -d " " >> $timeFile
+    cat $outputFile >> $all_output
 done
 
-echo "$device Fitness Average:"
-awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile
 
-echo "$device time Average:"
-awk "{s+=\$1} END {s/=$total; print s}" $timeFile
+echo "Function name: "$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
+
+fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
+echo "$device Fitness Average: $fitness_average"
+
+
+standard_deviation=$(awk "{s+=((\$1-$fitness_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $fitnessFile)
+echo "$device fitness standard deviation $standard_deviation"
+
+
+time_average=$(awk "{s+=\$1} END {s/=$total; print s}" $timeFile)
+echo "$device time Average: $time_average"
+
+standard_deviation=$(awk "{s+=((\$1-$time_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $timeFile)
+echo "$device time standard deviation $standard_deviation"
+
+rm -rf $outputFile
