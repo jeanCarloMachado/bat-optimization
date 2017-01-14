@@ -43,9 +43,11 @@ All populational meta-heuristics theoretically are able to benefit from
 implicit parallelization, which is the approach that each individual of
 the population executes concurrently.
 
-Compute unified device architecture (CUDA) is a platform to execute software concurrently, It uses a single data
-multiple execution approach.
-Previous researches suggests that highly parallel general processing application, speedups may vary from 10 to 450 \cite{cuda_optimizations}.
+Compute unified device architecture (CUDA) is a platform to execute
+software concurrently, It uses a single data multiple execution
+approach. Previous researches suggests that highly parallel
+general processing application, speedups may vary from 10 to 450
+\cite{cuda_optimizations}.
 
 This work attempts to investigate the applicability of the BAT algorithm
 concurrently on the GPU. Previously some demonstrations of the bat
@@ -55,11 +57,12 @@ implementation of the bat algorithm was found for GPU.
 
 \section{The CUDA platform}
 
-The CUDA platform uses a parallelization schema in "each cuda device supports the Single-Program Multiple-Data (SPMD)" \cite{cuda_optimizations}, where all concurrent threads are based on the same code but they may follow different paths.
-
+The CUDA platform uses a parallelization schema in "each cuda
+device supports the Single-Program Multiple-Data (SPMD)"
+\cite{cuda_optimizations}, where all concurrent threads are based on the
+same code but they may follow different paths.
 
 A good approach is to use the threaded model since it has the great benefit in performance.
-
 
 "..when attempting to achieve an application's maximum
 performance, the primary concern often is managing global memory
@@ -220,7 +223,7 @@ time spent in each execution of the algorithms is described in seconds.
         \bf Name & Time CPU & Time GPU & Speedup\\
     \hline
         E1 & 57.3774 & ?? & ?? \\
-        E3 & 54.6234 & 20.2427 & 2.6984 \\
+        E3 & 48.8477 & 20.2427 & 2.6984 \\
         E5 & 42.3531 & 32.1898 & 1.3157 \\
         E7 & 24.7752 & 26.4898 & 0.9352 \\
     \end{tabular}
@@ -236,7 +239,7 @@ time spent in each execution of the algorithms is described in seconds.
         \bf Name & Fitness CPU & Fitness GPU \\
     \hline
         E1 & 1.69691e-06 & ?? \\
-        E3 & 8.34383e-13 &  2.0095e-15  \\
+        E3 & 0 &  2.0095e-15  \\
         E5 & 6.50132e-07 & 0 \\
         E7 & 93.884 & 96.7034 & \\
     \end{tabular}
