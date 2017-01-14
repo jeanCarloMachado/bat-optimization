@@ -3,31 +3,18 @@
 #include <curand.h>
 #include <curand_kernel.h>
 #include <time.h>
-/* include MTGP host helper functions */
-#include <curand_mtgp32_host.h>
-/* include MTGP pre-computed parameter sets */
-#include <curand_mtgp32dc_p_11213.h>
-
-enum {ROSENBROOK, SPHERE, SCHWEFEL, ACKLEY, RASTRINGIN, GRIEWANK, SHUBER};
+extern "C" {
+#include "bat.h"
+}
 
 #define LAMBDA 0.1
 #define ALFA 0.5
-
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-
 #define ITERATIONS 10000
 #define BATS_COUNT 256
 #define DIMENSIONS 100
-
-const int EVALUTAION_FUNCTION = ROSENBROOK;
-
-
-__device__ int BOUNDRY_MAX;
-__device__ int BOUNDRY_MIN;
-__device__ int FREQUENCY_MIN;
-__device__ int FREQUENCY_MAX;
 
 struct bat {
     //tends towards 1
@@ -40,10 +27,14 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
+const int EVALUTAION_FUNCTION = SPHERE;
+
+__device__ int BOUNDRY_MAX;
+__device__ int BOUNDRY_MIN;
+__device__ int FREQUENCY_MIN;
+__device__ int FREQUENCY_MAX;
+
 __device__ double (*objective_function)(double[], int);
-
-
-
 __device__ double griewank(double solution[], int dimensions)
 {
     double total = 0;
@@ -60,8 +51,6 @@ __device__ double griewank(double solution[], int dimensions)
 
     return total;
 }
-
-
 
 __device__ double rastringin (double solution[], int dimensions)
 {
@@ -90,7 +79,6 @@ __device__ double ackley(double solution[], int dimensions)
     }
 
     //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1);
-    result = 666;
 
     return result;
 }
@@ -147,9 +135,6 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
     for (int i = 0; i < dimensions; i++) {
         position_average+=bat->position[i];
     }
-    /* printf("Frequency: %f\n", bat->frequency); */
-    /* printf("Pulse-rate: %f\n", bat->pulse_rate); */
-    /* printf("Loudness: %f\n", bat->loudness); */
     printf("ITERATIONS: %d\n", ITERATIONS);
     printf("BATS_COUNT: %d\n", BATS_COUNT);
     printf("DIMENSIONS: %d\n", DIMENSIONS);
@@ -157,7 +142,7 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
 }
 
 
-__device__ double  my_rand(curandStateMtgp32 *state, double min, double max)
+__device__ double  my_rand(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
     myrandf *= (max - min );
@@ -167,7 +152,7 @@ __device__ double  my_rand(curandStateMtgp32 *state, double min, double max)
 }
 
 
-__device__ int my_rand_int(curandStateMtgp32 *state, double min, double max)
+__device__ int my_rand_int(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
     myrandf *= (max - min );
@@ -205,24 +190,26 @@ __device__ void initialize_function(void)
             break;
     }
 }
-__global__ void run_bats(curandStateMtgp32 *state, unsigned int seed, struct bat *bats, struct bat *candidates)
+__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates)
 {
-    initialize_function();
-    //curand_init(seed, threadIdx.x, 0, &state);
+    int id = threadIdx.x + blockIdx.x;
+    curand_init(seed, threadIdx.x, 0, &state[id]);
 
     __shared__ struct bat *best;
     __shared__ int iteration;
     __shared__ double loudness_average;
     best = (struct bat *) malloc(sizeof(struct bat));
 
-
     loudness_average = 1.0;
     bats[threadIdx.x].pulse_rate = 0.0;
     bats[threadIdx.x].frequency = 0.0;
     bats[threadIdx.x].loudness = INITIAL_LOUDNESS;
+
+
     for (int j = 0; j < DIMENSIONS; j++) {
         bats[threadIdx.x].velocity[j] = 0;
         bats[threadIdx.x].position[j] = my_rand(state, BOUNDRY_MIN, BOUNDRY_MAX);
+
     }
 
     bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, DIMENSIONS);
@@ -280,7 +267,6 @@ __global__ void run_bats(curandStateMtgp32 *state, unsigned int seed, struct bat
             candidates[threadIdx.x].fitness = objective_function(candidates[threadIdx.x].position, DIMENSIONS);
 
             if (my_rand(state, 0.0,1.0) < bats[threadIdx.x].loudness || candidates[threadIdx.x].fitness < bats[threadIdx.x].fitness) {
-                /* printf("I: %d\n", iteration); */
                 copy_bat(&candidates[threadIdx.x], &bats[threadIdx.x]);
                 bats[threadIdx.x].pulse_rate = 1 - exp(-LAMBDA*iteration);
                 bats[threadIdx.x].loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
@@ -289,6 +275,8 @@ __global__ void run_bats(curandStateMtgp32 *state, unsigned int seed, struct bat
             loudness_average+=bats[threadIdx.x].loudness;
             __syncthreads();
             get_best(bats, best);
+            //printf("Fitness %f\n", bats[threadIdx.x].fitness);
+            //printf("Fitness %f", best->fitness);
             loudness_average/= BATS_COUNT;
 
             iteration++;
@@ -299,27 +287,26 @@ __global__ void run_bats(curandStateMtgp32 *state, unsigned int seed, struct bat
     }
 }
 
-
-int main(void)
+int main(int argc, char **argv)
 {
     clock_t begin = clock();
     struct bat *bats;
     struct bat *candidates;
-    cudaMalloc((void **)&bats, sizeof(struct bat) * BATS_COUNT);
-    cudaMalloc((void **)&candidates, sizeof(struct bat) * BATS_COUNT);
+
+    int size_of_bats = BATS_COUNT * sizeof(struct bat) ;
+
+    cudaMalloc((void **)&bats, size_of_bats);
+    cudaMalloc((void **)&candidates, size_of_bats);
 
 
-    curandStateMtgp32 *devMTGPStates;
-    mtgp32_kernel_params *devKernelParams;
-    cudaMalloc((void **)&devMTGPStates, 64 * 
-                          sizeof(curandStateMtgp32));
-    cudaMalloc((void**)&devKernelParams, sizeof(mtgp32_kernel_params));
-    curandMakeMTGP32Constants(mtgp32dc_params_fast_11213, devKernelParams);
-    curandMakeMTGP32KernelState(devMTGPStates, 
-    mtgp32dc_params_fast_11213, devKernelParams, 64, 1234);
+    curandState *deviceStates;
+    cudaMalloc((void **)&deviceStates, BATS_COUNT *sizeof(curandState));
 
-    run_bats<<<1,BATS_COUNT>>>(devMTGPStates, time(NULL), bats, candidates);
+    run_bats<<<1,BATS_COUNT>>>(deviceStates, time(NULL), bats, candidates);
+
+
     cudaFree(bats);
+    cudaFree(candidates);
 
     cudaError_t cudaerr = cudaDeviceSynchronize();
     if (cudaerr != cudaSuccess)
@@ -328,7 +315,8 @@ int main(void)
 
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Time took: %f\n", time_spent);
+    printf("Function %s\n", get_function_name(EVALUTAION_FUNCTION));
+    printf("Time took GPU: %f\n", time_spent);
     return 0;
 }
 
