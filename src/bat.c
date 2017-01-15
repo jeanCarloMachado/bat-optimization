@@ -17,6 +17,8 @@
 #define BATS_COUNT 256
 #define DIMENSIONS 100
 
+const int EVALUTAION_FUNCTION = ROSENBROOK;
+
 struct bat {
     //tends towards 1
     double pulse_rate;
@@ -28,7 +30,6 @@ struct bat {
     double *velocity;
 };
 
-const int EVALUTAION_FUNCTION = ACKLEY;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
@@ -42,7 +43,6 @@ int SECOND_SEED;
 
 int BOUNDRY_SCAPE_COUNT = 0;
 int BOUNDRY_COUNT = 0;
-
 
 double (*objective_function)(double[], int);
 void log_bat_stdout(struct bat *bat, int dimensions);

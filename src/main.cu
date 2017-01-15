@@ -16,6 +16,8 @@ extern "C" {
 #define BATS_COUNT 256
 #define DIMENSIONS 100
 
+const int EVALUTAION_FUNCTION = ROSENBROOK;
+
 #define CUDA_CALL(cuda_function, ...)  { \
     cudaError_t status = cuda_function(__VA_ARGS__); \
     cudaEnsureSuccess(status, #cuda_function, false, __FILE__, __LINE__); \
@@ -39,7 +41,7 @@ bool cudaEnsureSuccess(cudaError_t status, const char* status_context_descriptio
         fprintf(stderr, "(Unknown CUDA status code %i", status);
     }
 
-    fprintf(stderr, "Filename: %s, Line: %i", filename, line_number);
+    fprintf(stderr, "Filename: %s, Line: %i\n", filename, line_number);
 
     if(die_on_error) {
         exit(EXIT_FAILURE);
@@ -58,7 +60,6 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-const int EVALUTAION_FUNCTION = RASTRINGIN;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;
@@ -109,7 +110,7 @@ __device__ double ackley(double solution[], int dimensions)
         aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1.0);
+    //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1.0);
 
     return result;
 }
@@ -176,6 +177,8 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
 __device__ double  my_rand(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
+    //float myrandf = 666.0;
+
     myrandf *= (max - min );
     myrandf += min;
 
@@ -223,8 +226,10 @@ __device__ void initialize_function(void)
 }
 __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates)
 {
-    int id = threadIdx.x + blockIdx.x;
-    curand_init(seed, threadIdx.x, 0, &state[id]);
+    initialize_function();
+    int id = threadIdx.x + blockIdx.x * 64;
+    curand_init(seed, id, 0, &state[id]);
+    curandState localState = state[id];
 
     __shared__ struct bat *best;
     __shared__ int iteration;
@@ -239,20 +244,20 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
 
     for (int j = 0; j < DIMENSIONS; j++) {
         bats[threadIdx.x].velocity[j] = 0;
-        bats[threadIdx.x].position[j] = my_rand(state, BOUNDRY_MIN, BOUNDRY_MAX);
+        bats[threadIdx.x].position[j] = my_rand(&localState, BOUNDRY_MIN, BOUNDRY_MAX);
 
     }
 
     bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, DIMENSIONS);
 
-    __syncthreads();
+     __syncthreads();
 
     get_best(bats, best);
 
     iteration = 0;
     while(iteration < ITERATIONS) {
             //frequency
-            double beta = my_rand(state, BETA_MIN, BETA_MAX);
+            double beta = my_rand(&localState, BETA_MIN, BETA_MAX);
             beta = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 
             bats[threadIdx.x].frequency = beta;
@@ -282,21 +287,21 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
             }
 
             //local search
-            if (my_rand(state, 0.0, 1.0) < candidates[threadIdx.x].pulse_rate) {
+            if (my_rand(&localState, 0.0, 1.0) < candidates[threadIdx.x].pulse_rate) {
                 for (int i = 0; i < DIMENSIONS; i++ ) {
-                    candidates[threadIdx.x].position[i] = best->position[i] +  loudness_average * my_rand(state, -1.0, 1.0);
+                    candidates[threadIdx.x].position[i] = best->position[i] +  loudness_average * my_rand(&localState, -1.0, 1.0);
                 }
             }
 
             //position perturbation
-            int dimension = my_rand_int(state, 0, DIMENSIONS);
-            candidates[threadIdx.x].position[dimension] = candidates[threadIdx.x].position[dimension] * my_rand(state, 0.0,1.0);
+            int dimension = my_rand_int(&localState, 0, DIMENSIONS);
+            candidates[threadIdx.x].position[dimension] = candidates[threadIdx.x].position[dimension] * my_rand(&localState, 0.0,1.0);
 
 
             bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, DIMENSIONS);
             candidates[threadIdx.x].fitness = objective_function(candidates[threadIdx.x].position, DIMENSIONS);
 
-            if (my_rand(state, 0.0,1.0) < bats[threadIdx.x].loudness || candidates[threadIdx.x].fitness < bats[threadIdx.x].fitness) {
+            if (my_rand(&localState, 0.0,1.0) < bats[threadIdx.x].loudness || candidates[threadIdx.x].fitness < bats[threadIdx.x].fitness) {
                 copy_bat(&candidates[threadIdx.x], &bats[threadIdx.x]);
                 bats[threadIdx.x].pulse_rate = 1 - exp(-LAMBDA*iteration);
                 bats[threadIdx.x].loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
@@ -316,7 +321,7 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
         log_bat_stdout(best, DIMENSIONS);
     }
 
-    free(best);
+    __syncthreads();
 }
 
 int main(int argc, char **argv)
@@ -324,7 +329,6 @@ int main(int argc, char **argv)
     clock_t begin = clock();
     struct bat *bats;
     struct bat *candidates;
-
     int size_of_bats = BATS_COUNT * sizeof(struct bat) ;
 
     CUDA_CALL(cudaMalloc, (void **)&bats, size_of_bats);
@@ -332,17 +336,19 @@ int main(int argc, char **argv)
 
 
     curandState *deviceStates;
-    cudaMalloc((void **)&deviceStates, BATS_COUNT *sizeof(curandState));
+    CUDA_CALL(cudaMalloc, (void **)&deviceStates, BATS_COUNT *sizeof(curandState));
 
     run_bats<<<1,BATS_COUNT>>>(deviceStates, time(NULL), bats, candidates);
 
     CUDA_CALL(cudaDeviceSynchronize);
     CUDA_CALL(cudaFree, bats);
     CUDA_CALL(cudaFree, candidates);
+    CUDA_CALL(cudaFree, deviceStates);
 
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Function %s\n", get_function_name(EVALUTAION_FUNCTION));
     printf("Time took GPU: %f\n", time_spent);
+
     return 0;
 }
