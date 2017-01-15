@@ -16,6 +16,37 @@ extern "C" {
 #define BATS_COUNT 256
 #define DIMENSIONS 100
 
+#define CUDA_CALL(cuda_function, ...)  { \
+    cudaError_t status = cuda_function(__VA_ARGS__); \
+    cudaEnsureSuccess(status, #cuda_function, false, __FILE__, __LINE__); \
+}
+
+bool cudaEnsureSuccess(cudaError_t status, const char* status_context_description,
+        bool die_on_error, const char* filename, unsigned line_number) {
+    if (status_context_description == NULL)
+        status_context_description = "";
+    if (status == cudaSuccess) {
+        return true;
+    }
+    const char* errorString = cudaGetErrorString(status);
+    fprintf(stderr, "CUDA Error: ");
+    if (status_context_description != NULL) {
+        fprintf(stderr, "%s\n", status_context_description);
+    }
+    if (errorString != NULL) {
+        fprintf(stderr,"%s\n", errorString);
+    } else {
+        fprintf(stderr, "(Unknown CUDA status code %i", status);
+    }
+
+    fprintf(stderr, "Filename: %s, Line: %i", filename, line_number);
+
+    if(die_on_error) {
+        exit(EXIT_FAILURE);
+    }
+    return false;
+}
+
 struct bat {
     //tends towards 1
     double pulse_rate;
@@ -27,7 +58,7 @@ struct bat {
     double velocity[DIMENSIONS];
 };
 
-const int EVALUTAION_FUNCTION = SPHERE;
+const int EVALUTAION_FUNCTION = RASTRINGIN;
 
 __device__ int BOUNDRY_MAX;
 __device__ int BOUNDRY_MIN;
@@ -78,7 +109,7 @@ __device__ double ackley(double solution[], int dimensions)
         aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1);
+    result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1.0);
 
     return result;
 }
@@ -257,7 +288,6 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
                 }
             }
 
-
             //position perturbation
             int dimension = my_rand_int(state, 0, DIMENSIONS);
             candidates[threadIdx.x].position[dimension] = candidates[threadIdx.x].position[dimension] * my_rand(state, 0.0,1.0);
@@ -285,6 +315,8 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
     if (threadIdx.x == 0) {
         log_bat_stdout(best, DIMENSIONS);
     }
+
+    free(best);
 }
 
 int main(int argc, char **argv)
@@ -295,8 +327,8 @@ int main(int argc, char **argv)
 
     int size_of_bats = BATS_COUNT * sizeof(struct bat) ;
 
-    cudaMalloc((void **)&bats, size_of_bats);
-    cudaMalloc((void **)&candidates, size_of_bats);
+    CUDA_CALL(cudaMalloc, (void **)&bats, size_of_bats);
+    CUDA_CALL(cudaMalloc, (void **)&candidates, size_of_bats);
 
 
     curandState *deviceStates;
@@ -304,14 +336,9 @@ int main(int argc, char **argv)
 
     run_bats<<<1,BATS_COUNT>>>(deviceStates, time(NULL), bats, candidates);
 
-
-    cudaFree(bats);
-    cudaFree(candidates);
-
-    cudaError_t cudaerr = cudaDeviceSynchronize();
-    if (cudaerr != cudaSuccess)
-        printf("kernel launch failed with error \"%s\".\n",
-               cudaGetErrorString(cudaerr));
+    CUDA_CALL(cudaDeviceSynchronize);
+    CUDA_CALL(cudaFree, bats);
+    CUDA_CALL(cudaFree, candidates);
 
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -319,4 +346,3 @@ int main(int argc, char **argv)
     printf("Time took GPU: %f\n", time_spent);
     return 0;
 }
-
