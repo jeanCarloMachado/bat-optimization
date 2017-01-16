@@ -11,7 +11,6 @@ source:
 
 run_cpu: source
 	./bat
-	./post-run
 
 gpu:
 	nvcc -c src/common.c -Wno-deprecated-gpu-targets 
@@ -19,7 +18,6 @@ gpu:
 
 run_gpu: gpu
 	./bat_gpu
-	./post-run
 
 device_info:
 	nvcc src/inspect_device.cu -o ls_device
