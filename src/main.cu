@@ -13,10 +13,10 @@ extern "C" {
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
 #define ITERATIONS 10000
-#define BATS_COUNT 256
+#define BATS_COUNT 768
 #define DIMENSIONS 100
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = ACKLEY;
 
 #define CUDA_CALL(cuda_function, ...)  { \
     cudaError_t status = cuda_function(__VA_ARGS__); \
@@ -110,7 +110,7 @@ __device__ double ackley(double solution[], int dimensions)
         aux1 += cos(2.0*M_PI*solution[i]);
     }
 
-    //result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1.0);
+    result = -20.0*(exp(-0.2*sqrt(1.0/(float)dimensions*aux)))-exp(1.0/(float)dimensions*aux1)+20.0+exp(1.0);
 
     return result;
 }
@@ -177,7 +177,6 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
 __device__ double  my_rand(curandState *state, double min, double max)
 {
     float myrandf = curand_uniform(&state[blockIdx.x]);
-    //float myrandf = 666.0;
 
     myrandf *= (max - min );
     myrandf += min;

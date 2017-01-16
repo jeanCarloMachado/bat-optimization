@@ -18,7 +18,7 @@ timeFile="experiments/$date"_"$device/timefile"
 echo "Directory: $directory"
 
 if [ $device = "CPU" ]; then
-    make
+    make cpu
 else
     make gpu
 fi

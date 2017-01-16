@@ -9,7 +9,7 @@ source:
 	${CC} ${DEBUG} -c src/common.c 
 	${CC} ${DEBUG} bat.o common.o  src/main.c -lm -o bat 
 
-run: source
+run_cpu: source
 	./bat
 	./post-run
 

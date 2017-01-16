@@ -14,10 +14,10 @@
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
 #define ITERATIONS 10000
-#define BATS_COUNT 256
+#define BATS_COUNT 768
 #define DIMENSIONS 100
 
-const int EVALUTAION_FUNCTION = ROSENBROOK;
+const int EVALUTAION_FUNCTION = ACKLEY;
 
 struct bat {
     //tends towards 1
