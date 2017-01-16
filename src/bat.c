@@ -69,12 +69,6 @@ int RUN_TIME;
 
 double shuber (double solution[], int dimensions)
 {
-    /*
-       -   Domain  |x| <= 10.0
-       -   Number of local minimum = 400
-       -   Global minimum fmin = -24.062499 at the ff. points
-       -    (-6.774576, -6.774576), ..., (5.791794, 5.791794)
-       */
     double sum = 0.0;
     for (int i = 0; i < dimensions; i++) {
         sum += -sin(2.0*solution[i]+1.0)

@@ -12,10 +12,12 @@ extern "C" {
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define ITERATIONS 10000
-#define BATS_COUNT 768
 #define DIMENSIONS 100
 
+int iterations = 10000;
+int bats_count = 768;
+__device__ int dbats_count;
+__device__ int diterations;
 const int EVALUTAION_FUNCTION = ACKLEY;
 
 #define CUDA_CALL(cuda_function, ...)  { \
@@ -151,7 +153,7 @@ __device__ void  get_best(struct bat *bats, struct bat *best)
 
     current_best_val = bats[0].fitness;
     best_indice = 0;
-    for (int i = 0; i < BATS_COUNT; i++) {
+    for (int i = 0; i < dbats_count; i++) {
         if (bats[i].fitness < current_best_val) {
             current_best_val = bats[i].fitness;
             best_indice = i;
@@ -167,8 +169,8 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
     for (int i = 0; i < dimensions; i++) {
         position_average+=bat->position[i];
     }
-    printf("ITERATIONS: %d\n", ITERATIONS);
-    printf("BATS_COUNT: %d\n", BATS_COUNT);
+    printf("ITERATIONS: %d\n", diterations);
+    printf("BATS_COUNT: %d\n", dbats_count);
     printf("DIMENSIONS: %d\n", DIMENSIONS);
     printf("Fitness E: %E\n", bat->fitness);
 }
@@ -223,8 +225,10 @@ __device__ void initialize_function(void)
             break;
     }
 }
-__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates)
+__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates, int iterations, int bats_count)
 {
+    dbats_count = bats_count;
+    diterations = iterations;
     initialize_function();
     int id = threadIdx.x + blockIdx.x * 64;
     curand_init(seed, id, 0, &state[id]);
@@ -254,7 +258,7 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
     get_best(bats, best);
 
     iteration = 0;
-    while(iteration < ITERATIONS) {
+    while(iteration < iterations) {
             //frequency
             double beta = my_rand(&localState, BETA_MIN, BETA_MAX);
             beta = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
@@ -309,9 +313,7 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
             loudness_average+=bats[threadIdx.x].loudness;
             __syncthreads();
             get_best(bats, best);
-            //printf("Fitness %f\n", bats[threadIdx.x].fitness);
-            //printf("Fitness %f", best->fitness);
-            loudness_average/= BATS_COUNT;
+            loudness_average/= dbats_count;
 
             iteration++;
     }
@@ -326,18 +328,38 @@ __global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats
 int main(int argc, char **argv)
 {
     clock_t begin = clock();
+    char *HELP = "--help";
+
+    if (argc > 1 && strcmp(argv[1], HELP) == 0) {
+        printf("The GPU version of the BAT algorithm");
+        return 0;
+    }
+
+    char* sIterations;
+    sIterations = getenv("ITERATIONS");
+    if (sIterations != NULL) {
+        iterations = atoi(sIterations);
+    }
+
+    char* sBatsCount;
+    sBatsCount = getenv("BATS_COUNT");
+    if (sBatsCount != NULL) {
+        bats_count = atoi(sBatsCount);
+    }
+
+
     struct bat *bats;
     struct bat *candidates;
-    int size_of_bats = BATS_COUNT * sizeof(struct bat) ;
+    int size_of_bats = bats_count * sizeof(struct bat) ;
 
     CUDA_CALL(cudaMalloc, (void **)&bats, size_of_bats);
     CUDA_CALL(cudaMalloc, (void **)&candidates, size_of_bats);
 
 
     curandState *deviceStates;
-    CUDA_CALL(cudaMalloc, (void **)&deviceStates, BATS_COUNT *sizeof(curandState));
+    CUDA_CALL(cudaMalloc, (void **)&deviceStates, bats_count *sizeof(curandState));
 
-    run_bats<<<1,BATS_COUNT>>>(deviceStates, time(NULL), bats, candidates);
+    run_bats<<<1,bats_count>>>(deviceStates, time(NULL), bats, candidates, iterations, bats_count);
 
     CUDA_CALL(cudaDeviceSynchronize);
     CUDA_CALL(cudaFree, bats);
