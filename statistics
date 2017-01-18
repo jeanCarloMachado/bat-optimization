@@ -15,13 +15,13 @@ outputFile="experiments/$date"_"$device/output"
 all_output="experiments/$date"_"$device/all_output"
 timeFile="experiments/$date"_"$device/timefile"
 [ -z ${ITERATIONS+x} ] && {
-    export ITERATIONS=10001
+    export ITERATIONS=10000
 }
 
 export ITERATIONS
 
 [ -z ${BATS_COUNT+x} ] && {
-    export BATS_COUNT=769
+    export BATS_COUNT=768
 }
 export BATS_COUNT
 

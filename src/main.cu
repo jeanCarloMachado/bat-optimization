@@ -174,6 +174,7 @@ __device__ void log_bat_stdout(struct bat *bat, int dimensions)
     printf("ITERATIONS: %d\n", diterations);
     printf("BATS_COUNT: %d\n", dbats_count);
     printf("DIMENSIONS: %d\n", DIMENSIONS);
+    printf("POPULATION: %d\n", dbats_count);
     printf("Fitness E: %E\n", bat->fitness);
 }
 
