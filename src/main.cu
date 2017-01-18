@@ -16,9 +16,11 @@ extern "C" {
 
 int iterations = 10000;
 int bats_count = 768;
+int evaluation_function = ACKLEY;
+
+__device__ int devaluation_function;
 __device__ int dbats_count;
 __device__ int diterations;
-const int EVALUTAION_FUNCTION = ACKLEY;
 
 #define CUDA_CALL(cuda_function, ...)  { \
     cudaError_t status = cuda_function(__VA_ARGS__); \
@@ -197,7 +199,7 @@ __device__ int my_rand_int(curandState *state, double min, double max)
 
 __device__ void initialize_function(void)
 {
-    switch(EVALUTAION_FUNCTION) {
+    switch(devaluation_function) {
         case SPHERE:
             BOUNDRY_MIN = 0.0;
             BOUNDRY_MAX = 100.0;
@@ -225,9 +227,10 @@ __device__ void initialize_function(void)
             break;
     }
 }
-__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates, int iterations, int bats_count)
+__global__ void run_bats(curandState *state, unsigned int seed, struct bat *bats, struct bat *candidates, int iterations, int bats_count, int evaluation_function)
 {
     dbats_count = bats_count;
+    devaluation_function = evaluation_function;
     diterations = iterations;
     initialize_function();
     int id = threadIdx.x + blockIdx.x * 64;
@@ -331,7 +334,24 @@ int main(int argc, char **argv)
     char *HELP = "--help";
 
     if (argc > 1 && strcmp(argv[1], HELP) == 0) {
-        printf("The GPU version of the BAT algorithm");
+        printf("The GPU version of the BAT algorithm\
+                You may optionally pass the given variables:\
+                ITERATIONS=1000\
+                BATS_COUNT=1000\
+                FUNCTION_NUM=1\
+\
+                where FUNCTION_NUM can be one of the following:\
+\
+                0 ROSENBROOK,\
+                1 SPHERE,\
+                2 SCHWEFEL,\
+                3 ACKLEY,\
+                4 RASTRINGIN,\
+                5 GRIEWANK,\
+                6 SHUBER\
+\
+                ");
+
         return 0;
     }
 
@@ -348,6 +368,13 @@ int main(int argc, char **argv)
     }
 
 
+    char* sEvaluationFunction;
+    sEvaluationFunction = getenv("EVALUATION_FUNCTION");
+    if (sEvaluationFunction != NULL) {
+        evaluation_function = atoi(sEvaluationFunction);
+    }
+
+
     struct bat *bats;
     struct bat *candidates;
     int size_of_bats = bats_count * sizeof(struct bat) ;
@@ -359,7 +386,7 @@ int main(int argc, char **argv)
     curandState *deviceStates;
     CUDA_CALL(cudaMalloc, (void **)&deviceStates, bats_count *sizeof(curandState));
 
-    run_bats<<<1,bats_count>>>(deviceStates, time(NULL), bats, candidates, iterations, bats_count);
+    run_bats<<<1,bats_count>>>(deviceStates, time(NULL), bats, candidates, iterations, bats_count, evaluation_function);
 
     CUDA_CALL(cudaDeviceSynchronize);
     CUDA_CALL(cudaFree, bats);
@@ -368,7 +395,7 @@ int main(int argc, char **argv)
 
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Function %s\n", get_function_name(EVALUTAION_FUNCTION));
+    printf("Function %s\n", get_function_name(evaluation_function));
     printf("Time took GPU: %f\n", time_spent);
 
     return 0;

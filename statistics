@@ -6,7 +6,7 @@
 }
 
 device=$1
-total=${TOTAL:-20}
+total=${TOTAL:-2}
 date=$(date "+%Y-%m-%d_%H-%M-%S")
 directory="experiments/$date"_"$device"
 mkdir -p $directory
@@ -14,6 +14,21 @@ fitnessFile="experiments/$date"_"$device/fitness"
 outputFile="experiments/$date"_"$device/output"
 all_output="experiments/$date"_"$device/all_output"
 timeFile="experiments/$date"_"$device/timefile"
+[ -z ${ITERATIONS+x} ] && {
+    export ITERATIONS=10001
+}
+
+export ITERATIONS
+
+[ -z ${BATS_COUNT+x} ] && {
+    export BATS_COUNT=769
+}
+export BATS_COUNT
+
+[ -z ${EVALUATION_FUNCTION+x} ] && {
+    export EVALUATION_FUNCTION=1
+}
+export EVALUATION_FUNCTION
 
 echo "Directory: $directory"
 
@@ -37,6 +52,7 @@ done
 
 echo "Function : "$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
 echo "Iterations : "$(cat $all_output | grep 'ITERATIONS' | head -n1 | cut -d" " -f2)
+echo "Population : "$(cat $all_output | grep 'POPULATION' | head -n1 | cut -d" " -f2)
 
 fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
 echo "$device Fitness Average: $fitness_average"
