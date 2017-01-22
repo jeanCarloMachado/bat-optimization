@@ -5,9 +5,8 @@
     exit 1
 }
 
-
-device="CPU"
-total=${TOTAL:-20}
+device=$1
+total=${TOTAL:-2}
 date=$(date "+%Y-%m-%d_%H-%M-%S")
 directory="experiments/$date"_"$device"
 mkdir -p $directory
@@ -15,30 +14,45 @@ fitnessFile="experiments/$date"_"$device/fitness"
 outputFile="experiments/$date"_"$device/output"
 all_output="experiments/$date"_"$device/all_output"
 timeFile="experiments/$date"_"$device/timefile"
+[ -z ${ITERATIONS+x} ] && {
+    export ITERATIONS=10000
+}
+
+export ITERATIONS
+
+[ -z ${BATS_COUNT+x} ] && {
+    export BATS_COUNT=768
+}
+export BATS_COUNT
+
+[ -z ${EVALUATION_FUNCTION+x} ] && {
+    export EVALUATION_FUNCTION=1
+}
+export EVALUATION_FUNCTION
 
 echo "Directory: $directory"
 
-[ $device == "CPU" ] && {
-    make
-} || {
+if [ $device = "CPU" ]; then
+    make cpu
+else
     make gpu
-}
+fi
 
 for i in $(seq 1 $total); do
-
-    [ $device == "CPU" ] && {
+    if [ $device = "CPU" ]; then
         ./bat > $outputFile
-    } || {
+    else
         ./bat_gpu > $outputFile
-    }
+    fi
 
     cat $outputFile | grep "Fitnes" | cut -d":" -f2  | tr -d " " >> $fitnessFile
     cat $outputFile | grep "Time" | cut -d":" -f2 | tr -d " " >> $timeFile
     cat $outputFile >> $all_output
 done
 
-
-echo "Function name: "$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
+echo "Function : "$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
+echo "Iterations : "$(cat $all_output | grep 'ITERATIONS' | head -n1 | cut -d" " -f2)
+echo "Population : "$(cat $all_output | grep 'POPULATION' | head -n1 | cut -d" " -f2)
 
 fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
 echo "$device Fitness Average: $fitness_average"

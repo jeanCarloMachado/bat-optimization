@@ -13,9 +13,11 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define ITERATIONS 10000
-#define BATS_COUNT 256
 #define DIMENSIONS 100
+
+extern int bats_count;
+extern int iterations;
+extern int evaluation_function;
 
 struct bat {
     //tends towards 1
@@ -28,7 +30,6 @@ struct bat {
     double *velocity;
 };
 
-const int EVALUTAION_FUNCTION = ACKLEY;
 
 const int LOG_OBJECTIVE_ENABLED=0;
 const int LOG_ATRIBUTES_ENABLED=0;
@@ -42,7 +43,6 @@ int SECOND_SEED;
 
 int BOUNDRY_SCAPE_COUNT = 0;
 int BOUNDRY_COUNT = 0;
-
 
 double (*objective_function)(double[], int);
 void log_bat_stdout(struct bat *bat, int dimensions);
@@ -69,12 +69,6 @@ int RUN_TIME;
 
 double shuber (double solution[], int dimensions)
 {
-    /*
-       -   Domain  |x| <= 10.0
-       -   Number of local minimum = 400
-       -   Global minimum fmin = -24.062499 at the ff. points
-       -    (-6.774576, -6.774576), ..., (5.791794, 5.791794)
-       */
     double sum = 0.0;
     for (int i = 0; i < dimensions; i++) {
         sum += -sin(2.0*solution[i]+1.0)
@@ -180,7 +174,7 @@ struct bat get_best(struct bat *bats, struct bat *best)
 
     current_best_val = bats[0].fitness;
     best_indice = 0;
-    for (int i = 0; i < BATS_COUNT; i++) {
+    for (int i = 0; i < bats_count; i++) {
         if (bats[i].fitness < current_best_val) {
             current_best_val = bats[i].fitness;
             best_indice = i;
@@ -289,16 +283,17 @@ void log_bat_stdout(struct bat *bat, int dimensions)
         position_average+=bat->position[i];
     }
     position_average/=dimensions;
-    printf("ITERATIONS: %d\n", ITERATIONS);
-    printf("BATS_COUNT: %d\n", BATS_COUNT);
+    printf("ITERATIONS: %d\n", iterations);
+    printf("BATS_COUNT: %d\n", bats_count);
     printf("DIMENSIONS: %d\n", DIMENSIONS);
+    printf("POPULATION: %d\n", bats_count);
     logger(LOG_STDOUT, "Fitness E: %E\n", bat->fitness);
 }
 
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 {
 
-    for (int i = 0; i < BATS_COUNT; i++) {
+    for (int i = 0; i < bats_count; i++) {
         bats[i].fitness;
         bats[i].loudness = INITIAL_LOUDNESS;
 
@@ -399,22 +394,22 @@ double calc_loudness_average(struct bat *bats)
     double total = 0;
 
 
-    for(int i=0;i<BATS_COUNT;i++) {
+    for(int i=0;i<bats_count;i++) {
         total+= bats[i].loudness;
     }
 
-    return total / BATS_COUNT;
+    return total / bats_count;
 }
 
 double fitness_average(struct bat bats[])
 {
     double result = 0;
 
-    for (int i = 0; i < BATS_COUNT; i++) {
+    for (int i = 0; i < bats_count; i++) {
         result+= bats[i].fitness;
     }
 
-    return result / BATS_COUNT;
+    return result / bats_count;
 }
 
 void decrease_loudness(struct bat *bat, int iteration)
@@ -423,7 +418,7 @@ void decrease_loudness(struct bat *bat, int iteration)
     // final da execução tende a ser o ótimo global
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
 
-    /* bat->loudness = INITIAL_LOUDNESS - (INITIAL_LOUDNESS / ITERATIONS) * iteration; */
+    /* bat->loudness = INITIAL_LOUDNESS - (INITIAL_LOUDNESS / iterations) * iteration; */
 }
 
 void position_perturbation(struct bat *bat)
@@ -440,7 +435,7 @@ struct bat* get_worst(struct bat *bats)
 
     current_val = current_worst_val = bats[0].fitness;
     int worst_indice = 0;
-    for (int i = 0; i < BATS_COUNT; i++) {
+    for (int i = 0; i < bats_count; i++) {
         current_val = bats[i].fitness;
         if (current_worst_val <  current_val) {
             current_worst_val = current_val;
@@ -454,7 +449,7 @@ struct bat* get_worst(struct bat *bats)
 
 void initialize_function(void)
 {
-    switch(EVALUTAION_FUNCTION) {
+    switch(evaluation_function) {
         case SPHERE:
             BOUNDRY_MIN = 0.0;
             BOUNDRY_MAX = 100.0;
@@ -510,15 +505,15 @@ int run_bats(void)
 
     my_seed();
 
-    bats = (struct bat *) malloc(sizeof(struct bat) * BATS_COUNT);
+    bats = (struct bat *) malloc(sizeof(struct bat) * bats_count);
     best = (struct bat *) malloc(sizeof(struct bat));
     candidate = (struct bat *) malloc(sizeof(struct bat));
     initialize_bats(bats, best, candidate);
 
     get_best(bats, best);
 
-    for (iteration = 0; iteration < ITERATIONS ; ++iteration) {
-        for (int j = 0; j < BATS_COUNT; ++j){
+    for (iteration = 0; iteration < iterations ; ++iteration) {
+        for (int j = 0; j < bats_count; ++j){
             bats[j].frequency = generate_frequency();
             update_velocity(&bats[j], best);
             copy_bat(&bats[j], candidate);
@@ -545,7 +540,7 @@ int run_bats(void)
 
     }
 
-    printf("Function %s\n", get_function_name(EVALUTAION_FUNCTION));
+    printf("Function %s\n", get_function_name(evaluation_function));
     log_bat_stdout(best, DIMENSIONS);
 
     deallocate_bats(bats, best, candidate);
