@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  15 JAN 2017 16:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  22 JAN 2017 18:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -241,25 +241,7 @@ and I'll forget about whatever was undefined.
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
-! Extra alignment tab has been changed to \cr.
-<recently read> \endtemplate 
-                             
-l.228         (E7) 20.4486 &
-                             0.0847218 & 98.9875 & 0.0405622
-You have given more \span or & marks than there were
-in the preamble to the \halign or \valign now in progress.
-So I'll assume that you meant to type \cr instead.
-
-! Extra alignment tab has been changed to \cr.
-<recently read> \endtemplate 
-                             
-l.242         (E7) 28.9867 &
-                             1.24554 & 105.03 & 31.2888
-You have given more \span or & marks than there were
-in the preamble to the \halign or \valign now in progress.
-So I'll assume that you meant to type \cr instead.
-
+] [2]
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no © in font ptmr7t!
 Missing character: There is no Ã in font ptmri7t!
@@ -270,9 +252,9 @@ Missing character: There is no Ã in font ptmri7t!
 Missing character: There is no § in font ptmri7t!
 Missing character: There is no Ã in font ptmri7t!
 Missing character: There is no £ in font ptmri7t!
-[2]
+
 ! Undefined control sequence.
-l.283     \url
+l.290     \url
               {http://docs.nvidia.com/cuda/curand/device-api-overview.html#d...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -281,7 +263,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! You can't use `macro parameter character #' in horizontal mode.
-l.283 ...com/cuda/curand/device-api-overview.html#
+l.290 ...com/cuda/curand/device-api-overview.html#
                                                   device-api-overview}
 Sorry, but I'm not programmed to handle this case;
 I'll just pretend that you didn't ask for it.
@@ -289,7 +271,7 @@ If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 283--284
+Underfull \hbox (badness 10000) in paragraph at lines 290--291
 []\OT1/ptm/m/n/8 http://docs.nvidia.com/cuda/curand/device-api-overview.htmldev
 ice-api-
  []
@@ -329,7 +311,7 @@ t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></
 usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fo
 nts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (3 pages, 118676 bytes).
+Output written on paper.pdf (3 pages, 119254 bytes).
 PDF statistics:
  55 PDF objects out of 1000 (max. 8388607)
  39 compressed objects within 1 object stream

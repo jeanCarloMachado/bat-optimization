@@ -225,29 +225,11 @@ time spent in each execution of the algorithms is described in seconds.
         Time Avg & Time SD & Fit Avg & Fit SD\\
     \hline
         (E1) 49.4428 & 0.0557314 & 4.44089e-16 & 2.05196e-22 \\
-Function : ACKLEY
-Iterations : 10000
-Population : 768
-CPU Fitness Average: 4.44089e-16
-CPU fitness standard deviation 2.82843e-22
-CPU time Average: 161.439
-CPU time standard deviation 0.155131
+        (E2) 161.439 & 0.155131 & 4.44089e-16 & 2.82843e-22 \\
         (E3) 61.3661 & 5.06578   & 0  & 0 \\
-
-Iterations : 10000
-Population : 768
-CPU Fitness Average: 0
-CPU fitness standard deviation 0
-CPU time Average: 162.761
-CPU time standard deviation 57.8119
+        (E4) 162.761 & 57.8119 & 0 & 0 \\
         (E5) 52.0624 & 9.25666   & 0  & 0 \\
-Function : RASTRINGIN
-Iterations : 10000
-Population : 768
-CPU Fitness Average: 0
-CPU fitness standard deviation 0
-CPU time Average: 171.986
-CPU time standard deviation 14.9089
+        (E6) 171.986 & 14.9089 & 0 & 0 \\
         (E7) 20.4486 & 0.0847218 & 98.9875 & 0.0405622 \\
         (E8) 74.3533 & 0.186482 & 98.9864 & 0.0204378 \\
     \end{tabular}
@@ -271,12 +253,9 @@ CPU time standard deviation 14.9089
     \end{tabular}
 \end{table}
 
-Rosenbrook function had the poorest speedups in relation with the CPU
-version.
 
-The convergence results of the rosenbrook function are specially worse
-than the others but it seems to be a problem with the algorithm since it
-misbehaves equally bad on CPU.
+The fitness of almost all functions presented a slight worse result when compared with the cpu version.
+It seems that, the subsequent bats of the same iteration don't have a best based on this current iteration.
 
 \section{Conclusion}
 
