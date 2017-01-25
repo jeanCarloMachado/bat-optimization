@@ -2,6 +2,8 @@
 
 \usepackage[fleqn]{amsmath}
 \usepackage{algpseudocode}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
 \interdisplaylinepenalty=2500
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -122,6 +124,11 @@ The random algorithm used was the Mersenne twister.
 
 \section{Bat Design on GPU}
 
+\begin{figure}
+    \includegraphics{activitydiagram}
+    \caption{GPU process flow}
+\end{figure}
+
 Since the BAT algorithm uses a population of bats, the most intuitive
 parallelization method to apply on it is to use each bat on each GPU
 thread. \cite{pso-gpu} used a similar method for a GPU implementation
@@ -136,6 +143,7 @@ The random number generator used on the GPU was the MTGP32, to
 maintain the compatibility with the CPU version. Notwithstanding
 it's not recommended to use more than 256 threads per block with it
 \cite{curandIssue}.
+
 
 \begin{figure}
 \begin{algorithmic}[1]
@@ -247,7 +255,9 @@ time spent in each execution of the algorithms is described in seconds.
         (E1) 17.2255  & 0.708198 &  12.8881 & 2.40027 \\
         (E2) 10.9591  & 0.23902 & 10.9412 & 3.23942 \\
         (E3) 24.2459  & 0.740923  & 2.04281e-15 & 2.60744e-16 \\
+        (E4) 15.0012 & 2.01505e-15 & 2.55402e-16 & 0.0394986 \\
         (E5) 30.4483  & 2.0005    & 0 & 0 \\
+        (E6) 14.4247 & 0.0543432 & 0 & 0 \\
         (E7) 28.9867 & 1.24554 & 105.03 & 31.2888 \\
         (E8) 15.4403 & 0.326284 & 101.793 & 140.393 \\
     \end{tabular}
@@ -278,6 +288,7 @@ for the dimensions in which each bat details.
 A subpopulation approach may also work, considering each GPU block as
 it's boundaries, somewhat similar to the work made on parallel bat on
 CPU by \cite{paralellCPU}.
+
 
 \begin{thebibliography}{1}
 \bibitem{original}
