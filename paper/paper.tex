@@ -3,7 +3,7 @@
 \usepackage[fleqn]{amsmath}
 \usepackage{algpseudocode}
 \usepackage{graphicx}
-\graphicspath{{./images/}}
+\graphicspath{ {images/} }
 \interdisplaylinepenalty=2500
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -125,7 +125,9 @@ The random algorithm used was the Mersenne twister.
 \section{Bat Design on GPU}
 
 \begin{figure}
-    \includegraphics{activitydiagram}
+    \begin{center}
+    \includegraphics[width=150,heigth=200px]{activity}
+    \end{center}
     \caption{GPU process flow}
 \end{figure}
 
@@ -263,9 +265,10 @@ time spent in each execution of the algorithms is described in seconds.
     \end{tabular}
 \end{table}
 
-
 The fitness of almost all functions presented a slight worse result when compared with the cpu version.
-It seems that, the subsequent bats of the same iteration don't have a best based on this current iteration.
+This slightly difference, in most cases, probably refers to the case
+that the subsequent bats of the same iteration don't have a best based
+on this current iteration.
 
 \section{Conclusion}
 
@@ -288,7 +291,6 @@ for the dimensions in which each bat details.
 A subpopulation approach may also work, considering each GPU block as
 it's boundaries, somewhat similar to the work made on parallel bat on
 CPU by \cite{paralellCPU}.
-
 
 \begin{thebibliography}{1}
 \bibitem{original}
