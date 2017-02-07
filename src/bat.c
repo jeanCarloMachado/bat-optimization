@@ -109,7 +109,7 @@ double schwefel(double solution[], int dimensions)
     double aux = 0;
     for (int i=0;i<dimensions;i++)
     {
-        aux += solution[i]*sin(sqrt(fabs(solution[i]))); 
+        aux += solution[i]*sin(sqrt(fabs(solution[i])));
     }
     return(-1*aux/dimensions);
 }
@@ -339,13 +339,11 @@ void force_boundry_on_value(double* value)
 {
     BOUNDRY_COUNT++;
     if (*value > BOUNDRY_MAX) {
-        /* printf("MAX: %E \n", *value); */
         *value = BOUNDRY_MAX;
         BOUNDRY_SCAPE_COUNT++;
         return;
     }
     if (*value < BOUNDRY_MIN) {
-        /* printf("MIN: %E\n", *value); */
         *value = BOUNDRY_MIN;
         BOUNDRY_SCAPE_COUNT++;
     }
@@ -414,11 +412,7 @@ double fitness_average(struct bat bats[])
 
 void decrease_loudness(struct bat *bat, int iteration)
 {
-    // Se a diminuição for lenta o suficiente, o valor encontrado no
-    // final da execução tende a ser o ótimo global
     bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
-
-    /* bat->loudness = INITIAL_LOUDNESS - (INITIAL_LOUDNESS / iterations) * iteration; */
 }
 
 void position_perturbation(struct bat *bat)

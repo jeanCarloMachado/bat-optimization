@@ -25,7 +25,7 @@ Santa Catarina, Joinville
 \begin{abstract}
 The ever increasing parallel processing power of GPU's is an compelling
 motive to implement performance demanding algorithms, like optimization
-techniques, using this approach. This work aimed to develop a GPU
+techniques, using this technology. This work aimed to develop a GPU
 version of the bat metaheuristic, a CPU version were developed as well,
 as a way of comparison. A set of experiments where conducted in order
 to measure the speedup difference. The results suggests that the GPU
@@ -89,18 +89,17 @@ Some distinctions of the original paper are worth noticing
 order to increase the diversity factor.
 \end{itemize}
 
-The CPU version developed was single threaded.
-The random algorithm used was the Mersenne twister.
+The CPU version developed was single threaded. The random algorithm used
+was the xorshift algorithm.
 
 \begin{figure}
 \begin{algorithmic}[1]
 \State $Parameters:\ n,\alpha,\ \lambda$
 \State $initialize\ bats$
 \State $evaluate\ fitness$
-\State $selects\ best$
+\State $selects\ best\ \vec{x}_*$
 \While {$stop\ criteria\ false$}
     \For{$each\ bat$}
-
         \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
         \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
         \State $\vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}$
@@ -114,7 +113,7 @@ The random algorithm used was the Mersenne twister.
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
         \EndIf
-        \State $selects\ best$
+        \State $selects\ best\ \vec{x}_*$
     \EndFor
 \EndWhile
 \end{algorithmic}
@@ -153,7 +152,7 @@ it's not recommended to use more than 256 threads per block with it
 \State $initialize\ bats\ asynchronously$
 \State $evaluate\ fitness$
 \State $synchronize\ threads$
-\State $selects\ best$
+\State $selects\ best\ \vec{x}_*$
 \While {$stop\ criteria\ false$}
     \For{$each thread$}
 
@@ -171,7 +170,7 @@ it's not recommended to use more than 256 threads per block with it
             \State $A_i =  A_{0} * \alpha^i$
         \EndIf
         \State $synchronize\ threads$
-        \State $selects\ best$
+        \State $selects\ best\ \vec{x}_*$
     \EndFor
 \EndWhile
 \end{algorithmic}
@@ -265,10 +264,13 @@ time spent in each execution of the algorithms is described in seconds.
     \end{tabular}
 \end{table}
 
-The fitness of almost all functions presented a slight worse result when compared with the cpu version.
-This slightly difference, in most cases, probably refers to the case
-that the subsequent bats of the same iteration don't have a best based
-on this current iteration.
+The fitness of almost all functions presented a slight worse result
+when compared with the cpu version. This slightly difference, in most
+cases, probably refers to the case that the subsequent bats of the same
+iteration don't have a best based on this current iteration.
+
+However the purpose of this research is to focus on the speedups so it
+seems like a reasonable tradeoff.
 
 \section{Conclusion}
 
