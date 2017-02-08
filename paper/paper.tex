@@ -36,6 +36,36 @@ problems but for simpler cases the CPU version might outperform GPU.
 
 \section{Introduction}
 
+
+With the rising of the parallel computing the use of it on the sciences is becoming the rule to solve complex problems.
+
+A good way of solving complex problems, like NP complete one's, is through the use of metha-heuristics to guide it. A promising subsect of meta-heuristics which has promising characteristics to the use on GPU's is the swarm intelligence groups. Which encompases PSO, ACO, BAT, etc.
+
+Parpinelli writes about "they are compounded by a
+distributed society/population of individuals where the control is
+also distributed among the individuals (there is no centralized
+control); and the individuals decision-making is stochastic and
+based only on local information". Local work with discrete individuals are ideal characteristics to parallelization.
+
+This work attempts to investigate the applicability of the BAT algorithm
+concurrently on the GPU. Previously some demonstrations of the bat
+algorithm parallelized on CPU were presented in \cite{paralellCPUFirst}
+and \cite{paralellCPU}.  A novel publication about the use of the bat optimization can be found on ??.
+
+However no case was used til this moment to the applicability of the bat on gpu when comparing standard benchmark functions.
+
+\section{Cuda}
+
+Compute unified device architecture (CUDA) is a platform to execute
+software concurrently, It uses a SIMD \textit{single data multiple execution} 
+approach, where the concurrent code executes the same instruction but with divergent data. 
+
+Previous researches suggests that highly parallel
+applications may speedup up to 450 times \cite{cuda_optimizations}.
+
+
+\section{Bat algorithm}
+
 The bat algorithm is a populational meta-heuristic introduced by Yang in
 2010. It uses the inspiration of micro-bats which uses a type of sonar,
 called echolocation, to detect prey, avoid obstacles, and locate their
@@ -44,18 +74,6 @@ roosting crevices in the dark \cite{original}.
 All populational meta-heuristics theoretically are able to benefit from
 implicit parallelization, which is the approach that each individual of
 the population executes concurrently.
-
-Compute unified device architecture (CUDA) is a platform to execute
-software concurrently, It uses a single data multiple execution
-approach. Previous researches suggests that highly parallel
-general processing application, speedups may vary from 10 to 450
-\cite{cuda_optimizations}.
-
-This work attempts to investigate the applicability of the BAT algorithm
-concurrently on the GPU. Previously some demonstrations of the bat
-algorithm parallelized on CPU were presented in \cite{paralellCPUFirst}
-and \cite{paralellCPU}, however, til the day of this publication no
-implementation of the bat algorithm was found for GPU. 
 
 \section{The CUDA platform}
 
@@ -194,7 +212,7 @@ The benchmark functions used were the following:
 
 The experiments were executed on a machine with the following configuration:
 
-\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram \\ Compute capability 3.5 }
+\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram \\ Compute capability 3.5 \\ Kepler GM10x}
 
 Each experiment was executed a total of 20 times with 10 thousand
 iterations each and 100 dimensions in each function.
