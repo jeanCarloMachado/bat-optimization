@@ -34,48 +34,53 @@ problems but for simpler cases the CPU version might outperform GPU.
 \end{abstract}
 \IEEEpeerreviewmaketitle
 
-\section{Introduction}
+\section{Introduction}%{{{
 
+With the aid of parallel computing, specially GPU computing, it's
+possible to tackle ever increasing computational problems in decreasing amounts of time.
+A good way of solving complex problems, like NP one's is through the use
+of optimizaton algorithms, specially meta-heuristics. In the group of
+meta-heuristics a promising field for parallel computings is the swarm
+intelligence group. Which encompases many bio-inspiratons liks PSO, ACO,
+BAT, etc.
 
-With the rising of the parallel computing the use of it on the sciences is becoming the rule to solve complex problems.
+Parpinelli \cite{newInspirations}, when reffering to swarm
+intelligence algorithms, define: "they are compounded by a distributed
+society/population of individuals where the control is also
+distributed among the individuals (there is no centralized control);
+and the individuals decision-making is stochastic and based only on
+local information". 
 
-A good way of solving complex problems, like NP complete one's, is through the use of metha-heuristics to guide it. A promising subsect of meta-heuristics which has promising characteristics to the use on GPU's is the swarm intelligence groups. Which encompases PSO, ACO, BAT, etc.
+The fact that swarm intelligence algorithms have composable that run
+conceptually independent from one another makes them ideal for parallel
+enviroments.
 
-Parpinelli writes about "they are compounded by a
-distributed society/population of individuals where the control is
-also distributed among the individuals (there is no centralized
-control); and the individuals decision-making is stochastic and
-based only on local information". Local work with discrete individuals are ideal characteristics to parallelization.
-
-This work attempts to investigate the applicability of the BAT algorithm
-concurrently on the GPU. Previously some demonstrations of the bat
-algorithm parallelized on CPU were presented in \cite{paralellCPUFirst}
-and \cite{paralellCPU}.  A novel publication about the use of the bat optimization can be found on ??.
+This work attempts to investigate the applicability of a relatively new
+and promising swarm algorithm: the BAT algorithm in the GPU using CUDA.
+Previously some demonstrations of the bat algorithm parallelized on CPU
+were presented in \cite{paralellCPUFirst} and \cite{paralellCPU}. A
+novel publication about the use of the bat optimization can be found on
+??.
 
 However no case was used til this moment to the applicability of the bat on gpu when comparing standard benchmark functions.
 
-\section{Cuda}
+The rest of the paper is organized as following: Section 1 gives a overview of cuda and its components. Section 2 studies 
+the bat meta-heuristic, it's design and details. Section 3 details the experiments performed. Section 4 analyses the results and concludes.
 
-Compute unified device architecture (CUDA) is a platform to execute
-software concurrently, It uses a SIMD \textit{single data multiple execution} 
-approach, where the concurrent code executes the same instruction but with divergent data. 
+%}}}
+\section{Cuda}%{{{
+
+Compute Unified Device Architecture (CUDA) is a general purpose         
+parallel computing programming model for parallel computations \cite{cudaDefinition}. CUDA    
+uses a SIMD \textit{single data multiple execution} approach, where the 
+concurrent code executes the same instruction but with divergent data.  
 
 Previous researches suggests that highly parallel
 applications may speedup up to 450 times \cite{cuda_optimizations}.
 
+%%how cuda is organized?
 
-\section{Bat algorithm}
-
-The bat algorithm is a populational meta-heuristic introduced by Yang in
-2010. It uses the inspiration of micro-bats which uses a type of sonar,
-called echolocation, to detect prey, avoid obstacles, and locate their
-roosting crevices in the dark \cite{original}.
-
-All populational meta-heuristics theoretically are able to benefit from
-implicit parallelization, which is the approach that each individual of
-the population executes concurrently.
-
-\section{The CUDA platform}
+Cuda is organized on threads that are separated blocks which in their
 
 The CUDA platform uses a parallelization schema in "each cuda
 device supports the Single-Program Multiple-Data (SPMD)"
@@ -88,12 +93,25 @@ A good approach is to use the threaded model since it has the great benefit in p
 performance, the primary concern often is managing global memory
 latency." \cite{cuda_optimizations}
 
-\section{Bat Design on CPU}
+%}}}
+\section{Bat algorithm}%{{{ 
 
-The bat original paper don't clarify  all the implementation details working of the algoritm.
+The bat algorithm is a populational meta-heuristic introduced by Yang in
+2010. It uses the inspiration of micro-bats which uses a type of sonar,
+called echolocation, to detect prey, avoid obstacles, and locate their
+roosting crevices in the dark \cite{original}.
+
+All populational meta-heuristics theoretically are able to benefit from
+implicit parallelization, which is the approach that each individual of
+the population executes concurrently.
+
+\subsection{Bat Design on CPU}
+
+The bat original paper don't clarify all the implementation details
+working of the algoritm.
 
 In this work the bath algorithm used was the one proposed by
-\autocite{Jelson et al.}, since it represents a concrete demonstration of how
+\cite{comparisonBatParpinelli}, since it represents a concrete demonstration of how
 the bat metaheuristic might work.
 
 Some distinctions of the original paper are worth noticing
@@ -102,7 +120,6 @@ Some distinctions of the original paper are worth noticing
     \item The selection of new results on the original paper tends to be more greedy (line 14) [improve the descritpion of the other paper].
     \item On this paper the or operator were used but in the original one an And were proposed.
     \item The or operator tends to explore the search space better (more diversity).
-
     \item There's a distortion on a single dimension of the search space in
 order to increase the diversity factor.
 \end{itemize}
@@ -135,15 +152,15 @@ was the xorshift algorithm.
     \EndFor
 \EndWhile
 \end{algorithmic}
-\caption{Pseudo-code CPU}\label{GPU}
+\caption{Pseudo-code CPU}\label{cpu-pseudo}
 \end{figure}
 
 
-\section{Bat Design on GPU}
+\subsection{Bat Design on GPU}
 
 \begin{figure}
     \begin{center}
-    \includegraphics[width=150,heigth=200px]{activity}
+    \includegraphics[width=150px,height=200px]{activity}
     \end{center}
     \caption{GPU process flow}
 \end{figure}
@@ -192,10 +209,11 @@ it's not recommended to use more than 256 threads per block with it
     \EndFor
 \EndWhile
 \end{algorithmic}
-\caption{Pseudo-code GPU}\label{GPU}
+\caption{Pseudo-code GPU}\label{gpu-pseudo}
 \end{figure}
 
-\section{Experiments}
+%}}}
+\section{Experiments}%{{{ 
 
 For testing the performance of the algorithm a set of experiments where
 developed using diverse benchmark functions tested against a set of
@@ -237,7 +255,8 @@ iterations each and 100 dimensions in each function.
     \end{tabular}
 \end{table}
 
-\section{Results}
+%}}}
+\section{Results}%{{{ 
 
 In this section are described the speedup and convergence results. The
 time spent in each execution of the algorithms is described in seconds.
@@ -245,7 +264,7 @@ time spent in each execution of the algorithms is described in seconds.
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
     \caption{CPU Results}
-    \label{results}
+    \label{results-cpu}
     \centering
     \begin{tabular}{c|c|c|c}
     \hline
@@ -265,7 +284,7 @@ time spent in each execution of the algorithms is described in seconds.
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
     \caption{GPU Results}
-    \label{results}
+    \label{results-gpu}
     \centering
     \begin{tabular}{c|c|c|c}
     \hline
@@ -290,8 +309,8 @@ iteration don't have a best based on this current iteration.
 However the purpose of this research is to focus on the speedups so it
 seems like a reasonable tradeoff.
 
-\section{Conclusion}
-
+%}}}
+\section{Conclusion} %{{{
 It was observed speedups with big populations. The original BAT was
 proposed with 40 individuals and the speedups was seen with 250
 individuals.
@@ -302,33 +321,44 @@ implementation to be fair.
 With this work it's clear that is possible to speedup the bat
 metaheuristic using GPU. Notwithstanding the best results are only
 achievable on really complex problems with many dimensions.
-
-\section{Further works}
-
+%}}}
+\section{Further works} %{{{
 In the future it may be explored the usage of blocks as representation
 for the dimensions in which each bat details.
 
 A subpopulation approach may also work, considering each GPU block as
 it's boundaries, somewhat similar to the work made on parallel bat on
 CPU by \cite{paralellCPU}.
+%}}}
 
 \begin{thebibliography}{1}
 \bibitem{original}
+    %review
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
-\bibitem{Jelson et al.}
-    Jelson A. Cordeiro, Rafael Stubs Parpinelli Heitor Silvério Lopes \emph{Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho}.
+\bibitem{comparisonBatParpinelli}
+    J.A. Cordeiro and R.S. Parpinelli and H.S. Lopes, "Análise de Sensibilidade dos Parâmetros do Bat Algorithm e Comparação de Desempenho," Department of Bioinformatics, UTFPR
+\bibitem{cudaDefinition}
+    NVIDIA, "CUDA C Programming Guide," no. July. NVIDIA Corportation, 2013
 \bibitem{pso-gpu}
+    %review
     PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
 \bibitem{curandIssue}
-    \url{http://docs.nvidia.com/cuda/curand/device-api-overview.html#device-api-overview}
+    %review
+    http://docs.nvidia.com/cuda/curand/device-api-overview.html
 \bibitem{paralellCPU}
+    %review
     Parallelized Bat Algorithm with a Communication Strategy. Cheng-Fu Tsai, Thin-Kien Dao, Wei-Jie Yang, et al, University of applied sciences
 \bibitem{paralellCPUFirst}
+    %review
     Parallel bat algorithm for optimizing makespan in job scheduling problems, Thi-Kien Dao, Tien-Szu Pan, Trong-The Nguyen, Jeng-Shyang Pan,2015, Springer Sience Review
 \bibitem{gpuOptimization}
+    %review
     Optimization Principles and Application Performance Evaluation of a Multithreaded GPU using Cuda, Shane Ryo
 \bibitem{cuda_optimizations}
+    %review
     Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
+\bibitem{newInspirations}
+    Parpinelli, R.S. and Lopes, H.S. (2011) 'New inspierations in swarm intelligence: a survey', Int. J. Bio-Inspired Computation, Vol. 3, No. 1 pp.1-16
 
 \end{thebibliography}
 \end{document}
