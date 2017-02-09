@@ -45,11 +45,11 @@ intelligence group. Which encompases many bio-inspiratons liks PSO, ACO,
 BAT, etc.
 
 Parpinelli \cite{newInspirations}, when reffering to swarm
-intelligence algorithms, define: "they are compounded by a distributed
+intelligence algorithms, define that they are: \begin{quote} compounded by a distributed
 society/population of individuals where the control is also
 distributed among the individuals (there is no centralized control);
 and the individuals decision-making is stochastic and based only on
-local information". 
+local information .\end{quote}
 
 The fact that swarm intelligence algorithms have composable that run
 conceptually independent from one another makes them ideal for parallel
@@ -64,13 +64,13 @@ novel publication about the use of the bat optimization can be found on
 
 However no case was used til this moment to the applicability of the bat on gpu when comparing standard benchmark functions.
 
-The rest of the paper is organized as following: Section 1 gives a overview of cuda and its components. Section 2 studies 
-the bat meta-heuristic, it's design and details. Section 3 details the experiments performed. Section 4 analyses the results and concludes.
+The rest of the paper is organized as following: Section \ref{cuda} gives a overview of cuda and its components. Section \ref{bat} studies 
+the bat meta-heuristic, it's design and details. Section \ref{experiments} details the experiments performed. Section \ref{results} analyses the results and concludes.
 
 %}}}
-\section{Cuda}%{{{
+\section{Cuda} \label{cuda}%{{{
 
-Compute Unified Device Architecture (CUDA) is a general purpose         
+Compute Unified Device Architecture (CUDA) is a general purpose
 parallel computing programming model for parallel computations \cite{cudaDefinition}. CUDA    
 uses a SIMD \textit{single data multiple execution} approach, where the 
 concurrent code executes the same instruction but with divergent data.  
@@ -94,7 +94,7 @@ performance, the primary concern often is managing global memory
 latency." \cite{cuda_optimizations}
 
 %}}}
-\section{Bat algorithm}%{{{ 
+\section{Bat algorithm} \label{bat} %{{{
 
 The bat algorithm is a populational meta-heuristic introduced by Yang in
 2010. It uses the inspiration of micro-bats which uses a type of sonar,
@@ -213,7 +213,7 @@ it's not recommended to use more than 256 threads per block with it
 \end{figure}
 
 %}}}
-\section{Experiments}%{{{ 
+\section{Experiments} \label{experiments}%{{{ 
 
 For testing the performance of the algorithm a set of experiments where
 developed using diverse benchmark functions tested against a set of
@@ -256,7 +256,7 @@ iterations each and 100 dimensions in each function.
 \end{table}
 
 %}}}
-\section{Results}%{{{ 
+\section{Results} \label{results}%{{{
 
 In this section are described the speedup and convergence results. The
 time spent in each execution of the algorithms is described in seconds.
@@ -359,6 +359,5 @@ CPU by \cite{paralellCPU}.
     Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
 \bibitem{newInspirations}
     Parpinelli, R.S. and Lopes, H.S. (2011) 'New inspierations in swarm intelligence: a survey', Int. J. Bio-Inspired Computation, Vol. 3, No. 1 pp.1-16
-
 \end{thebibliography}
 \end{document}
