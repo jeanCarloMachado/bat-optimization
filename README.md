@@ -35,3 +35,20 @@ Testar mil dimensões.
 Validar a possibilidade de colocar mil dimensões.
 
 SPAA - simposio da ACM
+
+Generating results
+------------------
+
+0 - ROSENBROOK
+1 - SPHERE
+2 - SCHWEFEL
+3 - ACKLEY
+4 - RASTRINGIN
+5 - GRIEWANK
+6 - SHUBER
+
+
+```
+TOTAL=3 ITERATIONS=1000 BATS_COUNT=128 EVALUATION_FUNCTION=0 ./statistics GPU
+
+```

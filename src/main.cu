@@ -12,7 +12,7 @@ extern "C" {
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define DIMENSIONS 100
+#define DIMENSIONS 1000
 
 int iterations = 10000;
 int bats_count = 768;

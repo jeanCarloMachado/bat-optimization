@@ -13,7 +13,7 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define DIMENSIONS 100
+#define DIMENSIONS 1000
 
 extern int bats_count;
 extern int iterations;
@@ -507,7 +507,7 @@ int run_bats(void)
     get_best(bats, best);
 
     for (iteration = 0; iteration < iterations ; ++iteration) {
-        for (int j = 0; j < bats_count; ++j){
+        for (int j = 0; j < bats_count; ++j) {
             bats[j].frequency = generate_frequency();
             update_velocity(&bats[j], best);
             copy_bat(&bats[j], candidate);
@@ -529,9 +529,8 @@ int run_bats(void)
 
                 decrease_loudness(&bats[j], iteration);
             }
-            get_best(bats, best);
         }
-
+        get_best(bats, best);
     }
 
     printf("Function %s\n", get_function_name(evaluation_function));
