@@ -64,7 +64,7 @@ novel publication about the use of the bat optimization can be found on
 
 However no case was used til this moment to the applicability of the bat on gpu when comparing standard benchmark functions.
 
-The rest of the paper is organized as following: Section \ref{cuda} gives a overview of cuda and its components. Section \ref{bat} studies 
+The rest of the paper is organized as following: section \ref{cuda} gives a overview of cuda and its components. Section \ref{bat} studies 
 the bat meta-heuristic, it's design and details. Section \ref{experiments} details the experiments performed. Section \ref{results} analyses the results and concludes.
 
 %}}}
@@ -148,8 +148,8 @@ was the xorshift algorithm.
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
         \EndIf
-        \State $selects\ best\ \vec{x}_*$
     \EndFor
+    \State $selects\ best\ \vec{x}_*$
 \EndWhile
 \end{algorithmic}
 \caption{Pseudo-code CPU}\label{cpu-pseudo}
@@ -178,6 +178,7 @@ more complex problems.
 The random number generator used on the GPU was the MTGP32, to
 maintain the compatibility with the CPU version. Notwithstanding
 it's not recommended to use more than 256 threads per block with it
+
 \cite{curandIssue}.
 
 
@@ -189,7 +190,7 @@ it's not recommended to use more than 256 threads per block with it
 \State $synchronize\ threads$
 \State $selects\ best\ \vec{x}_*$
 \While {$stop\ criteria\ false$}
-    \For{$each thread$}
+    \For{$each\ thread$}
 
         \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
         \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
@@ -204,9 +205,9 @@ it's not recommended to use more than 256 threads per block with it
             \State $r_i = exp(\lambda * i)$
             \State $A_i =  A_{0} * \alpha^i$
         \EndIf
-        \State $synchronize\ threads$
-        \State $selects\ best\ \vec{x}_*$
     \EndFor
+    \State $synchronize\ threads$
+    \State $selects\ best\ \vec{x}_*$
 \EndWhile
 \end{algorithmic}
 \caption{Pseudo-code GPU}\label{gpu-pseudo}
