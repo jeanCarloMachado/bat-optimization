@@ -50,22 +50,19 @@ for i in $(seq 1 $total); do
     cat $outputFile >> $all_output
 done
 
-echo "Function : "$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
-echo "Iterations : "$(cat $all_output | grep 'ITERATIONS' | head -n1 | cut -d" " -f2)
-echo "Population : "$(cat $all_output | grep 'POPULATION' | head -n1 | cut -d" " -f2)
-
-fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
-echo "$device Fitness Average: $fitness_average"
-
-
-standard_deviation=$(awk "{s+=((\$1-$fitness_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $fitnessFile)
-echo "$device fitness standard deviation $standard_deviation"
-
+function=$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
+iterations=$(cat $all_output | grep 'ITERATIONS' | head -n1 | cut -d" " -f2)
+population=$(cat $all_output | grep 'POPULATION' | head -n1 | cut -d" " -f2)
 
 time_average=$(awk "{s+=\$1} END {s/=$total; print s}" $timeFile)
-echo "$device time Average: $time_average"
+time_standard_deviation=$(awk "{s+=((\$1-$time_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $timeFile)
 
-standard_deviation=$(awk "{s+=((\$1-$time_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $timeFile)
-echo "$device time standard deviation $standard_deviation"
+fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
+fitness_standard_deviation=$(awk "{s+=((\$1-$fitness_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $fitnessFile)
+
+dimensions=1000
+
+echo "function & dimensions & population & time_average & time_standard_deviation & fitness_average & fitness_standard_deviation"
+echo "$function & $dimensions & $population & $time_average & $time_standard_deviation & $fitness_average & $fitness_standard_deviation"
 
 rm -rf $outputFile
