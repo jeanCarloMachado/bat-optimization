@@ -60,14 +60,18 @@ and promising swarm algorithm: the BAT algorithm in the GPU using CUDA.
 Previously some demonstrations of the bat algorithm parallelized on CPU
 were presented in \cite{paralellCPUFirst} and \cite{paralellCPU}. A
 novel publication about the use of the bat optimization can be found on
-??.
+\cite{firstBatGPU}.
 
 However no case was used til this moment to the applicability of the bat on gpu when comparing standard benchmark functions.
 
-The rest of the paper is organized as following: section \ref{cuda} gives a overview of cuda and its components. Section \ref{bat} studies 
-the bat meta-heuristic, it's design and details. Section \ref{experiments} details the experiments performed. Section \ref{results} analyses the results and concludes.
+The rest of the paper is organized as following: section \ref{cuda}
+gives a overview of cuda and its components. Section \ref{bat}
+studies the bat meta-heuristic, it's design and details. Section
+\ref{experiments} details the experiments performed. Section
+\ref{results} analyses the results and concludes.
 
 %}}}
+
 \section{Cuda} \label{cuda}%{{{
 
 Compute Unified Device Architecture (CUDA) is a general purpose
@@ -94,6 +98,7 @@ performance, the primary concern often is managing global memory
 latency." \cite{cuda_optimizations}
 
 %}}}
+
 \section{Bat algorithm} \label{bat} %{{{
 
 The bat algorithm is a populational meta-heuristic introduced by Yang in
@@ -101,9 +106,13 @@ The bat algorithm is a populational meta-heuristic introduced by Yang in
 called echolocation, to detect prey, avoid obstacles, and locate their
 roosting crevices in the dark \cite{original}.
 
-All populational meta-heuristics theoretically are able to benefit from
-implicit parallelization, which is the approach that each individual of
-the population executes concurrently.
+The bat algorithm has two paramters: the pulse rate and the loudness.
+As time goes by the pulse-rate tends to increase and the loudness to
+decrease. The inspiration comes from the behaviour of bats that uses
+pulse rate as a slow and loud while in search for a pray and quick
+and low pitches when in perseguition of one. In the bat algorithm the
+loudness is used as a way of accepting bad results (diversification) and
+pulse rate as a way of selecting local search (exploitation).
 
 \subsection{Bat Design on CPU}
 
@@ -214,6 +223,7 @@ it's not recommended to use more than 256 threads per block with it
 \end{figure}
 
 %}}}
+
 \section{Experiments} \label{experiments}%{{{ 
 
 For testing the performance of the algorithm a set of experiments where
@@ -257,6 +267,7 @@ iterations each and 100 dimensions in each function.
 \end{table}
 
 %}}}
+
 \section{Results} \label{results}%{{{
 
 In this section are described the speedup and convergence results. The
@@ -311,6 +322,7 @@ However the purpose of this research is to focus on the speedups so it
 seems like a reasonable tradeoff.
 
 %}}}
+
 \section{Conclusion} %{{{
 It was observed speedups with big populations. The original BAT was
 proposed with 40 individuals and the speedups was seen with 250
@@ -323,6 +335,7 @@ With this work it's clear that is possible to speedup the bat
 metaheuristic using GPU. Notwithstanding the best results are only
 achievable on really complex problems with many dimensions.
 %}}}
+
 \section{Further works} %{{{
 In the future it may be explored the usage of blocks as representation
 for the dimensions in which each bat details.
@@ -350,8 +363,7 @@ CPU by \cite{paralellCPU}.
     %review
     Parallelized Bat Algorithm with a Communication Strategy. Cheng-Fu Tsai, Thin-Kien Dao, Wei-Jie Yang, et al, University of applied sciences
 \bibitem{paralellCPUFirst}
-    %review
-    Parallel bat algorithm for optimizing makespan in job scheduling problems, Thi-Kien Dao, Tien-Szu Pan, Trong-The Nguyen, Jeng-Shyang Pan,2015, Springer Sience Review
+    T. Dao et al.,  "Parallel bat algorithm for optimizing makespan in job scheduling problems", in Springer Sience Review, 2015
 \bibitem{gpuOptimization}
     %review
     Optimization Principles and Application Performance Evaluation of a Multithreaded GPU using Cuda, Shane Ryo
@@ -360,5 +372,7 @@ CPU by \cite{paralellCPU}.
     Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
 \bibitem{newInspirations}
     Parpinelli, R.S. and Lopes, H.S. (2011) 'New inspierations in swarm intelligence: a survey', Int. J. Bio-Inspired Computation, Vol. 3, No. 1 pp.1-16
+\bibitem{firstBatGPU}
+
 \end{thebibliography}
 \end{document}
