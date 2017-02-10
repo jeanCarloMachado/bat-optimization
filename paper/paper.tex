@@ -22,6 +22,7 @@ Santa Catarina, Joinville
 }}
 
 \maketitle
+
 \begin{abstract}
 The ever increasing parallel processing power of GPU's is an compelling
 motive to implement performance demanding algorithms, like optimization
@@ -32,6 +33,7 @@ to measure the speedup difference. The results suggests that the GPU
 version is able to achieve relevant speedups in highly populational
 problems but for simpler cases the CPU version might outperform GPU.
 \end{abstract}
+
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}%{{{
@@ -75,27 +77,54 @@ studies the bat meta-heuristic, it's design and details. Section
 \section{Cuda} \label{cuda}%{{{
 
 Compute Unified Device Architecture (CUDA) is a general purpose
-parallel computing programming model for parallel computations \cite{cudaDefinition}. CUDA    
-uses a SIMD \textit{single data multiple execution} approach, where the 
-concurrent code executes the same instruction but with divergent data.  
-
-Previous researches suggests that highly parallel
-applications may speedup up to 450 times \cite{cuda_optimizations}.
+parallel computing programming model for parallel computations \cite{cudaDefinition}. CUDA
+uses a SIMD \textit{single data multiple execution} approach \cite{cuda_optimizations}, where the
+concurrent code executes the same instruction but with divergent data.
 
 %%how cuda is organized?
 
-Cuda is organized on threads that are separated blocks which in their
+The basic element of work in a cuda device is a thread. That is aggrouped and 
+runs in parallel with 32 other threads called the warp.
+Wraps are grouped in blocks.
 
-The CUDA platform uses a parallelization schema in "each cuda
-device supports the Single-Program Multiple-Data (SPMD)"
-\cite{cuda_optimizations}, where all concurrent threads are based on the
-same code but they may follow different paths.
 
-A good approach is to use the threaded model since it has the great benefit in performance.
+\begin{figure}
+    \begin{center}
+    \includegraphics[width=200px,height=200px]{cudaModel}
+    \end{center}
+    \caption{The cuda structural organization}
+\end{figure}
 
-"..when attempting to achieve an application's maximum
-performance, the primary concern often is managing global memory
-latency." \cite{cuda_optimizations}
+%%how is cuda execution model
+
+A cuda program starts by allocating resources on the GPU and
+dispatching work to de done on the GPU.
+
+Once the GPU finishes it's work the GPU they are moved back from GPU
+memory to the CPU one. And the results can be returned.
+
+For the developer, the basic element of concern is the kernel, which is the function
+executed on the GPU. A kernel function defines the code to be executed by each of the massive
+numbers of threads to be invoked \cite{gpuOptimization}.
+
+%% some concerns of optimizing applications in cuda
+\subsection{Performance concerns in CUDA}
+Since the cuda model is complex, it's not trivial to setup an ideal configuration 
+of a problem in the GPU. However many good practises exists and great speedup is already 
+reported.  Previous researches suggests that highly parallel
+applications may speedup up to 450 times \cite{gpuOptimization}.
+
+Below are described some of the major concern while developing parallel algorithms  in CUDA.
+
+\begin{itemize}
+    \item When attempting to achieve an application's maximum performance, the primary concern often is managing global memory latency \cite{cuda_optimizations}. It's preferable to use local memory and shared memory instead of global since they are much faster.
+    \item In an ideal enviroment when the GPU starts
+        working the less the messaging passing between the GPU and the CPU, the better.
+    \item Decrease data interchange between the host and the GPU to the mininum.
+    \item Prefer floats to doubles when possible. The older versions of
+    CUDA GPU's had serious bottlenets using large variables type, but
+    this is a issues disappearing
+\end{itemize}
 
 %}}}
 
@@ -173,22 +202,23 @@ was the xorshift algorithm.
     \caption{GPU process flow}
 \end{figure}
 
-Since the BAT algorithm uses a population of bats, the most intuitive
-parallelization method to apply on it is to use each bat on each GPU
-thread. \cite{pso-gpu} used a similar method for a GPU implementation
-for the PSO algorithm.
+
+A conveninet approach to model the swarm in the GPU is to use each
+thread as an individual. \cite{pso-gpu} used a similar method for a
+GPU implementation for the PSO algorithm, and he says \begin{quote}
+Each element of the particle is treated individually in the thread,
+allowing efficient data parallelism whitout risk of starvation or race
+conditions.\end{quote}
 
 In the bat algorithm synchronization must occur on the selection of the
 best individual of the iteration. The best individual is kept in the
 threaded memory of the GPU which has a limit of 16KB, probably not feasible for
 more complex problems.
 
-The random number generator used on the GPU was the MTGP32, to
-maintain the compatibility with the CPU version. Notwithstanding
-it's not recommended to use more than 256 threads per block with it
-
-\cite{curandIssue}.
-
+The initial random number generator used on the GPU was the MTGP32.
+However later was discovered it's not recommended to use more than 256
+threads per block with it \cite{curandIssue}. So we moved the algorithms
+to the cuda default XORWOR.
 
 \begin{figure}
 \begin{algorithmic}[1]
@@ -272,6 +302,10 @@ iterations each and 100 dimensions in each function.
 In this section are described the speedup and convergence results. The
 time spent in each execution of the algorithms is described in seconds.
 
+%cpu
+%ROSENBROOK & 1000 & 128 & 93.2765 & 0.106094 & 12899091640 & 1.11906e+10
+
+
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
     \caption{CPU Results}
@@ -344,8 +378,8 @@ it's boundaries, somewhat similar to the work made on parallel bat on
 CPU by \cite{paralellCPU}.
 %}}}
 
-\begin{thebibliography}{1}
-\bibitem{original}
+\begin{thebibliography}{1} %{{{
+    \bibitem{original}
     %review
     Xin-She Yang \emph{A New Metaheuristics Bat-Inspired Algorithm}. Department of Engineering, Cambridge, 2010.
 \bibitem{comparisonBatParpinelli}
@@ -353,18 +387,17 @@ CPU by \cite{paralellCPU}.
 \bibitem{cudaDefinition}
     NVIDIA, "CUDA C Programming Guide," no. July. NVIDIA Corportation, 2013
 \bibitem{pso-gpu}
-    %review
-    PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based Graphics Processing Unit
+    D. L. Souza et al., "PSO-GPU: Accelerating Particle Swarm Optimization in CUDA-Based
+    Graphics Processing Units," in Laboratório de Computação Natural
+    (CESUPA)
 \bibitem{curandIssue}
-    %review
-    http://docs.nvidia.com/cuda/curand/device-api-overview.html
+    NVIDIA.  Bit Generation with the MTGP32 generator [Online]. Aveilable: http://docs.nvidia.com/cuda/curand/device-api-overview.html
 \bibitem{paralellCPU}
     C. Tsai, et al. "Parallelized Bat Algorithm with a Communication Strategy," in Modern Advances in Applied Intelligence, 27th International Conference of Industrial Engineering and Other Applications of Applied Intelligent Systems, IEA/AIE 2014
 \bibitem{paralellCPUFirst}
     T. Dao et al.,  "Parallel bat algorithm for optimizing makespan in job scheduling problems", in Springer Sience Review, 2015
 \bibitem{gpuOptimization}
-    %review
-    Optimization Principles and Application Performance Evaluation of a Multithreaded GPU using Cuda, Shane Ryo
+    S. Ryoo et al.,  "Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA," in Center of Reliable and High-Performance Computing, University of Illinois
 \bibitem{cuda_optimizations}
     %review
     Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
@@ -373,4 +406,5 @@ CPU by \cite{paralellCPU}.
 \bibitem{firstBatGPU}
     A. R. Choudhdury, "A GPU Implementation of a Bat Algorithm Trained Neural Network," in Neural Information Processing 23rd International Conference, ICONIP 2016
 \end{thebibliography}
+%}}}
 \end{document}

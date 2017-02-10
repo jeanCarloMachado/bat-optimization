@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  9 FEB 2017 21:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  10 FEB 2017 20:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -319,21 +319,34 @@ Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no § in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no £ in font ptmr7t!
+
+<images/cudaModel.png, id=1, 405.22821pt x 429.49028pt>
+File: images/cudaModel.png Graphic file (type png)
+
+<use images/cudaModel.png>
+Package pdftex.def Info: images/cudaModel.png used on input line 93.
+(pdftex.def)             Requested size: 200.75244pt x 200.75291pt.
  [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
-<images/activity.jpg, id=11, 352.31625pt x 605.26125pt>
+ <./images/cudaModel.png>]
+<images/activity.jpg, id=13, 352.31625pt x 605.26125pt>
 File: images/activity.jpg Graphic file (type jpg)
 
 <use images/activity.jpg>
-Package pdftex.def Info: images/activity.jpg used on input line 162.
+Package pdftex.def Info: images/activity.jpg used on input line 200.
 (pdftex.def)             Requested size: 150.56299pt x 200.75273pt.
- [2 <./images/activity.jpg>]
+ [2 <./images/activity.jpg>] [3]
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¡ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¢ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no § in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no £ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ³ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no § in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
@@ -350,19 +363,21 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3] (./paper.aux)
+[4
+
+] (./paper.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3483 strings out of 493013
- 52405 string characters out of 6139316
- 132849 words of memory out of 5000000
- 6990 multiletter control sequences out of 15000+600000
+ 3489 strings out of 493013
+ 52530 string characters out of 6139316
+ 133853 words of memory out of 5000000
+ 6995 multiletter control sequences out of 15000+600000
  40808 words of font info for 77 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 40i,7n,25p,272b,265s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 40i,7n,25p,296b,265s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-dist/fon
 ts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/publi
 c/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
@@ -372,10 +387,10 @@ t/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></
 usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-dist/fo
 nts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (3 pages, 146803 bytes).
+Output written on paper.pdf (4 pages, 217868 bytes).
 PDF statistics:
- 56 PDF objects out of 1000 (max. 8388607)
- 39 compressed objects within 1 object stream
+ 62 PDF objects out of 1000 (max. 8388607)
+ 42 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
