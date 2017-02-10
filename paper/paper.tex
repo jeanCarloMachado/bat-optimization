@@ -92,6 +92,7 @@ The basic element of work in a cuda device is a thread. That is aggrouped and
 runs in parallel with 32 other threads called the warp.
 Wraps are grouped in blocks.
 
+Streamming multiprocessors > organized in blocks of streaming processors
 
 \begin{figure}
     \begin{center}
@@ -310,6 +311,8 @@ time spent in each execution of the algorithms is described in seconds.
 %cpu
 %ROSENBROOK & 1000 & 128 & 93.2765 & 0.106094 & 12899091640 & 1.11906e+10
 
+%gpu
+%ROSENBROOK & 1000 & 768 & 138.296 & 0.654157 & 3.41412e+06 & 544668
 
 \begin{table}[!t]
     \renewcommand{\arraystretch}{1.3}
