@@ -40,6 +40,11 @@ problems but for simpler cases the CPU version might outperform GPU.
 
 With the aid of parallel computing, specially GPU computing, it's
 possible to tackle ever increasing computational problems in decreasing amounts of time.
+
+
+"...the ratio between many-core gpus and multi-core cpus for peak
+floating-point calculation throughput is about 10 to 1.  " \cite{programmingProcessors}
+
 A good way of solving complex problems, like NP one's is through the use
 of optimizaton algorithms, specially meta-heuristics. In the group of
 meta-heuristics a promising field for parallel computings is the swarm
@@ -78,7 +83,7 @@ studies the bat meta-heuristic, it's design and details. Section
 
 Compute Unified Device Architecture (CUDA) is a general purpose
 parallel computing programming model for parallel computations \cite{cudaDefinition}. CUDA
-uses a SIMD \textit{single data multiple execution} approach \cite{cuda_optimizations}, where the
+uses a SIMD \textit{single data multiple execution} approach \cite{gpuOptimization}, where the
 concurrent code executes the same instruction but with divergent data.
 
 %%how cuda is organized?
@@ -117,7 +122,7 @@ applications may speedup up to 450 times \cite{gpuOptimization}.
 Below are described some of the major concern while developing parallel algorithms  in CUDA.
 
 \begin{itemize}
-    \item When attempting to achieve an application's maximum performance, the primary concern often is managing global memory latency \cite{cuda_optimizations}. It's preferable to use local memory and shared memory instead of global since they are much faster.
+    \item When attempting to achieve an application's maximum performance, the primary concern often is managing global memory latency \cite{gpuOptimization}. It's preferable to use local memory and shared memory instead of global since they are much faster.
     \item In an ideal enviroment when the GPU starts
         working the less the messaging passing between the GPU and the CPU, the better.
     \item Decrease data interchange between the host and the GPU to the mininum.
@@ -398,13 +403,12 @@ CPU by \cite{paralellCPU}.
     T. Dao et al.,  "Parallel bat algorithm for optimizing makespan in job scheduling problems", in Springer Sience Review, 2015
 \bibitem{gpuOptimization}
     S. Ryoo et al.,  "Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA," in Center of Reliable and High-Performance Computing, University of Illinois
-\bibitem{cuda_optimizations}
-    %review
-    Optimization Principles and Application Performance Evaluation on a Multithreaded GPU using CUDA, Shane Ryoo, Critopher I Rodrigues et all
 \bibitem{newInspirations}
     Parpinelli, R.S. and Lopes, H.S. (2011) 'New inspierations in swarm intelligence: a survey', Int. J. Bio-Inspired Computation, Vol. 3, No. 1 pp.1-16
 \bibitem{firstBatGPU}
     A. R. Choudhdury, "A GPU Implementation of a Bat Algorithm Trained Neural Network," in Neural Information Processing 23rd International Conference, ICONIP 2016
+\bibitem{programmingProcessors}
+    W. W. Hwu and D. Kirk, "Programming massively parallel processors,," in Springer Verlag Gmbh, 2010
 \end{thebibliography}
 %}}}
 \end{document}
