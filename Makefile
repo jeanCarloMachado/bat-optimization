@@ -33,7 +33,7 @@ tests:
 	${CC} ${DEBUG} -c src/common.c
 	${CC} ${DEBUG} -c src/bat.c
 	${CC} ${DEBUG} -c src/unity.c
-	${CC} ${DEBUG}  common.o bat.o unity.o src/tests.c -lm -o bat_tests
+	${CC} ${DEBUG} common.o bat.o unity.o src/tests.c -lm -o bat_tests
 
 run_tests: tests
 	./bat_tests

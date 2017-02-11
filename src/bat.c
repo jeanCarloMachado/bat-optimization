@@ -14,6 +14,7 @@
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 1000
+const int LOG_OBJECTIVE_ENABLED=0;
 
 extern int bats_count;
 extern int iterations;
@@ -31,8 +32,6 @@ struct bat {
 };
 
 
-const int LOG_OBJECTIVE_ENABLED=0;
-const int LOG_ATRIBUTES_ENABLED=0;
 
 int BOUNDRY_MAX;
 int BOUNDRY_MIN;
@@ -45,7 +44,7 @@ int BOUNDRY_SCAPE_COUNT = 0;
 int BOUNDRY_COUNT = 0;
 
 double (*objective_function)(double[], int);
-void log_bat_stdout(struct bat *bat, int dimensions);
+void bat_stdout(struct bat *bat, int dimensions);
 int run_bats(void);
 void position_perturbation(struct bat *bat);
 void decrease_loudness(struct bat *bat, int iteration);
@@ -57,7 +56,7 @@ double generate_frequency();
 void update_velocity(struct bat *bat, struct bat *best);
 void force_boundry_on_vector(double vector[]);
 void force_boundry_on_value(double* value);
-void log_bat(struct bat *bat);
+void log_objective(struct bat *best, struct bat *all_bats);
 void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate);
 void initialize_function(void);
@@ -193,13 +192,9 @@ void logger(int destination, char *fmt, ...)
     vsprintf(formatted_string, fmt, argptr);
     va_end(argptr);
 
-    if (destination == LOG_OBJECTIVE) 
+    if (destination == LOG_OBJECTIVE)
         fprintf(LOG_OBJECTIVE_FILE,"%s",formatted_string);
-    else if (destination == LOG_SCALAR_ATRIBUTES)
-        fprintf(LOG_SCALAR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_VECTOR_ATRIBUTES)
-        fprintf(LOG_VECTOR_ATRIBUTES_FILE,"%s",formatted_string);
-    else if (destination == LOG_STDOUT) 
+    else if (destination == LOG_STDOUT)
         printf("%s",formatted_string);
 }
 
@@ -231,10 +226,6 @@ void deallocate_resources()
     if (LOG_OBJECTIVE_ENABLED) {
         fclose(LOG_OBJECTIVE_FILE);
     }
-    if (LOG_ATRIBUTES_ENABLED) {
-        fclose(LOG_SCALAR_ATRIBUTES_FILE);
-        fclose(LOG_VECTOR_ATRIBUTES_FILE);
-    }
 }
 
 void allocate_resources()
@@ -252,31 +243,9 @@ void allocate_resources()
         }
         printf ("Objective log: %s\n", fileName);
     }
-
-    if (LOG_ATRIBUTES_ENABLED) {
-        sprintf(fileName, "%s/%i-scalar_attr", DUMP_DIR, RUN_TIME);
-        LOG_SCALAR_ATRIBUTES_FILE = fopen(fileName,"w");
-        if (LOG_SCALAR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Scalar atributes log: %s\n", fileName);
-
-
-        sprintf(fileName, "%s/%i-vector_attr", DUMP_DIR, RUN_TIME);
-        LOG_VECTOR_ATRIBUTES_FILE = fopen(fileName,"w");
-        if (LOG_VECTOR_ATRIBUTES_FILE == NULL)
-        {
-            printf("Error opening file %s !\n", fileName);
-            exit(1);
-        }
-        printf ("Vector Atributes log: %s\n", fileName);
-
-    }
 }
 
-void log_bat_stdout(struct bat *bat, int dimensions) 
+void bat_stdout(struct bat *bat, int dimensions) 
 {
     double position_average =  0;
     for (int i = 0; i < dimensions; i++) {
@@ -325,13 +294,14 @@ void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 }
 
 
-void log_bat(struct bat *bat)
+void log_objective(struct bat *best, struct bat *all_bats)
 {
-    logger(LOG_SCALAR_ATRIBUTES, "F,PR,L: %E %E %E\n", bat->frequency, bat->pulse_rate, bat->loudness);
-
-    for (int i = 0; i < DIMENSIONS; i++) {
-        logger(LOG_VECTOR_ATRIBUTES, "%E\t%f\t%f\n", bat->velocity[i], bat->position[i], bat->fitness);
+    double average_fitness = 0;
+    for (int i =0; i< bats_count; i++) {
+        average_fitness+= all_bats[i].fitness;
     }
+    average_fitness/=bats_count;
+    logger(LOG_OBJECTIVE, "%E %E\n", best->fitness, average_fitness);
 }
 
 
@@ -531,10 +501,11 @@ int run_bats(void)
             }
         }
         get_best(bats, best);
+        //log_objective(best, bats);
     }
 
+    bat_stdout(best,DIMENSIONS);
     printf("Function %s\n", get_function_name(evaluation_function));
-    log_bat_stdout(best, DIMENSIONS);
 
     deallocate_bats(bats, best, candidate);
     deallocate_resources();

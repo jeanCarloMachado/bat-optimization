@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 [ $(ls dump/ | wc -l) -lt 1 ] && {
     echo "No dumps no reports"
     exit 0
@@ -18,33 +17,9 @@ else
     rename "$lastDumpTimestamp" 'latest' $lastDumpTimestamp-*
 fi
 
-[ $(which gnuplot) ] && {
-    [ -f latest-scalar_attr ] && {
-        echo '
-        set term png
-        set output "latest-scalar_attr.png"
-        plot "latest-scalar_attr" using 3  title "Pulse Rate" with lines,  \
-             "" using 4 title "Loudness" with lines
-        ' | gnuplot
-        [[ $(which xdg-open) ]] && {
-            xdg-open latest-scalar_attr.png
-        }
-    }
-
-    [ -f latest-objective ] && {
-        echo '
-        set term png
-        set output "latest-objective.png"
-        plot "latest-objective" using 1  title "Best" with lines, \
-        "" using 2 title "Average" with lines, \
-        "" using 3 title "Worst" with lines
-        ' | gnuplot
-        [[ $(which xdg-open) ]] && {
-            xdg-open latest-objective.png
-        }
-    }
-
-}
-
-
-exit 0
+echo '
+set term png
+set output "latest-objective.png"
+plot "latest-objective" using 1  title "Best" with lines, \
+"" using 2 title "Average" with lines
+' | gnuplot
