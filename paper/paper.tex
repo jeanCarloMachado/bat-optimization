@@ -28,11 +28,11 @@ Santa Catarina, Joinville
 The ever increasing parallel processing power of GPU's is an compelling
 reason to implement performance demanding algorithms, like optimization
 techniques, using this technology. This work aimed to develop the bat
-algorithm on GPU and benchmark it against a CPU version. A set of
+metaheuristic on GPU and benchmark it against a CPU version. A set of
 experiments where conducted in order to measure the speedup difference.
 The results suggests that the GPU version is able to achieve relevant
-speedups in highly populational problems but for simpler cases the CPU
-version might outperform the GPU.
+speedups in highly computational demanding problems but for simpler cases
+the CPU version might outperform the GPU.
 \end{abstract}
 
 \IEEEpeerreviewmaketitle
@@ -40,33 +40,36 @@ version might outperform the GPU.
 \section{Introduction} %{{{
 
 With the aid of parallel computing, specially GPU computing, it's
-possible to tackle ever increasing computational problems in decreasing amounts of time.
-And CPU's are lagging behind GPU's in many aspects.
-To give a point of contact, \cite{programmingProcessors} mentions
-that the ratio between many-core GPU's and multi-core CPU's for peak
-floating-point calculation throughput is about 10 to 1.
+possible to tackle ever increasing computational demanding problems in science
+with decreasing amounts of time. Further, CPU's are lagging behind GPU's in
+many aspects. To give a point of contact, \cite{programmingProcessors}
+mentions that the ratio between many-core GPU's and multi-core CPU's for
+peak floating-point calculation throughput is about 10 to 1.
 
-Meta-heuristics are a traditional method for solving complex problems.
-A promising meta-heuristics group for parallel computing is the swarm
-intelligence. Which encompasses many bio-inspirations like PSO, ACO, and
-the relatively novel BAT algorithm. Parpinelli \cite{newInspirations},
-when referring to swarm intelligence algorithms, define that they
-are: \begin{quote} compounded by a distributed society/population of
+A traditionally complex class of problems are those solved through
+the use of meta-heuristics. Within the group of metaheuristics a
+special group benefits specially from parallel computing are the swarm
+intelligence metaheuristics. Which encompasses many bio-inspirations
+like PSO, ACO, and the BAT algorithm. Parpinelli
+\cite{newInspirations}, when referring to swarm intelligence algorithms,
+define that they are:
+
+\begin{quote} Compounded by a distributed society/population of
 individuals where the control is also distributed among the individuals
 (there is no centralized control); and the individuals decision-making
 is stochastic and based only on local information.\end{quote}
 
-The fact that swarm intelligence algorithms have composed by
+The fact that swarm intelligence algorithms are composed by
 independent parts enables them to run in parallel. This work attempts
 to investigate the applicability of a relatively new and promising
 swarm algorithm: the BAT algorithm using the CUDA model. 
 
 Previously some demonstrations of the bat algorithm parallelized on CPU
 were presented in \cite{paralellCPUFirst} and \cite{paralellCPU}. A
-recent publication about the use of the bat optimization can be found on
+recent publication about the use of the bat optimization on GPU for the training of neural networks can be found on
 \cite{firstBatGPU}. However, til the moment of this publications
 there's no application of the bat on GPU tested against standard
-functions.
+benchmark functions.
 
 The rest of the paper is organized as following: Section \ref{cuda}
 gives a overview of CUDA and its components. Section \ref{bat}
@@ -86,49 +89,49 @@ executes the same instruction but with divergent data.
 
 %%how CUDA is organized?
 
-The basic element of work in a CUDA device is a thread. That is
-aggruped and runs in parallel with 32 other threads called the warp.
-Wraps are grouped in blocks.
+The basic element of work in a CUDA device is a thread. Groups of
+threads are organized in blocks that are themselves wrapped inside
+grids. The compute distributor of the GPU allocates this blocks in
+Streaming Multiprocessors. Inside the Streaming Multiprocessors the
+threads are preferably organized in blocks of 32, called a warp, that
+executes at the same time.
 
-Streamming multiprocessors > organized in blocks of streaming processors
-
-\begin{figure}
+\begin{figure}[H]
     \begin{center}
     \includegraphics[width=200px,height=200px]{cudaModel}
     \end{center}
     \caption{The CUDA structural organization}
+    \label{cuda-organization}
 \end{figure}
 
 %%how is CUDA execution model
 
-A CUDA program starts by allocating resources on the GPU and
-dispatching work to de done on the GPU.
-
-Once the GPU finishes it's work the GPU they are moved back from GPU
-memory to the CPU one. And the results can be returned.
+A CUDA program starts by allocating resources on the GPU (the host)
+and dispatching work to be done on the GPU (the device). Once the GPU
+finishes it's work, the results are moved back from GPU memory to the
+CPU memory. And the results can be returned or further processed.
 
 For the developer, the basic element of concern is the kernel, which is
 the function executed on the GPU. A kernel function defines the code
 to be executed by each of the massive numbers of threads to be invoked
 \cite{gpuOptimization}.
 
+Figure \ref{cuda-organization} illustrates the CUDA architecture mentioned above.
+
 %% some concerns of optimizing applications in CUDA
 \subsection{Performance concerns in CUDA}
-Since the CUDA model is complex, it's not trivial to setup an ideal configuration 
-of a problem in the GPU. However many good practises exists and great speedup is already 
+Since the CUDA model is complex, it's no trivial to setup an ideal configuration 
+of a problem in the GPU. However many good practises exists and great speedup is already
 reported.  Previous researches suggests that highly parallel
 applications may speedup up to 450 times \cite{gpuOptimization}.
 
-Below are described some of the major concern while developing parallel algorithms  in CUDA.
+Below are described some of the major concerns a developer must have
+while developing parallel algorithms in CUDA.
 
 \begin{itemize}
     \item When attempting to achieve an application's maximum performance, the primary concern often is managing global memory latency \cite{gpuOptimization}. It's preferable to use local memory and shared memory instead of global since they are much faster.
-    \item In an ideal enviroment when the GPU starts
-        working the less the messaging passing between the GPU and the CPU, the better.
-    \item Decrease data interchange between the host and the GPU to the mininum.
-    \item Prefer floats to doubles when possible. The older versions of
-    CUDA GPU's had serious bottlenets using large variables type, but
-    this is a issues disappearing
+    \item The less the messaging passing between the GPU and the CPU, the better.
+    \item In order to get optimal efficiency the division of work should be in multiples of 32 threads. The hardware will not coalesce threads from different warps \cite{cuda_internals}.
 \end{itemize}
 
 %}}}
@@ -140,6 +143,19 @@ The bat algorithm is a populational meta-heuristic introduced by Yang \cite{orig
 called echolocation, to detect prey, avoid obstacles, and locate their
 roosting crevices in the dark \cite{original}.
 
+The bat algorithm is increasingly popular and many successful problems
+where solved though it. Induja \cite{bat-usage} mentions some:
+
+\begin{itemize}
+\item Clustering
+\item Scheduling
+\item Phishing detection
+\item Document de-duplication
+\item Engine rotation tuning
+\item Image processing
+\end{itemize}
+
+
 The bat algorithm has two parameters: the pulse rate and the loudness.
 As time goes by the pulse-rate tends to increase and the loudness to
 decrease. The inspiration comes from the behavior of some bats that use
@@ -148,28 +164,11 @@ and low pitches when in persecution of one. In the bat algorithm the
 loudness is used as a way of accepting bad results (diversification) and
 pulse rate as a way of selecting local search (exploitation).
 
-As the base algorithm we used the bat as proposed by
-\cite{comparisonBatParpinelli}. Since this paper has a more detailed
+As the base algorithm for our tests we used the bat as proposed by
+Cordeiro \cite{comparisonBatParpinelli}. Since this paper has a more detailed
 implementation than the original one. The algorithm can be found in Figure \ref{cpu-pseudo}.
 
-Some distinctions of the original paper are worth noticing:
-
-The selection of new results on the original paper tends to be more
-greedy. On the original paper, for accepting new results on each
-iteration, the loudness must be greater than a aleatory number and the
-fitness of the candidate must be better than the current best.
-However on the version proposed by \cite{comparisonBatParpinelli} its used
-an \textit{OR} operator, so more candidates are accepted.
-
-The or operator tends to explore the search space better (more
-diversity). Another divergent aspect of the alternative bat is that
-it contains a distortion of a single dimension of the results, in order 
-to further increase the diversity.
-
-At last, the random algorithm used was not specified on any of the papers,
-nevertheless on our simulations the Xorshift algorithm was used.
-
-\begin{figure}
+\begin{figure}[H]
 \begin{algorithmic}[1]
 \State $Parameters:\ n,\alpha,\ \lambda$
 \State $initialize\ bats$
@@ -197,9 +196,30 @@ nevertheless on our simulations the Xorshift algorithm was used.
 \caption{Pseudo-code CPU}\label{cpu-pseudo}
 \end{figure}
 
+Although some distinctions of the original paper are worth noticing as listed below.
+
+The selection of new results on the original paper tends to be more
+greedy. On the original paper, for accepting new results on each
+iteration, the loudness must be greater than a aleatory number and the
+fitness of the candidate must be better than the current best.
+However on the version proposed by Cordeiro \cite{comparisonBatParpinelli} its used
+an \textit{OR} operator, so more candidates are accepted (line 14) \ref{cpu-pseudo}.
+The \textit{OR} operator tends to provide more diversity.
+
+Another divergent aspect of the alternative bat is that
+it contains a distortion of a single dimension of the results, in order 
+to further increase the diversity.
+
+At last, the random algorithm used was not present in neither the
+papers. Initially we used the MTGP32 algorithm. However, later was
+discovered it's not recommended to use more than 256 threads per block
+with it \cite{curandIssue}. So we opted for the XORWOR which has no
+limitations of numbers of threads per block.
+
+
 \subsection{Bat Design on GPU}
 
-\begin{figure}
+\begin{figure}[H]
     \begin{center}
     \includegraphics[width=150px,height=200px]{activity}
     \end{center}
@@ -207,23 +227,31 @@ nevertheless on our simulations the Xorshift algorithm was used.
 \end{figure}
 
 A convenient approach to model the swarm in the GPU is to use each
-thread as an individual. \cite{pso-gpu} used a similar method for a
-GPU implementation for the PSO algorithm, and he says \begin{quote}
-Each element of the particle is treated individually in the thread,
-allowing efficient data parallelism whitout risk of starvation or race
-conditions.\end{quote}
+thread as an individual in a single block. Souza \cite{pso-gpu} used a similar method for
+a GPU implementation for the PSO algorithm. And, when discussing the
+architectural trade offs of the thread as individual approach, he says:
+"allows efficient data parallelism without risk of starvation or race
+conditions".
 
-In the bat algorithm synchronization must occur on the selection of the
-best individual of the iteration. The best individual is kept in the
-threaded memory of the GPU which has a limit of 16KB, probably not feasible for
-more complex problems.
+Further, the threaded as individual approach is simple and intuitive.
+Allows efficient data sharing through shared memory, making no use of global memory.
+The message passing between the CPU and the GPU is kept to the bare minimum as well.
+In our implementation there's only the initialization of the device and
+the reply to the host with the processed data.
 
-The initial random number generator used on the GPU was the MTGP32.
-However later was discovered it's not recommended to use more than 256
-threads per block with it \cite{curandIssue}. So we moved the algorithms
-to the CUDA default XORWOR.
 
-\begin{figure}
+As a drawback of this design is the hardware limitation for working
+on a single block. In our GPU the maximum of threads per block is 768
+and the memory limit is 16KB. Nevertheless neither of this constraints
+were limitations on our simulations. While using 768 individuals in ten
+thousand iterations with a thousand dimension the memory maximum was
+never reached. Either way, it may be a problem for problems that require
+huge amounts of data.
+
+Figure \ref{gpu-pseudo} contains the bat pseudo-code with the proper changes for 
+working on the GPU.
+
+\begin{figure}[H]
 \begin{algorithmic}[1]
 \State $Parameters:\ n,\alpha,\ \lambda$
 \State $initialize\ bats\ asynchronously$
@@ -251,34 +279,18 @@ to the CUDA default XORWOR.
     \State $selects\ best\ \vec{x}_*$
 \EndWhile
 \end{algorithmic}
-\caption{Pseudo-code GPU}\label{gpu-pseudo}
+\caption{Pseudo-code GPU}
+\label{gpu-pseudo}
 \end{figure}
 
 %}}}
 
 \section{Experiments} \label{experiments}%{{{ 
 
-For accessing the performance of the algorithm a set of experiments where
-elaborated as follows.
+In order to access the performance of the algorithm a set of experiments where
+conducted for the following benchmark functions:
 
-The benchmark functions used were the following:
-\begin{itemize}
-    \item Ackley
-    \item Griewank
-    \item Rastringin
-    \item Rosenbrook
-\end{itemize}
-
-The experiments were executed on a machine with the following configuration:
-
-\textit{Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz \\ GK208 GeForce GT 720 1024 MB of vram \\ Compute capability 3.5 \\ Kepler GM10x}
-
-Each experiment was executed a total of 20 times. A total of 10 thousand
-iterations where performed in each experiment. The benchmark functions were 
-all normalized to work with 100 dimensions for each test. Table \ref{list-of-experiments} 
-details each experiment performed.
-
-\begin{table}[!htbp]
+\begin{table}[H]
     \renewcommand{\arraystretch}{1.3}
     \caption{Experiments}
     \label{list-of-experiments}
@@ -298,29 +310,34 @@ details each experiment performed.
     \end{tabular}
 \end{table}
 
+Each experiment was executed a total of 20 times. A total of 10 thousand
+iterations where performed in each experiment. The benchmark functions were 
+all normalized to work with 100 dimensions for each test. Table \ref{list-of-experiments} 
+details each experiment performed.
+
+The experiments were executed on a machine with the following
+configuration. A CPU with an Intel(R) Core(TM) i5-4460 CPU @ 3.20GHz. A
+GPU GK208 GeForce GT 720 with 1024 MB of vram and a Compute capability
+3.5 that belongs to the Kepler architecture (GM10x).
+
+
 %}}}
 
 \section{Results} \label{results}%{{{
 
-In this section are described the speedup and convergence results. 
+In this section are described the speedup and convergence results.
 
-The fitness of almost all functions presented a slight worse result
-when compared with the CPU version. Since there's no noticeable difference in the design 
-we assume that's related to the way the GPU process random numbers.
-
-Anyway the purpose of this research is to focus on the speedups so it
-seems like a reasonable trade off.
-
-The results shows that, as the bat population increases the performance
-increases as well on the GPU. The contrary is observed for the CPU.
+The fitness of almost all GPU functions presented a slight worse
+result when compared with the CPU version. Since there's no noticeable
+difference in the design we assume that's related to the way the GPU
+process random numbers. Anyway the purpose of this research is to focus
+on the speedups so it seems like a reasonable trade off.
 
 
-\begin{figure}
-    \begin{center}
-    \includegraphics[width=200px,height=200px]{objective}
-    \end{center}
-    \caption{Convergence on Rosenbrook}
-\end{figure}
+The difference in speedup with a 256 individuals population when
+comparing with the 768's population shows that as the bat population
+increases the performance increases as well on the GPU. The contrary is
+observed for the CPU.
 
 %cpu
 % function & dimensions & population & time_average & time_standard_deviation & fitness_average & fitness_standard_deviation
@@ -328,8 +345,6 @@ increases as well on the GPU. The contrary is observed for the CPU.
 % ROSENBROOK & 1000 & 128 & 93.2765 & 0.106094 & 12899091640 & 1.11906e+10
 % ROSENBROOK & 1000 & 512 & 375.774 & 0.330394 & 999 & 0
 % ROSENBROOK & 1000 & 512 & 380.667 & 6.64737 & 2.09486e+09 & 2.96258e+09
-
-
 
 %gpu
 % ROSENBROOK & 1000 & 128 & 498.714 &  & 1465.49 &
@@ -379,6 +394,17 @@ increases as well on the GPU. The contrary is observed for the CPU.
     \end{tabular}
 \end{table}
 
+Figure \ref{convergence_comparisom} demonstrates the convergence difference between
+the GPU and CPU.
+
+\begin{figure}[H]
+    \begin{center}
+    \includegraphics[width=200px,height=200px]{objective}
+    \end{center}
+    \label{convergence_comparisom}
+    \caption{Convergence curves comparison}
+\end{figure}
+
 %}}}
 
 \section{Conclusion} %{{{
@@ -386,16 +412,23 @@ increases as well on the GPU. The contrary is observed for the CPU.
 With this work it's clear that is possible to speedup the bat
 metaheuristic using GPU. Notwithstanding the best results are only
 achievable on really complex problems with many dimensions.
+
+While working with simpler problems the CPU are a much simpler approach
+and may even return better results. However when the problem is so
+complex that the time to process is the major issue, the GPU usage
+starts to shine. Swarm intelligence metaheuristics are a ideal choice to
+apply the parallel architectures due their inner decomposable characteristics.
 %}}}
 
 \section{Further works} %{{{
+
 Since the CPU version developed was single threaded it may had some
 disadvantages in speedup. The advantages of the algorithm may be tested
 against a threaded CPU implementation.
 
-As the amount of memory is limited in the threaded model. In the future
-it may be explored the usage of blocks as representation for the
-dimensions in which each bat details.
+There are hardware constraints that might limit the approach where
+proposed. In the future it may be explored the usage of blocks as
+representation for the dimensions in which each bat details.
 
 A sub-population approach may also work, considering each GPU block as
 it's boundaries, somewhat similar to the work made on parallel bat on
@@ -415,7 +448,7 @@ CPU by \cite{paralellCPU}.
     Graphics Processing Units," in Laboratório de Computação Natural
     (CESUPA)
 \bibitem{curandIssue}
-    NVIDIA.  Bit Generation with the MTGP32 generator [Online]. Aveilable: http://docs.nvidia.com/cuda/curand/device-api-overview.html
+    NVIDIA.  Bit Generation with the MTGP32 generator [Online]. Available: http://docs.nvidia.com/cuda/curand/device-api-overview.html
 \bibitem{paralellCPU}
     C. Tsai, et al. "Parallelized Bat Algorithm with a Communication Strategy," in Modern Advances in Applied Intelligence, 27th International Conference of Industrial Engineering and Other Applications of Applied Intelligent Systems, IEA/AIE 2014
 \bibitem{paralellCPUFirst}
@@ -428,6 +461,12 @@ CPU by \cite{paralellCPU}.
     A. R. Choudhdury, "A GPU Implementation of a Bat Algorithm Trained Neural Network," in Neural Information Processing 23rd International Conference, ICONIP 2016
 \bibitem{programmingProcessors}
     W. W. Hwu and D. Kirk, "Programming massively parallel processors,," in Springer Verlag Gmbh, 2010
+\bibitem{bat-usage}
+    S. Induja, "Bat Algorithm: An Overview and it's Applicaions,"
+    in International Journal of Advanced Research in Computer and Communication Engineering, 2016
+\bibitem{cuda_internals}
+    How do CUDA blocks/warps/threads map onto CUDA cores? [Online]. Available: http://docs.nvidia.com/cuda/curand/device-api-overview.html
+
 \end{thebibliography}
 %}}}
 \end{document}

@@ -5,7 +5,7 @@
 #include <string.h>
 
 extern int run_bats(void);
-int iterations = 10000;
+int iterations = 100;
 int bats_count = 768;
 int evaluation_function = ACKLEY;
 

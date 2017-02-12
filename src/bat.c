@@ -14,7 +14,7 @@
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 1000
-const int LOG_OBJECTIVE_ENABLED=0;
+const int LOG_OBJECTIVE_ENABLED=1;
 
 extern int bats_count;
 extern int iterations;
@@ -296,11 +296,7 @@ void deallocate_bats(struct bat *bats, struct bat *best, struct bat *candidate)
 
 void log_objective(struct bat *best, struct bat *all_bats)
 {
-    double average_fitness = 0;
-    for (int i =0; i< bats_count; i++) {
-        average_fitness+= all_bats[i].fitness;
-    }
-    average_fitness/=bats_count;
+    double average_fitness = fitness_average(all_bats);
     logger(LOG_OBJECTIVE, "%E %E\n", best->fitness, average_fitness);
 }
 
@@ -492,7 +488,7 @@ int run_bats(void)
 
             bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
             candidate->fitness = fabs(objective_function(candidate->position, DIMENSIONS));
-            if (my_rand(0.0,1.0) < bats[j].loudness || candidate->fitness < bats[j].fitness) {
+            if (my_rand(0.0,1.0) < bats[j].loudness && candidate->fitness < bats[j].fitness) {
                 copy_bat(candidate, &bats[j]);
                 bats[j].fitness = candidate->fitness;
                 bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
@@ -501,7 +497,9 @@ int run_bats(void)
             }
         }
         get_best(bats, best);
-        //log_objective(best, bats);
+        if (LOG_OBJECTIVE_ENABLED) {
+            log_objective(best, bats);
+        }
     }
 
     bat_stdout(best,DIMENSIONS);
