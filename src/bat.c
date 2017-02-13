@@ -14,6 +14,7 @@
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
 #define DIMENSIONS 1000
+
 const int LOG_OBJECTIVE_ENABLED=1;
 
 extern int bats_count;

@@ -9,7 +9,7 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 \begin{document}
-\title{Parallel Bat Optimization on GPU using CUDA}
+\title{Parallel Bat Optimization using CUDA}
 
 \author{\IEEEauthorblockN{Jean Carlo Machado}
 \IEEEauthorblockA{Universidade do Estado de Santa Catarina\\Master in applied computations\\
@@ -229,7 +229,7 @@ limitations of numbers of threads per block.
 A convenient approach to model the swarm in the GPU is to use each
 thread as an individual in a single block. Souza \cite{pso-gpu} used a similar method for
 a GPU implementation for the PSO algorithm. And, when discussing the
-architectural trade offs of the thread as individual approach, he says:
+architectural trade-offs of the thread as individual approach, he says:
 "allows efficient data parallelism without risk of starvation or race
 conditions".
 
@@ -331,7 +331,7 @@ The fitness of almost all GPU functions presented a slight worse
 result when compared with the CPU version. Since there's no noticeable
 difference in the design we assume that's related to the way the GPU
 process random numbers. Anyway the purpose of this research is to focus
-on the speedups so it seems like a reasonable trade off.
+on the speedups so it seems like a reasonable trade-off.
 
 
 The difference in speedup with a 256 individuals population when
