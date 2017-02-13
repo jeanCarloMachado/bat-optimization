@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  13 FEB 2017 20:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  13 FEB 2017 21:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -337,7 +337,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 File: images/objective.png Graphic file (type png)
 
 <use images/objective.png>
-Package pdftex.def Info: images/objective.png used on input line 402.
+Package pdftex.def Info: images/objective.png used on input line 401.
 (pdftex.def)             Requested size: 200.7446pt x 200.75012pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -388,7 +388,7 @@ share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dis
 t/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times
 /utmbi8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/shar
 e/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (5 pages, 224005 bytes).
+Output written on paper.pdf (5 pages, 223935 bytes).
 PDF statistics:
  67 PDF objects out of 1000 (max. 8388607)
  44 compressed objects within 1 object stream

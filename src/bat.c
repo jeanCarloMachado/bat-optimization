@@ -34,7 +34,7 @@ struct bat {
 
 
 
-int BOUNDRY_MAX;
+int boundry_max;
 int BOUNDRY_MIN;
 int FREQUENCY_MIN;
 int FREQUENCY_MAX;
@@ -201,23 +201,24 @@ void logger(int destination, char *fmt, ...)
 
 void my_seed(void)
 {
-    FIRST_SEED = time(NULL);
-    SECOND_SEED = 19;
+    /* FIRST_SEED = time(NULL); */
+    /* SECOND_SEED = 19; */
+    MT_seed();
 }
 
-uint64_t xorshift128plus(void) {
+/* unsigned int x = 548787455, y = 842502087, z = 3579807591, w = 273326509; */
 
-    uint64_t x = FIRST_SEED;
-    uint64_t const y = SECOND_SEED;
-    FIRST_SEED = y;
-    x ^= x << 23; // a
-    SECOND_SEED = x ^ y ^ (x >> 17) ^ (y >> 26); // b, c
-    return SECOND_SEED + y;
-}
+/* unsigned int XORShift() { */
+/* 	unsigned int t = x ^ (x << 11); */
+/* 	x = y; y = z; z = w; */
+/* 	return w = w ^ (w >> 19) ^ t ^ (t >> 8); */
+/* } */
 
 double my_rand(int min, int max)
 {
-    double result = (double)min + ((max - min)*(double)xorshift128plus()/(RAND_MAX+1.0));
+    double result = (double)min + ((max - min)*MT_randInt(max)/(RAND_MAX+1.0));
+
+    printf("%e %d %d\n", result, min, max);
     return result;
 }
 
@@ -270,8 +271,9 @@ void initialize_bats(struct bat *bats, struct bat *best, struct bat *candidate)
         bats[i].velocity = (double *) malloc(sizeof(double) * DIMENSIONS);
         bats[i].position = (double *) malloc(sizeof(double) * DIMENSIONS);
         for (int j = 0; j < DIMENSIONS; j++) {
-            bats[i].velocity[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
-            bats[i].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
+            bats[i].velocity[j] = my_rand(BOUNDRY_MIN, boundry_max);
+            bats[i].position[j] = my_rand(BOUNDRY_MIN, boundry_max);
+            //printf("%f %d\n",my_rand(BOUNDRY_MIN, boundry_max), boundry_max);
         }
 
         bats[i].fitness = fabs(objective_function(bats[i].position, DIMENSIONS));
@@ -305,8 +307,8 @@ void log_objective(struct bat *best, struct bat *all_bats)
 void force_boundry_on_value(double* value)
 {
     BOUNDRY_COUNT++;
-    if (*value > BOUNDRY_MAX) {
-        *value = BOUNDRY_MAX;
+    if (*value > boundry_max) {
+        *value = boundry_max;
         BOUNDRY_SCAPE_COUNT++;
         return;
     }
@@ -413,37 +415,37 @@ void initialize_function(void)
     switch(evaluation_function) {
         case SPHERE:
             BOUNDRY_MIN = 0.0;
-            BOUNDRY_MAX = 100.0;
+            boundry_max = 100.0;
             objective_function = &sphere;
             break;
         case RASTRINGIN:
             BOUNDRY_MIN = -5.12;
-            BOUNDRY_MAX = 5.12;
+            boundry_max = 5.12;
             objective_function = &rastringin;
             break;
         case GRIEWANK:
             BOUNDRY_MIN = -600.0;
-            BOUNDRY_MAX = 600.0;
+            boundry_max = 600.0;
             objective_function = &griewank;
             break;
         case ACKLEY:
             BOUNDRY_MIN = -32.0;
-            BOUNDRY_MAX = 32.0;
+            boundry_max = 32.0;
             objective_function = &ackley;
             break;
         case SHUBER:
             BOUNDRY_MIN = -100.0;
-            BOUNDRY_MAX = 100.0;
+            boundry_max = 100.0;
             objective_function = &shuber;
             break;
         case SCHWEFEL:
             BOUNDRY_MIN = -500.0;
-            BOUNDRY_MAX = 500.0;
+            boundry_max = 500.0;
             objective_function = &schwefel;
             break;
         case ROSENBROOK:
             BOUNDRY_MIN = -30.0;
-            BOUNDRY_MAX = 30.0;
+            boundry_max = 30.0;
             objective_function = &rosenbrock;
             break;
     }
@@ -462,7 +464,7 @@ int run_bats(void)
     initialize_function();
 
     FREQUENCY_MIN=BOUNDRY_MIN;
-    FREQUENCY_MAX=BOUNDRY_MAX;
+    FREQUENCY_MAX=boundry_max;
 
     my_seed();
 

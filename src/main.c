@@ -40,7 +40,6 @@ int main(int argc, char **argv)
         bats_count = atoi(sBatsCount);
     }
 
-
     char* sIterations;
     sIterations = getenv("ITERATIONS");
     if (sIterations != NULL) {

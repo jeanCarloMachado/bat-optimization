@@ -4,11 +4,11 @@ all: cpu gpu
 .PHONY: paper
 .PHONY: tests
 
-
 cpu:
 	${CC} ${DEBUG} -c src/bat.c
 	${CC} ${DEBUG} -c src/common.c
-	${CC} ${DEBUG} bat.o common.o  src/main.c -lm -o bat
+	${CC} ${DEBUG} -c src/mersenne.c
+	${CC} ${DEBUG} bat.o common.o mersenne.o src/main.c -lm -o bat
 
 run_cpu: cpu
 	./bat

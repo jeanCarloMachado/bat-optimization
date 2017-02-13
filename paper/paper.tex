@@ -333,9 +333,8 @@ difference in the design we assume that's related to the way the GPU
 process random numbers. Anyway the purpose of this research is to focus
 on the speedups so it seems like a reasonable trade-off.
 
-
-The difference in speedup with a 256 individuals population when
-comparing with the 768's population shows that as the bat population
+The difference in speedup with a 256 individuals population, when
+comparing with the 768's population, shows that as the bat population
 increases the performance increases as well on the GPU. The contrary is
 observed for the CPU.
 
@@ -426,13 +425,10 @@ Since the CPU version developed was single threaded it may had some
 disadvantages in speedup. The advantages of the algorithm may be tested
 against a threaded CPU implementation.
 
-There are hardware constraints that might limit the approach where
-proposed. In the future it may be explored the usage of blocks as
-representation for the dimensions in which each bat details.
-
-A sub-population approach may also work, considering each GPU block as
-it's boundaries, somewhat similar to the work made on parallel bat on
-CPU by \cite{paralellCPU}.
+Also, there are hardware constraints that might limit the approach
+here proposed. A sub-population approach may serve as an alternative,
+considering each GPU block as it's boundaries, somewhat similar to the
+work made on parallel bat on CPU by \cite{paralellCPU}.
 
 %}}}
 
