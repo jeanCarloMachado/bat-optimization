@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  13 FEB 2017 21:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Arch Linux) (preloaded format=pdflatex 2016.11.21)  15 FEB 2017 20:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -333,15 +333,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [2]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [3 <./images/activity.jpg>] <images/objective.png, id=26, 481.8pt x 361.35pt>
-File: images/objective.png Graphic file (type png)
-
-<use images/objective.png>
-Package pdftex.def Info: images/objective.png used on input line 401.
-(pdftex.def)             Requested size: 200.7446pt x 200.75012pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+ [3 <./images/activity.jpg>]
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¡ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
@@ -356,7 +348,7 @@ Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no § in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no £ in font ptmr7t!
- [4 <./images/objective.png>]
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -368,30 +360,28 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[5
-
-] (./paper.aux) ) 
+[4] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 3560 strings out of 493013
- 53504 string characters out of 6139316
- 131217 words of memory out of 5000000
- 7062 multiletter control sequences out of 15000+600000
+ 3556 strings out of 493013
+ 53405 string characters out of 6139316
+ 131225 words of memory out of 5000000
+ 7059 multiletter control sequences out of 15000+600000
  39672 words of font info for 76 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
  40i,7n,25p,293b,263s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
-share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dis
-t/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times
-/utmbi8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/shar
-e/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (5 pages, 223935 bytes).
+{/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/sha
+re/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></us
+r/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-d
+ist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/tim
+es/utmbi8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/sh
+are/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on paper.pdf (4 pages, 215339 bytes).
 PDF statistics:
- 67 PDF objects out of 1000 (max. 8388607)
- 44 compressed objects within 1 object stream
+ 62 PDF objects out of 1000 (max. 8388607)
+ 42 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

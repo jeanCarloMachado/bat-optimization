@@ -42,7 +42,7 @@ cases the CPU version might outperform the GPU.
 With the aid of parallel computing, specially GPU computing, it's
 possible to tackle ever increasing computational demanding problems in science
 with decreasing amounts of time. Further, CPU's are lagging behind GPU's in
-many aspects. To give a point of contact, \cite{programmingProcessors}
+many aspects. To give a point of contact, Hwu \cite{programmingProcessors}
 mentions that the ratio between many-core GPU's and multi-core CPU's for
 peak floating-point calculation throughput is about 10 to 1.
 
@@ -65,9 +65,9 @@ to investigate the applicability of a relatively new and promising
 swarm algorithm: the BAT algorithm using the CUDA model. 
 
 Previously some demonstrations of the bat algorithm parallelized on CPU
-were presented in \cite{paralellCPUFirst} and \cite{paralellCPU}. A
+were presented in Dao \cite{paralellCPUFirst} and Tsai \cite{paralellCPU}. A
 recent publication about the use of the bat optimization on GPU for the training of neural networks can be found on
-\cite{firstBatGPU}. However, til the moment of this publications
+Choudhdury \cite{firstBatGPU}. However, til the moment of this publications
 there's no application of the bat on GPU tested against standard
 benchmark functions.
 
@@ -224,6 +224,7 @@ limitations of numbers of threads per block.
     \includegraphics[width=150px,height=200px]{activity}
     \end{center}
     \caption{GPU process flow}
+    \label{processFlow}
 \end{figure}
 
 A convenient approach to model the swarm in the GPU is to use each
@@ -245,11 +246,10 @@ on a single block. In our GPU the maximum of threads per block is 768
 and the memory limit is 16KB. Nevertheless neither of this constraints
 were limitations on our simulations. While using 768 individuals in ten
 thousand iterations with a thousand dimension the memory maximum was
-never reached. Either way, it may be a problem for problems that require
-huge amounts of data.
-
-Figure \ref{gpu-pseudo} contains the bat pseudo-code with the proper changes for 
-working on the GPU.
+never reached. Either way, it may be a problem when huge amounts of data
+are required. Figure \ref{gpu-pseudo} contains the bat pseudo-code with
+the proper changes for working on the GPU. Figure \ref{processFlow}
+presents a bigger view of the architecture.
 
 \begin{figure}[H]
 \begin{algorithmic}[1]
@@ -393,16 +393,16 @@ observed for the CPU.
     \end{tabular}
 \end{table}
 
-Figure \ref{convergence_comparisom} demonstrates the convergence difference between
-the GPU and CPU.
+% Figure \ref{convergence_comparisom} demonstrates the convergence difference between
+% the GPU and CPU.
 
-\begin{figure}[H]
-    \begin{center}
-    \includegraphics[width=200px,height=200px]{objective}
-    \end{center}
-    \label{convergence_comparisom}
-    \caption{Convergence curves comparison}
-\end{figure}
+% \begin{figure}[H]
+%     \begin{center}
+%     \includegraphics[width=200px,height=200px]{objective}
+%     \end{center}
+%     \label{convergence_comparisom}
+%     \caption{Convergence curves comparison}
+% \end{figure}
 
 %}}}
 
@@ -428,7 +428,7 @@ against a threaded CPU implementation.
 Also, there are hardware constraints that might limit the approach
 here proposed. A sub-population approach may serve as an alternative,
 considering each GPU block as it's boundaries, somewhat similar to the
-work made on parallel bat on CPU by \cite{paralellCPU}.
+work made on parallel bat on CPU by Tsai \cite{paralellCPU}.
 
 %}}}
 

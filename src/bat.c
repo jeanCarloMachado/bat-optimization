@@ -214,11 +214,10 @@ void my_seed(void)
 /* 	return w = w ^ (w >> 19) ^ t ^ (t >> 8); */
 /* } */
 
-double my_rand(int min, int max)
+double my_rand( double inferior, double superior)
 {
-    double result = (double)min + ((max - min)*MT_randInt(max)/(RAND_MAX+1.0));
+  double result = (double)inferior + ((superior - inferior)*MT_randInt(RAND_MAX)/(RAND_MAX+1.0));
 
-    printf("%e %d %d\n", result, min, max);
     return result;
 }
 
