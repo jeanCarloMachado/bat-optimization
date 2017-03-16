@@ -33,7 +33,6 @@ struct bat {
 };
 
 
-
 int boundry_max;
 int BOUNDRY_MIN;
 int FREQUENCY_MIN;
@@ -205,14 +204,6 @@ void my_seed(void)
     /* SECOND_SEED = 19; */
     MT_seed();
 }
-
-/* unsigned int x = 548787455, y = 842502087, z = 3579807591, w = 273326509; */
-
-/* unsigned int XORShift() { */
-/* 	unsigned int t = x ^ (x << 11); */
-/* 	x = y; y = z; z = w; */
-/* 	return w = w ^ (w >> 19) ^ t ^ (t >> 8); */
-/* } */
 
 double my_rand( double inferior, double superior)
 {
