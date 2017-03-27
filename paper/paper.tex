@@ -4,7 +4,7 @@
 \usepackage{algpseudocode}
 \usepackage{graphicx}
 \usepackage{float}
-\graphicspath{ {images/} }
+\graphicspath{{images/}}
 \interdisplaylinepenalty=2500
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -71,8 +71,8 @@ Choudhdury \cite{firstBatGPU}. However, til the moment of this publications
 there's no application of the bat on GPU tested against standard
 benchmark functions.
 
-The rest of the paper is organized as following: Section \ref{cuda}
-gives a overview of CUDA and its components. Section \ref{bat}
+The rest of the paper is organized as following: Section `~\ref{cuda}
+gives a overview of CUDA and its components. Section `~\ref{bat}
 studies the bat meta-heuristic, it's design and details. Section
 \ref{experiments} details the experiments performed. Section
 \ref{results} analyses the results.
@@ -260,7 +260,6 @@ presents a bigger view of the architecture.
 \State $selects\ best\ \vec{x}_*$
 \While {$stop\ criteria\ false$}
     \For{$each\ thread$}
-
         \State $f_i=f_{min} + (f_{max} - f_{min})\beta, \in \beta [0,1]$
         \State $\vec{v}_i^{t+1} = \vec{v}_i^{t} + (\vec{x}_i^{t} + \vec{x}_*^{t})f_i$
         \State $\vec{x}_{temp} = \vec{x}_i^{t} + \vec{v}_i^{t+1}$
@@ -285,7 +284,7 @@ presents a bigger view of the architecture.
 
 %}}}
 
-\section{Experiments} \label{experiments}%{{{ 
+\section{Experiments} \label{experiments}%{{{
 
 In order to access the performance of the algorithm a set of experiments where
 conducted for the following benchmark functions:
