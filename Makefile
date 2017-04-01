@@ -42,4 +42,3 @@ paper:
 	cd paper ; \
 	pdflatex paper.tex ; \
 	mv paper.pdf  ../paper.pdf
-	# pdflatex -interaction=nonstopmode paper.tex ; \

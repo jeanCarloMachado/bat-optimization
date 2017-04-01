@@ -6,7 +6,7 @@
 }
 
 device=$1
-total=${TOTAL:-2}
+run_times=${RUN_TIMES:-2}
 date=$(date "+%Y-%m-%d_%H-%M-%S")
 directory="experiments/$date"_"$device"
 mkdir -p $directory
@@ -38,7 +38,7 @@ else
     make gpu
 fi
 
-for i in $(seq 1 $total); do
+for i in $(seq 1 $run_times); do
     if [ $device = "CPU" ]; then
         ./bat > $outputFile
     else
@@ -54,11 +54,11 @@ function=$(cat $all_output | grep 'Function' | head -n1 | cut -d" " -f2)
 iterations=$(cat $all_output | grep 'ITERATIONS' | head -n1 | cut -d" " -f2)
 population=$(cat $all_output | grep 'POPULATION' | head -n1 | cut -d" " -f2)
 
-time_average=$(awk "{s+=\$1} END {s/=$total; print s}" $timeFile)
-time_standard_deviation=$(awk "{s+=((\$1-$time_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $timeFile)
+time_average=$(awk "{s+=\$1} END {s/=$run_times; print s}" $timeFile)
+time_standard_deviation=$(awk "{s+=((\$1-$time_average)^2)} END {s/=($run_times-1); s=sqrt(s); print s}" $timeFile)
 
-fitness_average=$(awk "{s+=\$1} END {s/=$total; print s}" $fitnessFile)
-fitness_standard_deviation=$(awk "{s+=((\$1-$fitness_average)^2)} END {s/=($total-1); s=sqrt(s); print s}" $fitnessFile)
+fitness_average=$(awk "{s+=\$1} END {s/=$run_times; print s}" $fitnessFile)
+fitness_standard_deviation=$(awk "{s+=((\$1-$fitness_average)^2)} END {s/=($run_times-1); s=sqrt(s); print s}" $fitnessFile)
 
 dimensions=1000
 
