@@ -7,7 +7,7 @@ all: cpu gpu
 cpu:
 	${CC} ${DEBUG} -c src/bat.c
 	${CC} ${DEBUG} -c src/common.c
-	${CC} ${DEBUG} -c src/mersenne.c
+	${CC} ${DEBUG} -c src/bat/mersenne.c
 	${CC} ${DEBUG} bat.o common.o mersenne.o src/main.c -lm -o bat
 
 run_cpu: cpu
@@ -29,13 +29,14 @@ clear:
 	rm -rf dump/*
 	rm -rf *.o
 
-tests:
-	${CC} ${DEBUG} -c src/common.c
-	${CC} ${DEBUG} -c src/bat.c
+test:
+	${CC} ${DEBUG} -c src/bat/common.c
+	${CC} ${DEBUG} -c src/bat/cpu.c
+	${CC} ${DEBUG} -c src/bat/mersenne.c
 	${CC} ${DEBUG} -c src/unity.c
-	${CC} ${DEBUG} common.o bat.o unity.o src/tests.c -lm -o bat_tests
+	${CC} ${DEBUG} cpu.o common.o mersenne.o unity.o src/test_cpu.c -lm -o bat_tests
 
-run_tests: tests
+run_test: test
 	./bat_tests
 
 paper:

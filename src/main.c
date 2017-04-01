@@ -7,7 +7,7 @@
 extern int run_bats(void);
 int iterations = 100;
 int bats_count = 768;
-int evaluation_function = ACKLEY;
+int evaluation_function = 0;
 
 int main(int argc, char **argv)
 {
