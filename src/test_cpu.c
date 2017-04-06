@@ -6,15 +6,13 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include "unity.h"
-#include "bat/internal.h"
+#include "bat.h"
 
-
-int bats_count;
-int evaluation_function;
-int iterations;
 
 void setUp()
 {
+    my_seed();
+    initialize_function(SPHERE);
 }
 
 void tearDown()
@@ -26,8 +24,22 @@ void test_initialize_bat(void)
     Bat *bat;
 
     bat = bat_factory();
-    TEST_ASSERT(bat->loudness == 1);
-    TEST_ASSERT(bat->pulse_rate == 0);
+    TEST_ASSERT(bat_loudness_get(bat) == 1);
+    TEST_ASSERT(bat_pulse_rate_get(bat) == 0);
+}
+
+void test_copy_bat(void)
+{
+    Bat *bat_a;
+    Bat *bat_b;
+
+    bat_a = bat_factory();
+    bat_b = bat_factory();
+
+    TEST_ASSERT(bat_fitness_get(bat_a) != bat_fitness_get(bat_b));
+    bat_copy(bat_a, bat_b);
+
+    TEST_ASSERT(bat_fitness_get(bat_a) == bat_fitness_get(bat_b));
 }
 
 void test_schewefel(void)
@@ -46,6 +58,7 @@ int main(void) {
 
     RUN_TEST(test_schewefel);
     RUN_TEST(test_initialize_bat);
+    RUN_TEST(test_copy_bat);
 
     return UNITY_END();
 }

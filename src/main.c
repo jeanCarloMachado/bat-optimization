@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bat.h"
 #include <time.h>
 #include <string.h>
+#include "bat.h"
 
 extern int run_bats(void);
 int iterations = 100;
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     }
 
     clock_t begin = clock();
-    run_bats();
+    bat_run();
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Time took: %f\n", time_spent);

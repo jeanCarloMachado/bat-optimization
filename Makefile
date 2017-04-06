@@ -4,13 +4,21 @@ all: cpu gpu
 .PHONY: paper
 .PHONY: tests
 
-cpu:
-	${CC} ${DEBUG} -c src/bat.c
-	${CC} ${DEBUG} -c src/common.c
+test:
 	${CC} ${DEBUG} -c src/bat/mersenne.c
-	${CC} ${DEBUG} bat.o common.o mersenne.o src/main.c -lm -o bat
+	${CC} ${DEBUG} -c src/bat/common.c
+	${CC} ${DEBUG} -c src/bat/cpu.c
+	${CC} ${DEBUG} -c src/unity.c
+	${CC} ${DEBUG} cpu.o mersenne.o common.o unity.o src/test_cpu.c -lm -o bat_tests
+	./bat_tests
 
-run_cpu: cpu
+cpu:
+	${CC} ${DEBUG} -c src/bat/mersenne.c
+	${CC} ${DEBUG} -c src/bat/common.c
+	${CC} ${DEBUG} -c src/bat/cpu.c
+	${CC} ${DEBUG} cpu.o common.o mersenne.o src/main.c -lm -o bat
+
+run: cpu
 	./bat
 
 gpu:
@@ -29,15 +37,7 @@ clear:
 	rm -rf dump/*
 	rm -rf *.o
 
-test:
-	${CC} ${DEBUG} -c src/bat/common.c
-	${CC} ${DEBUG} -c src/bat/cpu.c
-	${CC} ${DEBUG} -c src/bat/mersenne.c
-	${CC} ${DEBUG} -c src/unity.c
-	${CC} ${DEBUG} cpu.o common.o mersenne.o unity.o src/test_cpu.c -lm -o bat_tests
 
-run_test: test
-	./bat_tests
 
 paper:
 	cd paper ; \
