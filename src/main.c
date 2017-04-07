@@ -18,9 +18,9 @@ int main(int argc, char **argv)
                 You may optionally pass the given variables:\
                 ITERATIONS=1000\
                 BATS_COUNT=1000\
-                FUNCTION_NUM=1\
+                EVALUATION_FUNCTION=1\
 \
-                where FUNCTION_NUM can be one of the following:\
+                where EVALUATION_FUNCTION can be one of the following:\
 \
                 0 ROSENBROOK,\
                 1 SPHERE,\
