@@ -10,16 +10,14 @@ all: cpu gpu
 .PHONY: tests
 
 test:
-	${CC} ${FLAGS} -c src/bat/mersenne.c
 	${CC} ${FLAGS} -c src/bat/cpu.c
 	${CC} ${FLAGS} -c src/unity.c
-	${CC} ${FLAGS} cpu.o mersenne.o  unity.o src/test_cpu.c -lm -o bat_tests
+	${CC} ${FLAGS} cpu.o unity.o src/test_cpu.c -lm -o bat_tests
 	./bat_tests
 
 cpu: clear
-	${CC} ${FLAGS} -c src/bat/mersenne.c
 	${CC} ${FLAGS} -c src/bat/cpu.c
-	${CC} ${FLAGS} cpu.o mersenne.o src/main.c -lm -o bat
+	${CC} ${FLAGS} cpu.o src/main.c -lm -o bat
 
 run: cpu
 	./bat
