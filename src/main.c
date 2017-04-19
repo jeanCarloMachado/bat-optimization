@@ -4,10 +4,42 @@
 #include <string.h>
 #include "bat.h"
 
-extern int run_bats(void);
+extern void bat_run(void);
 int iterations = 100;
 int bats_count = 768;
 int evaluation_function = 0;
+
+char* get_function_name(int index)
+{
+    char* str;
+    switch (index) {
+        case ROSENBROOK:
+            str = "ROSENBROOK";
+            break;
+        case SPHERE:
+            str = "SPHERE";
+            break;
+        case SCHWEFEL:
+            str = "SCHWEFEL";
+            break;
+        case ACKLEY:
+            str = "ACKLEY";
+            break;
+        case RASTRINGIN:
+            str = "RASTRINGIN";
+            break;
+        case GRIEWANK:
+            str = "GRIEWANK";
+            break;
+        case SHUBER:
+            str = "SHUBER";
+            break;
+    }
+
+    return str;
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -57,6 +89,7 @@ int main(int argc, char **argv)
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Time took: %f\n", time_spent);
+    printf("Function %s\n", get_function_name(evaluation_function));
     return 0;
 }
 
