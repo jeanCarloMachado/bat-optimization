@@ -4,7 +4,7 @@ latest*
 *.o
 *.swp
 a.out
-bat
+/bat
 bat_gpu
 *.aux
 experiments
