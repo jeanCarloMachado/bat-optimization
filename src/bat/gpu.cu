@@ -15,9 +15,9 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define DIMENSIONS 1000
 
 
+extern int dimensions;
 extern int bats_count;
 extern int evaluation_function;
 extern int iterations;
@@ -81,8 +81,8 @@ typedef struct Bat {
     double loudness;
     double fitness;
     double frequency;
-    double position[DIMENSIONS];
-    double velocity[DIMENSIONS];
+    double position[1000];
+    double velocity[1000];
 } Bat;
 
 __device__ int BOUNDRY_MAX;
@@ -193,7 +193,7 @@ __device__ void log_bat_stdout(struct Bat *bat, int dimensions)
     }
     printf("ITERATIONS: %d\n", diterations);
     printf("BATS_COUNT: %d\n", dbats_count);
-    printf("DIMENSIONS: %d\n", DIMENSIONS);
+    printf("DIMENSIONS: %d\n", dimensions);
     printf("POPULATION: %d\n", dbats_count);
     printf("Fitness E: %E\n", bat->fitness);
 }
@@ -238,9 +238,8 @@ __device__ void initialize_function(void)
             break;
     }
 }
-__global__ void local_bat_run(curandState *state, unsigned int seed, struct Bat *bats, struct Bat *candidates, int iterations, int bats_count, int evaluation_function);
 
-__global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, struct Bat *candidates, int iterations, int bats_count, int evaluation_function)
+__global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, struct Bat *candidates, int iterations, int bats_count, int evaluation_function, int dimensions)
 {
     MT_seed(time, clock);
     dbats_count = bats_count;
@@ -259,13 +258,13 @@ __global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, stru
     bats[threadIdx.x].loudness = INITIAL_LOUDNESS;
 
 
-    for (int j = 0; j < DIMENSIONS; j++) {
+    for (int j = 0; j < dimensions; j++) {
         bats[threadIdx.x].velocity[j] = 0;
         bats[threadIdx.x].position[j] = my_rand(BOUNDRY_MIN, BOUNDRY_MAX);
 
     }
 
-    bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, DIMENSIONS);
+    bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, dimensions);
 
      __syncthreads();
 
@@ -275,11 +274,11 @@ __global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, stru
     while(iteration < iterations) {
             //frequency
             double beta = my_rand(BETA_MIN, BETA_MAX);
-            beta = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
 
-            bats[threadIdx.x].frequency = beta;
+            bats[threadIdx.x].frequency = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
+
             //velocity
-            for (int i = 0; i < DIMENSIONS; ++i) {
+            for (int i = 0; i < dimensions; ++i) {
                 bats[threadIdx.x].velocity[i]+=  (bats[threadIdx.x].position[i] - best->position[i]) * bats[threadIdx.x].frequency;
 
                 if (bats[threadIdx.x].velocity[i] > BOUNDRY_MAX) {
@@ -292,7 +291,7 @@ __global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, stru
             copy_bat(&bats[threadIdx.x], &candidates[threadIdx.x]);
 
             //update position
-            for (int i = 0; i < DIMENSIONS; ++i) {
+            for (int i = 0; i < dimensions; ++i) {
                 candidates[threadIdx.x].position[i] += candidates[threadIdx.x].velocity[i];
 
                 if (candidates[threadIdx.x].position[i] > BOUNDRY_MAX) {
@@ -305,20 +304,20 @@ __global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, stru
 
             //local search
             if (my_rand(0.0, 1.0) < candidates[threadIdx.x].pulse_rate) {
-                for (int i = 0; i < DIMENSIONS; i++ ) {
+                for (int i = 0; i < dimensions; i++ ) {
                     candidates[threadIdx.x].position[i] = best->position[i] +  loudness_average * my_rand(-1.0, 1.0);
                 }
             }
 
             //position perturbation
-            int dimension = my_rand(0, DIMENSIONS);
+            int dimension = my_rand(0, dimensions);
             candidates[threadIdx.x].position[dimension] = candidates[threadIdx.x].position[dimension] * my_rand(0.0,1.0);
 
 
-            bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, DIMENSIONS);
-            candidates[threadIdx.x].fitness = objective_function(candidates[threadIdx.x].position, DIMENSIONS);
+            bats[threadIdx.x].fitness = objective_function(bats[threadIdx.x].position, dimensions);
+            candidates[threadIdx.x].fitness = objective_function(candidates[threadIdx.x].position, dimensions);
 
-            if (my_rand(0.0,1.0) < bats[threadIdx.x].loudness || candidates[threadIdx.x].fitness < bats[threadIdx.x].fitness) {
+            if (my_rand(0.0,1.0) < bats[threadIdx.x].loudness && candidates[threadIdx.x].fitness < bats[threadIdx.x].fitness) {
                 copy_bat(&candidates[threadIdx.x], &bats[threadIdx.x]);
                 bats[threadIdx.x].pulse_rate = 1 - exp(-LAMBDA*iteration);
                 bats[threadIdx.x].loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
@@ -333,7 +332,7 @@ __global__ void local_bat_run(time_t time, clock_t clock, struct Bat *bats, stru
     }
 
     if (threadIdx.x == 0) {
-        log_bat_stdout(best, DIMENSIONS);
+        log_bat_stdout(best, dimensions);
     }
 
     __syncthreads();
@@ -351,7 +350,7 @@ void bat_run(void)
     curandState *deviceStates;
     CUDA_CALL(cudaMalloc, (void **)&deviceStates, bats_count *sizeof(curandState));
 
-    local_bat_run<<<1,bats_count>>>(time(NULL), clock(), bats, candidates, iterations, bats_count, evaluation_function);
+    local_bat_run<<<1,bats_count>>>(time(NULL), clock(), bats, candidates, iterations, bats_count, evaluation_function, dimensions);
 
     CUDA_CALL(cudaDeviceSynchronize);
     CUDA_CALL(cudaFree, bats);

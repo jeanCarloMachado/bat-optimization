@@ -6,6 +6,7 @@
 
 extern void bat_run(void);
 int iterations = 100;
+int dimensions = 1000;
 int bats_count = 768;
 int evaluation_function = 0;
 

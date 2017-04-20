@@ -15,7 +15,6 @@
 #define BETA_MAX 1.0
 #define BETA_MIN 0.0
 #define INITIAL_LOUDNESS 1.0
-#define DIMENSIONS 1000
 #define DUMP_DIR "./dump"
 
 typedef struct Bat {
@@ -51,6 +50,7 @@ double MT_randExc(const double  *n );
 const int LOG_OBJECTIVE_ENABLED=1;
 
 extern int bats_count;
+extern int dimensions;
 extern int iterations;
 extern int evaluation_function;
 void logger(int destination, char *fmt, ...);
@@ -72,7 +72,6 @@ double fitness_average(struct Bat bats[]);
 double calc_loudness_average(struct Bat *bats);
 void local_search(struct Bat *bat, struct Bat *best, double loudness_average);
 void update_position(struct Bat *bat);
-double generate_frequency();
 void update_velocity(struct Bat *bat, struct Bat *best);
 void force_boundry_on_vector(double vector[]);
 void force_boundry_on_value(double* value);
@@ -233,7 +232,7 @@ void bat_stdout(struct Bat *bat, int dimensions)
     position_average/=dimensions;
     printf("ITERATIONS: %d\n", iterations);
     printf("BATS_COUNT: %d\n", bats_count);
-    printf("DIMENSIONS: %d\n", DIMENSIONS);
+    printf("DIMENSIONS: %d\n", dimensions);
     printf("POPULATION: %d\n", bats_count);
     logger(LOG_STDOUT, "Fitness E: %E\n", bat->fitness);
 }
@@ -245,15 +244,15 @@ struct Bat* bat_factory()
 
     bat->loudness = INITIAL_LOUDNESS;
 
+    bat->velocity = (double *) malloc(sizeof(bat->position) * dimensions);
+    bat->position = (double *) malloc(sizeof(bat->position) * dimensions);
 
-    bat->velocity = (double *) malloc(sizeof(double) * DIMENSIONS);
-    bat->position = (double *) malloc(sizeof(double) * DIMENSIONS);
-    for (int j = 0; j < DIMENSIONS; j++) {
+    for (int j = 0; j < dimensions; j++) {
         bat->velocity[j] = my_rand(BOUNDRY_MIN, boundry_max);
         bat->position[j] = my_rand(BOUNDRY_MIN, boundry_max);
     }
 
-    bat->fitness = fabs(objective_function(bat->position, DIMENSIONS));
+    bat->fitness = fabs(objective_function(bat->position, dimensions));
 
     return bat;
 }
@@ -282,28 +281,22 @@ void force_boundry_on_value(double* value)
 
 void force_boundry_on_vector(double vector[])
 {
-    for (int i = 0; i < DIMENSIONS; i++ ) {
+    for (int i = 0; i < dimensions; i++ ) {
         force_boundry_on_value(&vector[i]);
     }
 }
 
 void update_velocity(struct Bat *bat, struct Bat *best)
 {
-    for (int i = 0; i < DIMENSIONS; ++i) {
+    for (int i = 0; i < dimensions; ++i) {
         bat->velocity[i]+= (bat->position[i] - best->position[i]) * bat->frequency;
         force_boundry_on_value(&bat->velocity[i]);
     }
 }
 
-double generate_frequency()
-{
-    double beta = my_rand(BETA_MIN, BETA_MAX);
-    return FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
-}
-
 void update_position(struct Bat *bat)
 {
-    for (int i = 0; i < DIMENSIONS; ++i) {
+    for (int i = 0; i < dimensions; ++i) {
         bat->position[i] += bat->velocity[i];
 
         force_boundry_on_value(&bat->position[i]);
@@ -312,7 +305,7 @@ void update_position(struct Bat *bat)
 
 void local_search(struct Bat *bat, struct Bat *best, double loudness_average)
 {
-    for (int i = 0; i < DIMENSIONS; i++ ) {
+    for (int i = 0; i < dimensions; i++ ) {
         bat->position[i] = best->position[i] + loudness_average * my_rand(-1.0, 1.0);
     }
 }
@@ -340,17 +333,6 @@ double fitness_average(struct Bat bats[])
     return result / bats_count;
 }
 
-void decrease_loudness(struct Bat *bat, int iteration)
-{
-    bat->loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
-}
-
-void position_perturbation(struct Bat *bat)
-{
-    int dimension = my_rand(0, DIMENSIONS-1);
-    //bat->position[dimension] = bat->position[dimension] * my_rand(0.0,1.0);
-    force_boundry_on_vector(bat->position); 
-}
 
 double bat_loudness_get(struct Bat *bat)
 {
@@ -463,7 +445,10 @@ void bat_run(void)
 
     for (int iteration = 0; iteration < iterations ; ++iteration) {
         for (int j = 0; j < bats_count; ++j) {
-            bats[j].frequency = generate_frequency();
+
+            double beta = my_rand(BETA_MIN, BETA_MAX);
+            bats[j].frequency = FREQUENCY_MIN + (FREQUENCY_MAX - FREQUENCY_MIN) * beta;
+
             update_velocity(&bats[j], best);
             bat_copy(&bats[j], candidate);
 
@@ -473,16 +458,18 @@ void bat_run(void)
                 local_search(candidate, best, calc_loudness_average(bats));
             }
 
-            position_perturbation(candidate);
+            int dimension = my_rand(0, dimensions-1);
+            //bat->position[dimension] = bat->position[dimension] * my_rand(0.0,1.0);
+            force_boundry_on_vector(candidate->position);
 
-            bats[j].fitness = fabs(objective_function(bats[j].position, DIMENSIONS));
-            candidate->fitness = fabs(objective_function(candidate->position, DIMENSIONS));
+            bats[j].fitness = fabs(objective_function(bats[j].position, dimensions));
+            candidate->fitness = fabs(objective_function(candidate->position, dimensions));
             if (my_rand(0.0,1.0) < bats[j].loudness && candidate->fitness < bats[j].fitness) {
                 bat_copy(candidate, &bats[j]);
                 bats[j].fitness = candidate->fitness;
                 bats[j].pulse_rate = 1 - exp(-LAMBDA*iteration);
 
-                decrease_loudness(&bats[j], iteration);
+                bats[j].loudness = INITIAL_LOUDNESS*pow(ALFA, iteration);
             }
         }
         get_best(bats, best);
@@ -491,7 +478,7 @@ void bat_run(void)
         }
     }
 
-    bat_stdout(best,DIMENSIONS);
+    bat_stdout(best,dimensions);
 
     if (LOG_OBJECTIVE_ENABLED) {
         fclose(LOG_OBJECTIVE_FILE);
